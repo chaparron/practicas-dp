@@ -1,0 +1,226 @@
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  EnvironmentStackName:
+    Type: String
+    AllowedValues: [ qa, prod ]
+Mappings:
+  Config:
+    qa:
+      JpmcAesEncryptionKey: "5EC4A697141C8CE45509EF485EE7D4B1"
+      JpmcSha256HashKey: "E59CD2BF6F4D86B5FB3897A680E0DD3E"
+      JpmcPassCode: "ETKT4295"
+      JpmcBankId: "001002"
+      JpmcTerminalId: "10010186"
+      JpmcMerchantId: "100000000010588"
+      JpmcMcc: "5999"
+      JpmcCurrency: "356"
+      JpmcReturnUrlId: "https://webhook.site/537c1b38-f705-4886-8b51-d49ef04b1c76"
+    prod:
+      JpmcAesEncryptionKey: "5EC4A697141C8CE45509EF485EE7D4B1"
+      JpmcSha256HashKey: "E59CD2BF6F4D86B5FB3897A680E0DD3E"
+      JpmcPassCode: "ETKT4295"
+      JpmcBankId: "001002"
+      JpmcTerminalId: "10010186"
+      JpmcMerchantId: "100000000010588"
+      JpmcMcc: "5999"
+      JpmcCurrency: "356"
+      JpmcReturnUrlId: "https://webhook.site/537c1b38-f705-4886-8b51-d49ef04b1c76"
+Globals:
+  Function:
+    Runtime: "java11"
+    Timeout: 40
+    MemorySize: 512
+    AutoPublishAlias: live
+    Layers:
+      - !Sub "arn:aws:lambda:${AWS::Region}:451483290750:layer:NewRelicLambdaExtension:23"
+    Environment:
+      Variables:
+        PROFILE: LIVE
+        REGION: !Ref "AWS::Region"
+        ACCOUNT_ID: !Ref "AWS::AccountId"
+        LOGGING_LEVEL: ERROR
+        API_CALL_ATTEMPT_TIMEOUT_IN_MS: 10000
+        API_CALL_TIMEOUT_IN_S: 30
+        NEW_RELIC_ACCOUNT_ID: 902679
+        NEW_RELIC_PRIMARY_APPLICATION_ID: 902679
+        NEW_RELIC_TRUSTED_ACCOUNT_KEY: 902679
+        NEW_RELIC_EXTENSION_SEND_FUNCTION_LOGS: true
+        NEW_RELIC_DEBUG: true
+        NEW_RELIC_LAMBDA_EXTENSION_ENABLED: !FindInMap [ Config, !Ref EnvironmentStackName, NewRelicLambdaExtensionEnabled ]
+        FORCE_UPDATE: 1
+
+    DeploymentPreference:
+      Type: AllAtOnce
+    VpcConfig:
+      SecurityGroupIds:
+        - !Sub '{{resolve:ssm:/foundation/${EnvironmentStackName}/beanstalk/security_groups:1}}'
+      SubnetIds:
+        !Split [ ",", !FindInMap [ Config, !Ref EnvironmentStackName, SubnetsStr ] ]
+
+Resources:
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+                - "dynamodb.amazonaws.com"
+                - "sns.amazonaws.com"
+                - "sqs.amazonaws.com"
+                - "secretsmanager.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+        - "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+        - "arn:aws:iam::aws:policy/AmazonSNSFullAccess"
+        - "arn:aws:iam::aws:policy/AmazonSQSFullAccess"
+        - "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+        - 'arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess'
+
+  DummyApi:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: "api"
+      Handler: "adapters.rest.DummyApiGateway"
+      Role: !GetAtt LambdaExecutionRole.Arn
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrentExecutions: !FindInMap [ Config, !Ref EnvironmentStackName, ProvisionedExecutionsApiGatewayMinCapacity ]
+      ReservedConcurrentExecutions: !FindInMap [ Config, !Ref EnvironmentStackName, ReservedExecutionsApiGateway ]
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Method: any
+            Path: /{proxy+}
+            RestApiId:
+              Ref: DummyApiGateway
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:NEW_RELIC_LICENSE_KEY*"
+
+  DummyApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub "${EnvironmentStackName}-digital-payments-dummy-gateway"
+      StageName: !Ref EnvironmentStackName
+
+  ApiGatewayHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: "api"
+      Handler: "adapters.rest.JpmcApiGateway"
+      Tracing: Active
+      Role: !GetAtt LambdaExecutionRole.Arn
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrentExecutions: !FindInMap [ Config, !Ref EnvironmentStackName, ProvisionedExecutionsApiGatewayMinCapacity ]
+      ReservedConcurrentExecutions: !FindInMap [ Config, !Ref EnvironmentStackName, ReservedExecutionsApiGateway ]
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Method: any
+            Path: /{proxy+}
+            RestApiId:
+              Ref: ApiGatewayApi
+      Environment:
+        Variables:
+          PAYMENTS_ROOT:
+            Fn::ImportValue:
+              !Sub "${EnvironmentStackName}-payments-ApiRootURL"
+          API_ROOT:
+            Fn::ImportValue:
+              !Sub "${EnvironmentStackName}-api-ApiRootURL"
+          JPMC_AES_ENCRYPTION_KEY: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcAesEncryptionKey ]
+          JPMC_SHAE256_HASH_KEY: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcSha256HashKey ]
+          JPMC_PASS_CODE: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcPassCode ]
+          JPMC_BANK_ID: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcBankId ]
+          JPMC_TERMINAL_ID: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcTerminalId ]
+          JPMC_MERCHANT_ID: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcMerchantId ]
+          JPMC_MCC: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcMcc ]
+          JPMC_CURRENCY: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcCurrency ]
+          JPMC_RETURN_URL_ID: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcReturnUrlId ]
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:NEW_RELIC_LICENSE_KEY*"
+
+            Fn::ImportValue:
+              !Sub "${EnvironmentStackName}-RejectedInvoiceTopicArn"
+
+  ApiGatewayHandlerScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MinCapacity: !FindInMap [ Config, !Ref EnvironmentStackName, ProvisionedExecutionsApiGatewayMinCapacity ]
+      MaxCapacity: !FindInMap [ Config, !Ref EnvironmentStackName, ProvisionedExecutionsApiGatewayMaxCapacity ]
+      ResourceId: !Sub function:${ApiGatewayHandler}:live
+      RoleARN: !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/lambda.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_LambdaConcurrency
+      ScalableDimension: lambda:function:ProvisionedConcurrency
+      ServiceNamespace: lambda
+    DependsOn: ApiGatewayHandlerAliaslive
+
+  ApiGatewayHandlerScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: utilization
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref ApiGatewayHandlerScalableTarget
+      TargetTrackingScalingPolicyConfiguration:
+        TargetValue: 0.1
+        PredefinedMetricSpecification:
+          PredefinedMetricType: LambdaProvisionedConcurrencyUtilization
+
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref EnvironmentStackName
+      Auth:
+        DefaultAuthorizer: W2BTokenAuthorizer
+        Authorizers:
+          W2BTokenAuthorizer:
+            FunctionArn:
+              Fn::ImportValue: !Sub "AuthorizerHandlerArn"
+            FunctionPayloadType: REQUEST
+            AuthorizerPayloadFormatVersion: 2.0
+            Identity:
+              Headers:
+                - Authorization
+
+  SupermoneyHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: "api"
+      Handler: "adapters.rest.WebhookApiGateway"
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Method: any
+            Path: /{proxy+}
+            RestApiId:
+              Ref: WebhookApiGateway
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:NEW_RELIC_LICENSE_KEY*"
+
+  WebhookApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub "${EnvironmentStackName}-wabi2b-digital-payments-webhooks"
+      StageName: !Ref EnvironmentStackName
+      Domain:
+        CertificateArn:
+          Fn::ImportValue: !Sub "Wabi2bCertificate"
+        DomainName: !Sub "${EnvironmentStackName}-digital-payments-webhook.wabi2b.com"
+
+Outputs:
+  ApiRootURL:
+    Export:
+      Name: !Sub "${EnvironmentStackName}-digital-payments-ApiRootURL"
+    Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/${EnvironmentStackName}/"
