@@ -7,25 +7,29 @@ Parameters:
 Mappings:
   Config:
     qa:
-      JpmcAesEncryptionKey: "5EC4A697141C8CE45509EF485EE7D4B1"
-      JpmcSha256HashKey: "E59CD2BF6F4D86B5FB3897A680E0DD3E"
-      JpmcPassCode: "ETKT4295"
-      JpmcBankId: "001002"
-      JpmcTerminalId: "10010186"
-      JpmcMerchantId: "100000000010588"
-      JpmcMcc: "5999"
-      JpmcCurrency: "356"
-      JpmcReturnUrlId: "https://webhook.site/537c1b38-f705-4886-8b51-d49ef04b1c76"
+      SubnetsStr: "subnet-01878f0d35f9729f5,subnet-09f271fab57fee96c,subnet-04d617a5c5e9fdc4c"
+      SupermoneyApiUrl: "https://uat.mintwalk.com"
+      SupermoneySecret: "qa/supermoney"
+      EnableSuperMoneyEncryption: "false"
+      EnableFakeSuperMoneyBalance: "false"
+      EnableFakeSuperMoneyPayment: "false"
+      ProvisionedExecutionsApiGatewayMinCapacity: 2
+      ProvisionedExecutionsApiGatewayMaxCapacity: 10
+      ReservedExecutionsApiGateway: 15
+      ClientSecret: "qa/bnpl-credits"
+      NewRelicLambdaExtensionEnabled: false
     prod:
-      JpmcAesEncryptionKey: "5EC4A697141C8CE45509EF485EE7D4B1"
-      JpmcSha256HashKey: "E59CD2BF6F4D86B5FB3897A680E0DD3E"
-      JpmcPassCode: "ETKT4295"
-      JpmcBankId: "001002"
-      JpmcTerminalId: "10010186"
-      JpmcMerchantId: "100000000010588"
-      JpmcMcc: "5999"
-      JpmcCurrency: "356"
-      JpmcReturnUrlId: "https://webhook.site/537c1b38-f705-4886-8b51-d49ef04b1c76"
+      SubnetsStr: "subnet-02892d9b9c9f13256,subnet-0d2c43077cc4fb646,subnet-0a31d7dcc515f14cb"
+      SupermoneyApiUrl: "https://uat.mintwalk.com"
+      SupermoneySecret: "prod/supermoney"
+      EnableSuperMoneyEncryption: "true"
+      EnableFakeSuperMoneyBalance: "true"
+      EnableFakeSuperMoneyPayment: "true"
+      ProvisionedExecutionsApiGatewayMinCapacity: 2
+      ProvisionedExecutionsApiGatewayMaxCapacity: 10
+      ReservedExecutionsApiGateway: 15
+      ClientSecret: "prod/bnpl-credits"
+      NewRelicLambdaExtensionEnabled: true
 Globals:
   Function:
     Runtime: "java11"
@@ -84,11 +88,38 @@ Resources:
         - "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
         - 'arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess'
 
+  DummyApi:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: "api"
+      Handler: "adapters.rest.DummyApiGateway"
+      Role: !GetAtt LambdaExecutionRole.Arn
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrentExecutions: !FindInMap [ Config, !Ref EnvironmentStackName, ProvisionedExecutionsApiGatewayMinCapacity ]
+      ReservedConcurrentExecutions: !FindInMap [ Config, !Ref EnvironmentStackName, ReservedExecutionsApiGateway ]
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Method: any
+            Path: /{proxy+}
+            RestApiId:
+              Ref: DummyApiGateway
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:NEW_RELIC_LICENSE_KEY*"
+
+  DummyApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub "${EnvironmentStackName}-bnpl-credits-dummy-gateway"
+      StageName: !Ref EnvironmentStackName
+
   ApiGatewayHandler:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: "api"
-      Handler: "adapters.rest.JpmcApiGateway"
+      Handler: "adapters.rest.BnPlApiGateway"
       Tracing: Active
       Role: !GetAtt LambdaExecutionRole.Arn
       ProvisionedConcurrencyConfig:
@@ -110,15 +141,26 @@ Resources:
           API_ROOT:
             Fn::ImportValue:
               !Sub "${EnvironmentStackName}-api-ApiRootURL"
-          JPMC_AES_ENCRYPTION_KEY: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcAesEncryptionKey ]
-          JPMC_SHAE256_HASH_KEY: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcSha256HashKey ]
-          JPMC_PASS_CODE: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcPassCode ]
-          JPMC_BANK_ID: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcBankId ]
-          JPMC_TERMINAL_ID: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcTerminalId ]
-          JPMC_MERCHANT_ID: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcMerchantId ]
-          JPMC_MCC: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcMcc ]
-          JPMC_CURRENCY: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcCurrency ]
-          JPMC_RETURN_URL_ID: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcReturnUrlId ]
+          PAYMENT_TABLE: !Ref BnplCreditTable
+          SUPERMONEY_API_URI: !FindInMap [ Config, !Ref EnvironmentStackName, SupermoneyApiUrl ]
+          SUPERMONEY_ENABLE_ENCRYPTION: !FindInMap [ Config, !Ref EnvironmentStackName, EnableSuperMoneyEncryption ]
+          SUPERMONEY_API_USER: !Sub
+            - '{{resolve:secretsmanager:${secretId}:SecretString:username}}'
+            - secretId: !FindInMap [ Config, !Ref EnvironmentStackName, SupermoneySecret ]
+          SUPERMONEY_API_SECRET: !Sub
+            - '{{resolve:secretsmanager:${secretId}:SecretString:password}}'
+            - secretId: !FindInMap [ Config, !Ref EnvironmentStackName, SupermoneySecret ]
+          SUPERMONEY_AES_ENCRYPTION_KEY: !Sub
+            - '{{resolve:secretsmanager:${secretId}:SecretString:encryptionKey}}'
+            - secretId: !FindInMap [ Config, !Ref EnvironmentStackName, SupermoneySecret ]
+          CLIENT_ID: !Sub
+            - '{{resolve:secretsmanager:${secretId}:SecretString:client}}'
+            - secretId: !FindInMap [ Config, !Ref EnvironmentStackName, ClientSecret ]
+          CLIENT_PASSWORD: !Sub
+            - '{{resolve:secretsmanager:${secretId}:SecretString:password}}'
+            - secretId: !FindInMap [ Config, !Ref EnvironmentStackName, ClientSecret ]
+          FAKE_SUPERMONEY_BALANCE: !FindInMap [ Config, !Ref EnvironmentStackName, EnableFakeSuperMoneyBalance ]
+          FAKE_SUPERMONEY_PAYMENT: !FindInMap [ Config, !Ref EnvironmentStackName, EnableFakeSuperMoneyPayment ]
       Policies:
         - AWSSecretsManagerGetSecretValuePolicy:
             SecretArn: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:NEW_RELIC_LICENSE_KEY*"
@@ -164,8 +206,53 @@ Resources:
               Headers:
                 - Authorization
 
+  SupermoneyHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: "api"
+      Handler: "adapters.rest.WebhookApiGateway"
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Method: any
+            Path: /{proxy+}
+            RestApiId:
+              Ref: WebhookApiGateway
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:NEW_RELIC_LICENSE_KEY*"
+
+  WebhookApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub "${EnvironmentStackName}-wabi2b-bnpl-credits-webhooks"
+      StageName: !Ref EnvironmentStackName
+      Domain:
+        CertificateArn:
+          Fn::ImportValue: !Sub "Wabi2bCertificate"
+        DomainName: !Sub "${EnvironmentStackName}-bnpl-credits-webhook.wabi2b.com"
+
+  BnplCreditTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      KeySchema:
+        - AttributeName: "PK"
+          KeyType: "HASH"
+        - AttributeName: "SK"
+          KeyType: "RANGE"
+      AttributeDefinitions:
+        - AttributeName: "PK"
+          AttributeType: "S"
+        - AttributeName: "SK"
+          AttributeType: "S"
+      BillingMode: "PAY_PER_REQUEST"
+
 Outputs:
   ApiRootURL:
     Export:
-      Name: !Sub "${EnvironmentStackName}-digital-payments-ApiRootURL"
+      Name: !Sub "${EnvironmentStackName}-bnpl-credits-ApiRootURL"
     Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/${EnvironmentStackName}/"
