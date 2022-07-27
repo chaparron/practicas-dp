@@ -38,7 +38,7 @@ enum class EnvironmentVariable {
                     .split(LIST_DELIMITER)
                     .filter { it.isNotEmpty() }
                     .map { it.uppercase() },
-                enabled = STATE_VALIDATION_ENABLED.get().toBoolean()
+                enabled = JPMC_STATE_VALIDATION_ENABLED.get().toBoolean()
             )
     }
 
