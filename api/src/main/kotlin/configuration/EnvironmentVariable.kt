@@ -1,6 +1,7 @@
 package configuration
 
 enum class EnvironmentVariable {
+    BANK_ACCOUNT_TABLE,
     JPMC_AES_ENCRYPTION_KEY,
     JPMC_SHAE256_HASH_KEY,
     JPMC_PASS_CODE,

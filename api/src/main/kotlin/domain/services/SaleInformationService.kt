@@ -6,14 +6,19 @@ import com.wabi2b.jpmc.sdk.usecase.sale.SaleService
 import org.slf4j.LoggerFactory
 import java.util.*
 
+interface ISaleInformationService {
+    //TODO Se debe crear un objeto de dominio propio y no usar el del SDK.
+    fun getSaleInformation(amount: String): SaleInformation
+}
+
 class SaleInformationService(
     private val saleServiceSdk: SaleService
-) {
+) : ISaleInformationService {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
     //TODO Se debe crear un objeto de dominio propio y no usar el del SDK.
-    fun getSaleInformation(amount: String): SaleInformation {
+    override fun getSaleInformation(amount: String): SaleInformation {
         logger.trace("Starting getSaleInformation")
 
         //TODO ver como  se meten todas estas properties por variables de entorno / secrets

@@ -5,7 +5,7 @@ import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import domain.model.errors.JpmcErrorReason
-import domain.services.SaleInformationService
+import domain.services.ISaleInformationService
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
@@ -13,7 +13,7 @@ import wabi.rest2lambda.RestHandler
 import wabi.rest2lambda.ok
 
 class JpmcSaleInformationHandler(
-    private val service: SaleInformationService,
+    private val service: ISaleInformationService,
     private val jsonMapper: Json,
     private val securityCheck: ((APIGatewayProxyRequestEvent, String?) -> Unit)? = null
 ) : RestHandler {

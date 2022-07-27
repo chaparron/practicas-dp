@@ -2,14 +2,16 @@ package configuration
 
 import adapters.rest.validations.Security
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
-import domain.services.SaleInformationService
+import domain.functions.BankAccountListenerFunction
+import domain.services.ISaleInformationService
 import kotlinx.serialization.json.Json
 import org.mockito.kotlin.mock
 
 class TestConfiguration(
     override val jsonMapper: Json = MainConfiguration.jsonMapper,
     val authorizerWrapper: Security.AuthorizerWrapper = mock(),
-    override val saleInformationService: SaleInformationService = mock(),
+    override val saleInformationService: ISaleInformationService = mock(),
+    override val bankAccountListenerFunction: BankAccountListenerFunction = BankAccountListenerFunction(jsonMapper, mock()),
 
     ) : Configuration {
 
