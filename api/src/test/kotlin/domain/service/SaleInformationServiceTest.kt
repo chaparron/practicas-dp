@@ -2,39 +2,36 @@ package domain.service
 
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleInformation
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleService
+import configuration.EnvironmentVariable
 import domain.services.SaleInformationService
-import io.mockk.MockKAnnotations
-import io.mockk.every
-import io.mockk.impl.annotations.InjectMockKs
-import io.mockk.impl.annotations.MockK
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.InjectMocks
+import org.mockito.Mock
+import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.any
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 
-//@ExtendWith(MockitoExtension::class)
+@ExtendWith(MockitoExtension::class)
 class SaleInformationServiceTest {
 
-    @MockK
+    @Mock
     private lateinit var saleServiceSdk: SaleService
 
-    @InjectMockKs
-    private lateinit var sut: SaleInformationService
+    @Mock
+    private lateinit var configuration: EnvironmentVariable.JpmcConfiguration
 
-    @BeforeEach
-    fun setup() {
-        MockKAnnotations.init(this, relaxUnitFun = true)
-    }
+    @InjectMocks
+    private lateinit var sut: SaleInformationService
 
     @Test
     fun `given a valid request when getSaleInformation then return valid information`() {
-        val saleInformation = SaleInformation(
-            bankId = "001002",
-            merchantId = "100000000010588",
-            terminalId = "10010186",
-            encData = "0123456789abcdefgh"
-        )
-        every { saleServiceSdk.getSaleInformation(any()) }.returns(saleInformation)
+        val saleInformation = anySaleInformation()
+        whenever(saleServiceSdk.getSaleInformation(any())).thenReturn(saleInformation)
+        wheneverForConfigurations()
 
         val response = sut.getSaleInformation("2995")
 
@@ -45,6 +42,38 @@ class SaleInformationServiceTest {
             { assertEquals(saleInformation.terminalId, response.terminalId) },
             { assertEquals(saleInformation.encData, response.encData) },
         )
+
+        verify(saleServiceSdk).getSaleInformation(any())
+        verifyForConfigurations()
     }
 
+
+    private fun anySaleInformation() = SaleInformation(
+        bankId = "001002",
+        merchantId = "100000000010588",
+        terminalId = "10010186",
+        encData = "0123456789abcdefgh"
+    )
+
+    private fun wheneverForConfigurations() {
+        whenever(configuration.version).thenReturn("")
+        whenever(configuration.passCode).thenReturn("")
+        whenever(configuration.bankId).thenReturn("")
+        whenever(configuration.terminalId).thenReturn("")
+        whenever(configuration.merchantId).thenReturn("")
+        whenever(configuration.mcc).thenReturn("")
+        whenever(configuration.currency).thenReturn("")
+        whenever(configuration.returnUrl).thenReturn("")
+    }
+
+    private fun verifyForConfigurations() {
+        verify(configuration).bankId
+        verify(configuration).terminalId
+        verify(configuration).version
+        verify(configuration).passCode
+        verify(configuration).merchantId
+        verify(configuration).mcc
+        verify(configuration).currency
+        verify(configuration).returnUrl
+    }
 }

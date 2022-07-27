@@ -1,43 +1,44 @@
 package domain.services
 
-import com.wabi2b.jpmc.sdk.usecase.sale.SaleInformation
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleRequest
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleService
-import org.slf4j.LoggerFactory
+import configuration.EnvironmentVariable.JpmcConfiguration
+import domain.model.SaleInformation
+import domain.model.errors.FunctionalityNotAvailable
 import java.util.*
 
-interface ISaleInformationService {
-    //TODO Se debe crear un objeto de dominio propio y no usar el del SDK.
-    fun getSaleInformation(amount: String): SaleInformation
-}
-
 class SaleInformationService(
-    private val saleServiceSdk: SaleService
-) : ISaleInformationService {
-
-    private val logger = LoggerFactory.getLogger(javaClass)
-
-    //TODO Se debe crear un objeto de dominio propio y no usar el del SDK.
-    override fun getSaleInformation(amount: String): SaleInformation {
-        logger.trace("Starting getSaleInformation")
-
-        //TODO ver como  se meten todas estas properties por variables de entorno / secrets
-        val request = SaleRequest(
-            version = "1",
-            txnRefNo = UUID.randomUUID().toString(),
-            amount = amount,
-            passCode = "ETKT4295",
-            bankId = "001002",
-            terminalId = "10010186",
-            merchantId = "100000000010588",
-            mCC = "5999",
-            currency = "356",
-            txnType = "Pay",
-            returnUrl = "https://webhook.site/537c1b38-f705-4886-8b51-d49ef04b1c76"
-        )
-
-        logger.trace("Retrieving sale information from sdk")
-        return saleServiceSdk.getSaleInformation(request)
+    private val saleServiceSdk: SaleService,
+    private val configuration: JpmcConfiguration
+) {
+    companion object {
+        private const val TRANSACTION_TYPE = "Pay"
     }
+
+    @Throws(FunctionalityNotAvailable::class)
+    fun getSaleInformation(amount: String): SaleInformation {
+        return saleServiceSdk.getSaleInformation(buildRequest(amount)).toSaleInformation()
+    }
+
+    private fun buildRequest(amount: String) = SaleRequest(
+        version = configuration.version,
+        txnRefNo = UUID.randomUUID().toString(),
+        amount = amount,
+        passCode = configuration.passCode, //TODO this passCode must be in a Secret
+        bankId = configuration.bankId,
+        terminalId = configuration.terminalId,
+        merchantId = configuration.merchantId,
+        mCC = configuration.mcc,
+        currency = configuration.currency,
+        txnType = TRANSACTION_TYPE,
+        returnUrl = configuration.returnUrl
+    )
+
+    fun com.wabi2b.jpmc.sdk.usecase.sale.SaleInformation.toSaleInformation() = SaleInformation(
+        bankId = "$bankId",
+        merchantId = "$merchantId",
+        terminalId = "$terminalId",
+        encData = "$encData"
+    )
 
 }

@@ -22,9 +22,10 @@ open class Security {
 
     open class AuthorizerWrapper(event: APIGatewayProxyRequestEvent) {
         private val authorizer = event.authorizer()
+
         fun requestedByUser(userId: String) = authorizer.getLoggedUser()?.id == userId
         fun matchAnyAuthority(authorities: List<String>) = authorities.any { authorizer.hasAuthority(it) }
-        fun getCountryId() = authorizer.getCountryIds()?.firstOrNull()
+        fun getState() = authorizer.getRawToken()?.let { JwtDecoder(it).getStateField() }
     }
 
     open fun buildAuthorizer(event: APIGatewayProxyRequestEvent) = AuthorizerWrapper(event)

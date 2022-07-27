@@ -1,5 +1,7 @@
 package configuration
 
+private const val LIST_DELIMITER = ","
+
 enum class EnvironmentVariable {
     BANK_ACCOUNT_TABLE,
     JPMC_AES_ENCRYPTION_KEY,
@@ -10,7 +12,10 @@ enum class EnvironmentVariable {
     JPMC_MERCHANT_ID,
     JPMC_MCC,
     JPMC_CURRENCY,
-    JPMC_RETURN_URL_ID;
+    JPMC_RETURN_URL,
+    JPMC_VERSION,
+    JPMC_AVAILABLE_FOR,
+    STATE_VALIDATION_ENABLED;
 
     companion object {
         fun jpmcConfiguration(): JpmcConfiguration =
@@ -23,9 +28,20 @@ enum class EnvironmentVariable {
                 merchantId = JPMC_MERCHANT_ID.get(),
                 mcc = JPMC_MCC.get(),
                 currency = JPMC_CURRENCY.get(),
-                returnUrl = JPMC_RETURN_URL_ID.get(),
+                returnUrl = JPMC_RETURN_URL.get(),
+                version = JPMC_VERSION.get()
+            )
+
+        fun jpmcStateValidationConfig(): JpmcStateValidationConfig =
+            JpmcStateValidationConfig(
+                availableFor = JPMC_AVAILABLE_FOR.get()
+                    .split(LIST_DELIMITER)
+                    .filter { it.isNotEmpty() }
+                    .map { it.uppercase() },
+                enabled = STATE_VALIDATION_ENABLED.get().toBoolean()
             )
     }
+
 
     private val value: String
         get(): String {
@@ -52,6 +68,12 @@ enum class EnvironmentVariable {
         val merchantId: String,
         val mcc: String,
         val currency: String,
-        val returnUrl: String
+        val returnUrl: String,
+        val version: String
+    )
+
+    data class JpmcStateValidationConfig(
+        val availableFor: List<String>,
+        val enabled: Boolean
     )
 }

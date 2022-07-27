@@ -135,7 +135,6 @@ dependencies {
     testImplementation("io.projectreactor:reactor-core:$testReactorCoreVersion")
     testImplementation("io.projectreactor.netty:reactor-netty:$testReactorNettyVersion")
     testImplementation("io.projectreactor:reactor-test:$testReactorTestVersion")
-    testImplementation("io.mockk:mockk:1.12.4")
 
     // Wabi
     implementation("yopdev:rest2lambda:1004-bf762288624a4811b08e4be067e4b1e512acc0c0")

@@ -41,14 +41,19 @@ object MainConfiguration : Configuration {
     }
 
     override val saleInformationService: SaleInformationService by lazy {
-        SaleInformationService(
-            saleServiceSdk = SaleService(
-                //TODO La key del hash deberá ir por secret
-                hashCalculator = DigestHashCalculator("E59CD2BF6F4D86B5FB3897A680E0DD3E"),
-                //TODO La key del encryper deberá ir por secret
-                encrypter = AesEncrypterService("5EC4A697141C8CE45509EF485EE7D4B1")
+        with(EnvironmentVariable.jpmcConfiguration()) {
+            SaleInformationService(
+                saleServiceSdk = SaleService(
+                    hashCalculator = DigestHashCalculator(this.sha256HashKey), //TODO this key must be in a Secret
+                    encrypter = AesEncrypterService(this.aesEncryptionKey) //TODO this key must be in a Secret
+                ),
+                configuration = this
             )
-        )
+        }
+    }
+
+    override val jpmcStateValidationConfig: EnvironmentVariable.JpmcStateValidationConfig by lazy {
+        EnvironmentVariable.jpmcStateValidationConfig()
     }
 
     override val bankAccountListenerFunction: BankAccountListenerFunction by lazy {
