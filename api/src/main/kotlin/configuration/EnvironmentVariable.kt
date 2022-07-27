@@ -15,7 +15,7 @@ enum class EnvironmentVariable {
     JPMC_RETURN_URL,
     JPMC_VERSION,
     JPMC_AVAILABLE_FOR,
-    STATE_VALIDATION_ENABLED;
+    JPMC_STATE_VALIDATION_ENABLED;
 
     companion object {
         fun jpmcConfiguration(): JpmcConfiguration =
