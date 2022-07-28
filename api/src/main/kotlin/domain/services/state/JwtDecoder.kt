@@ -1,4 +1,4 @@
-package adapters.rest.validations
+package domain.services.state
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString

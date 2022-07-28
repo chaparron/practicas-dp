@@ -3,6 +3,7 @@ package adapters.rest.validations
 import adapters.rest.authorizer
 import adapters.rest.validations.Security.SecurityCheckResult.*
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
+import domain.services.state.JwtDecoder
 
 open class Security {
 

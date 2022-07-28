@@ -8,6 +8,7 @@ enum class JpmcErrorReason(
     private val pattern: (Any?) -> String
 ) {
     MISSING_AMOUNT(BAD_REQUEST, missingProperty("amount")),
+    MISSING_SUPPLIER_ID(BAD_REQUEST, missingProperty("supplierId")),
     FUNCTIONALITY_NOT_AVAILABLE(BAD_REQUEST, { "This functionality is only available from Mumbai users" }),
     UNKNOWN(ErrorType.UNKNOWN, { "Unexpected error occur" });
 

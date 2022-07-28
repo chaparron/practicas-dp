@@ -5,7 +5,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import wabi.rest2lambda.RestHandler
 
-class JpmcProcessInformationHandler() : RestHandler {
+class JpmcProcessInformationHandler : RestHandler {
 
     companion object {
         const val PROCESS_INFORMATION_PATH = "/jpmc/processInformation"

@@ -7,7 +7,7 @@ import domain.model.SaleInformation
 import domain.model.errors.FunctionalityNotAvailable
 import java.util.*
 
-class SaleInformationService(
+class JpmcSaleInformationService(
     private val saleServiceSdk: SaleService,
     private val configuration: JpmcConfiguration
 ) {
@@ -34,7 +34,7 @@ class SaleInformationService(
         returnUrl = configuration.returnUrl
     )
 
-    fun com.wabi2b.jpmc.sdk.usecase.sale.SaleInformation.toSaleInformation() = SaleInformation(
+    private fun com.wabi2b.jpmc.sdk.usecase.sale.SaleInformation.toSaleInformation() = SaleInformation(
         bankId = "$bankId",
         merchantId = "$merchantId",
         terminalId = "$terminalId",

@@ -1,9 +1,8 @@
-package domain.service
+package domain.services
 
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleInformation
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleService
 import configuration.EnvironmentVariable
-import domain.services.SaleInformationService
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.extension.ExtendWith
@@ -16,7 +15,7 @@ import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 
 @ExtendWith(MockitoExtension::class)
-class SaleInformationServiceTest {
+class JpmcSaleInformationServiceTest {
 
     @Mock
     private lateinit var saleServiceSdk: SaleService
@@ -25,7 +24,7 @@ class SaleInformationServiceTest {
     private lateinit var configuration: EnvironmentVariable.JpmcConfiguration
 
     @InjectMocks
-    private lateinit var sut: SaleInformationService
+    private lateinit var sut: JpmcSaleInformationService
 
     @Test
     fun `given a valid request when getSaleInformation then return valid information`() {

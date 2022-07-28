@@ -1,7 +1,7 @@
 package configuration
 
-import adapters.repositories.SupplierRepository
 import adapters.repositories.DynamoDBSupplierRepository
+import adapters.repositories.SupplierRepository
 import adapters.rest.validations.Security
 import com.wabi2b.jpmc.sdk.security.cipher.aes.encrypt.AesEncrypterService
 import com.wabi2b.jpmc.sdk.security.hash.sha256.DigestHashCalculator
@@ -11,9 +11,12 @@ import com.wabi2b.serializers.InstantSerializer
 import com.wabi2b.serializers.URISerializer
 import com.wabi2b.serializers.UUIDStringSerializer
 import domain.functions.SupplierListenerFunction
-import domain.services.SupplierService
 import domain.services.DefaultSupplierService
-import domain.services.SaleInformationService
+import domain.services.JpmcSaleInformationService
+import domain.services.state.StateValidatorService
+import domain.services.SupplierService
+import domain.services.providers.PaymentProviderService
+import domain.services.providers.jpmc.JpmProviderService
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
@@ -25,7 +28,7 @@ object MainConfiguration : Configuration {
 
     private val logger = LoggerFactory.getLogger(MainConfiguration::class.java)
 
-    override val security: Security by lazy { Security() }
+    private val security: Security by lazy { Security() }
 
     override val jsonMapper: Json by lazy {
         Json {
@@ -40,9 +43,9 @@ object MainConfiguration : Configuration {
         }
     }
 
-    override val saleInformationService: SaleInformationService by lazy {
+    override val jpmcSaleInformationService: JpmcSaleInformationService by lazy {
         with(EnvironmentVariable.jpmcConfiguration()) {
-            SaleInformationService(
+            JpmcSaleInformationService(
                 saleServiceSdk = SaleService(
                     hashCalculator = DigestHashCalculator(this.sha256HashKey), //TODO this key must be in a Secret
                     encrypter = AesEncrypterService(this.aesEncryptionKey) //TODO this key must be in a Secret
@@ -60,6 +63,22 @@ object MainConfiguration : Configuration {
         SupplierListenerFunction(
             jsonMapper = jsonMapper,
             supplierService = supplierService
+        )
+    }
+
+    override val stateValidatorService: StateValidatorService by lazy {
+        StateValidatorService(
+            stateValidationConfig = jpmcStateValidationConfig,
+            security = security
+        )
+    }
+
+    override val paymentProviderService: PaymentProviderService by lazy {
+        PaymentProviderService(
+            JpmProviderService(
+                supplierService = supplierService,
+                stateValidator = stateValidatorService
+            )
         )
     }
 

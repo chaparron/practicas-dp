@@ -1,14 +1,16 @@
 package configuration
 
-import adapters.rest.validations.Security
 import domain.functions.SupplierListenerFunction
-import domain.services.SaleInformationService
+import domain.services.JpmcSaleInformationService
+import domain.services.state.StateValidatorService
+import domain.services.providers.PaymentProviderService
 import kotlinx.serialization.json.Json
 
 interface Configuration {
-    val security: Security
     val jsonMapper: Json
-    val saleInformationService: SaleInformationService
+    val jpmcSaleInformationService: JpmcSaleInformationService
     val jpmcStateValidationConfig: EnvironmentVariable.JpmcStateValidationConfig
     val supplierListenerFunction: SupplierListenerFunction
+    val stateValidatorService: StateValidatorService
+    val paymentProviderService: PaymentProviderService
 }

@@ -1,11 +1,11 @@
 {
   "body": "",
   "resource": "/{proxy+}",
-  "path": "/dp/jpmc/saleInformation",
+  "path": "/dp/paymentProviders",
   "httpMethod": "GET",
   "isBase64Encoded": true,
   "queryStringParameters": {
-    "amount": "666"
+    "supplierId": "666"
   },
   "multiValueQueryStringParameters": {
     "foo": [

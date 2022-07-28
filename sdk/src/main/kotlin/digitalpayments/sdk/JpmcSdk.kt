@@ -1,6 +1,7 @@
 package digitalpayments.sdk
 
 import digitalpayments.sdk.configuration.SdkConfiguration
+import digitalpayments.sdk.model.Provider
 import digitalpayments.sdk.model.SaleInformationResponse
 import kotlinx.serialization.decodeFromString
 import org.springframework.http.HttpHeaders
@@ -17,6 +18,7 @@ import java.util.*
 
 interface JpmcSdk {
     fun getSaleInformation(amount: String, accessToken: String): Mono<SaleInformationResponse>
+    fun getPaymentProviders(supplierId: String, accessToken: String): Mono<List<Provider>>
 }
 
 class HttpJpmcSdk(root: URI) : JpmcSdk {
@@ -35,7 +37,7 @@ class HttpJpmcSdk(root: URI) : JpmcSdk {
         webClient.get()
             .uri { builder ->
                 builder
-                    .path("/jpmc/saleInformation")
+                    .path("/dp/jpmc/saleInformation")
                     .queryParam("amount", amount)
                     .build()
             }
@@ -48,4 +50,22 @@ class HttpJpmcSdk(root: URI) : JpmcSdk {
                 mapper.decodeFromString<SaleInformationResponse>(responseBody)
             }
             .switchIfEmpty(Mono.error(UnexpectedResponse("Unexpected error retrieving payment information with amount $amount")))
+
+    override fun getPaymentProviders(supplierId: String, accessToken: String): Mono<List<Provider>> =
+        webClient.get()
+            .uri { builder ->
+                builder
+                    .path("/dp/paymentProviders")
+                    .queryParam("supplierId", supplierId)
+                    .build()
+            }
+            .header(AUTHORIZATION, "Bearer $accessToken")
+            .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .retrieve()
+            .onStatus(HttpStatus::isError, detailedHttpErrorHandler::handle)
+            .bodyToMono(String::class.java)
+            .map { responseBody ->
+                mapper.decodeFromString<List<Provider>>(responseBody)
+            }
+            .switchIfEmpty(Mono.error(UnexpectedResponse("Unexpected error retrieving payment information with supplierId $supplierId")))
 }

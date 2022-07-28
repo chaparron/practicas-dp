@@ -1,8 +1,7 @@
-package domain.service
+package domain.services
 
 import adapters.repositories.SupplierRepository
 import anySupplier
-import domain.services.DefaultSupplierService
 import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn

@@ -8,9 +8,11 @@ import com.amazonaws.services.lambda.runtime.tests.annotations.HandlerParams
 import com.amazonaws.services.lambda.runtime.tests.annotations.Responses
 import configuration.TestConfiguration
 import domain.model.SaleInformation
+import domain.services.providers.Provider
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.JsonElement
 import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
@@ -35,55 +37,98 @@ class JpmcApiGatewayTest {
     private val configuration = TestConfiguration.mockedInstance()
     private val handler = JpmcApiGateway(configuration)
 
-    @ParameterizedTest
-    @HandlerParams(
-        events = Events(folder = "aws/rest/commons/events", type = APIGatewayProxyRequestEvent::class),
-        responses = Responses(folder = "aws/rest/commons/responses", type = APIGatewayProxyResponseEvent::class)
-    )
-    fun commonsEventsTest(event: APIGatewayProxyRequestEvent, expectedResponse: APIGatewayProxyResponseEvent) {
-        givenSecurityCheckStubs(expectedResponse)
-
-        val response = handler.handleRequest(event, context)
-
-        assertResponse(
-            actualResponse = response,
-            expectedResponse = expectedResponse,
-            ignoreBodyFields = arrayOf()
-        )
+    companion object {
+        private const val STATE = "IN-MH"
     }
 
-    @ParameterizedTest
-    @HandlerParams(
-        events = Events(folder = "aws/rest/saleInformation/events", type = APIGatewayProxyRequestEvent::class),
-        responses = Responses(folder = "aws/rest/saleInformation/responses", type = APIGatewayProxyResponseEvent::class)
-    )
-    fun saleInformationEventsTest(event: APIGatewayProxyRequestEvent, expectedResponse: APIGatewayProxyResponseEvent) {
-        givenSecurityCheckStubs(expectedResponse)
-        whenExpectedStatusBalanceResponseContext(
-            expectedResponse.statusCode,
-            event.queryStringParameters["amount"]
+    @Nested
+    inner class GetSaleInformation {
+        @ParameterizedTest
+        @HandlerParams(
+            events = Events(folder = "aws/rest/commons/events", type = APIGatewayProxyRequestEvent::class),
+            responses = Responses(folder = "aws/rest/commons/responses", type = APIGatewayProxyResponseEvent::class)
         )
+        fun commonsEventsTest(event: APIGatewayProxyRequestEvent, expectedResponse: APIGatewayProxyResponseEvent) {
+            givenSecurityCheckStubs(expectedResponse)
 
-        val response = handler.handleRequest(event, context)
-        assertResponse(
-            actualResponse = response,
-            expectedResponse = expectedResponse,
-            ignoreBodyFields = arrayOf("id", "created", "invoice.id", "loan.id", "loan.created")
+            val response = handler.handleRequest(event, context)
+
+            assertResponse(
+                actualResponse = response, expectedResponse = expectedResponse, ignoreBodyFields = arrayOf()
+            )
+        }
+
+        @ParameterizedTest
+        @HandlerParams(
+            events = Events(folder = "aws/rest/saleInformation/events", type = APIGatewayProxyRequestEvent::class),
+            responses = Responses(
+                folder = "aws/rest/saleInformation/responses", type = APIGatewayProxyResponseEvent::class
+            )
         )
+        fun saleInformationEventsTest(
+            event: APIGatewayProxyRequestEvent, expectedResponse: APIGatewayProxyResponseEvent
+        ) {
+            givenSecurityCheckStubs(expectedResponse)
+            whenExpectedSaleInformationResponseContext(
+                expectedResponse.statusCode, event.queryStringParameters["amount"]
+            )
+
+            val response = handler.handleRequest(event, context)
+            assertResponse(
+                actualResponse = response,
+                expectedResponse = expectedResponse,
+            )
+        }
+
+        private fun whenExpectedSaleInformationResponseContext(statusCode: Int, amount: String?) {
+            val saleInformationService = configuration.jpmcSaleInformationService
+            logger.trace("Stubbing response $statusCode-$amount")
+            when (statusCode) {
+                200 -> doReturn(
+                    SaleInformation(
+                        bankId = "", merchantId = "", terminalId = "", encData = ""
+                    )
+                ).whenever(saleInformationService).getSaleInformation(any())
+            }
+        }
     }
 
-    private fun whenExpectedStatusBalanceResponseContext(statusCode: Int, customerIdParam: String?) {
-        val saleInformationService = configuration.saleInformationService
-        logger.trace("Stubbing response $statusCode-$customerIdParam")
-        when (statusCode) {
-            200 -> doReturn(
-                SaleInformation(
-                    bankId = "",
-                    merchantId = "",
-                    terminalId = "",
-                    encData = ""
-                )
-            ).whenever(saleInformationService).getSaleInformation(any())
+
+    @Nested
+    inner class PaymentProviders {
+
+        @ParameterizedTest
+        @HandlerParams(
+            events = Events(folder = "aws/rest/paymentProviders/events", type = APIGatewayProxyRequestEvent::class),
+            responses = Responses(
+                folder = "aws/rest/paymentProviders/responses", type = APIGatewayProxyResponseEvent::class
+            )
+        )
+        fun paymentProvidersEventsTest(
+            event: APIGatewayProxyRequestEvent, expectedResponse: APIGatewayProxyResponseEvent
+        ) {
+            givenSecurityCheckStubs(expectedResponse)
+            whenExpectedProvidersResponseContext(
+                expectedResponse.statusCode, event.queryStringParameters["supplierId"]!!, STATE
+            )
+
+            val response = handler.handleRequest(event, context)
+            assertResponse(
+                actualResponse = response,
+                expectedResponse = expectedResponse,
+            )
+        }
+
+        private fun whenExpectedProvidersResponseContext(statusCode: Int, supplierId: String, state: String) {
+            val paymentProviderService = configuration.paymentProviderService
+            val stateValidatorService = configuration.stateValidatorService
+            whenever(stateValidatorService.getState(any())).thenReturn(STATE)
+
+            logger.trace("Stubbing response $statusCode-$supplierId-$state")
+            when (statusCode) {
+                200 -> doReturn(listOf(Provider.JP_MORGAN)).whenever(paymentProviderService)
+                    .availableProviders(state, supplierId)
+            }
         }
     }
 
@@ -98,19 +143,13 @@ class JpmcApiGatewayTest {
         if (actualResponse.headers?.get(CONTENT_TYPE) == APPLICATION_JSON) {
             val expectedResponseBody = configuration.jsonMapper.decodeFromString<JsonElement>(expectedResponse.body)
             val actualResponseBody = configuration.jsonMapper.decodeFromString<JsonElement>(actualResponse.body)
-            Assertions.assertThat(actualResponseBody)
-                .usingRecursiveComparison()
-                .ignoringFields(*ignoreBodyFields)
+            Assertions.assertThat(actualResponseBody).usingRecursiveComparison().ignoringFields(*ignoreBodyFields)
                 .isEqualTo(expectedResponseBody)
         }
     }
 
     private fun givenSecurityCheckStubs(expectedResponse: APIGatewayProxyResponseEvent) {
         val authorizerWrapper = configuration.authorizerWrapper
-        val stateValidationEnabled = configuration.jpmcStateValidationConfig
-
-        whenever(stateValidationEnabled.enabled).doReturn(true)
-        whenever(stateValidationEnabled.availableFor).doReturn(mutableListOf("IN-MH"))
 
         if (expectedResponse.body != null) {
             when (expectedResponse.statusCode) {
