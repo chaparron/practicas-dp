@@ -4,7 +4,7 @@ import anySupplier
 import adapters.infrastructure.CreateTableRequest
 import adapters.infrastructure.DynamoDbContainer
 import adapters.infrastructure.DynamoTestSupport
-import adapters.infrastructure.DynamoTestSupport.bankAccountTable
+import adapters.infrastructure.DynamoTestSupport.supplierTable
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import org.junit.jupiter.api.BeforeAll
@@ -32,10 +32,10 @@ internal class DynamoDBSupplierRepositoryTest {
     @BeforeAll
     fun setUp() {
         dynamoDbClient = DynamoTestSupport.dynamoDbClient(container.endpoint())
-        sut = DynamoDBSupplierRepository(dynamoDbClient, bankAccountTable)
+        sut = DynamoDBSupplierRepository(dynamoDbClient, supplierTable)
 
         CreateTableRequest(
-            tableName = bankAccountTable,
+            tableName = supplierTable,
             attributes = listOf(CreateTableRequest.Param(DynamoDBAttribute.PK.param)),
             pk = DynamoDBAttribute.PK.param
         ).doExecuteWith(dynamoDbClient, DynamoTestSupport::createTable)
@@ -51,7 +51,7 @@ internal class DynamoDBSupplierRepositoryTest {
     }
 
     @Test
-    fun `throws BankAccountPayoutNotFound when bank account does not exist`() {
+    fun `throws SupplierNotFound when bank account does not exist`() {
         val supplierId = randomString()
 
         assertFailsWith<SupplierNotFound> {

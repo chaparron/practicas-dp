@@ -16,25 +16,25 @@ class DefaultSupplierServiceTest {
     private val sut = DefaultSupplierService(supplierRepository)
 
     @Test
-    fun `can save a bank account`() {
-        val bankAccount = anySupplier()
-        doReturn(bankAccount).whenever(supplierRepository).save(bankAccount)
+    fun `can save a supplier`() {
+        val supplier = anySupplier()
+        doReturn(supplier).whenever(supplierRepository).save(supplier)
 
-        val actual = sut.save(bankAccount)
+        val actual = sut.save(supplier)
 
-        assertEquals(bankAccount, actual)
+        assertEquals(supplier, actual)
     }
 
     @Test
-    fun `can retrieve saved bank account`(){
-        val bankAccount = anySupplier()
-        doReturn(bankAccount).whenever(supplierRepository).save(bankAccount)
-        doReturn(bankAccount).whenever(supplierRepository).get(bankAccount.supplierId)
+    fun `can retrieve saved supplier`(){
+        val supplier = anySupplier()
+        doReturn(supplier).whenever(supplierRepository).save(supplier)
+        doReturn(supplier).whenever(supplierRepository).get(supplier.supplierId)
 
-        sut.save(bankAccount)
+        sut.save(supplier)
 
-        val actual = sut.get(bankAccount.supplierId)
+        val actual = sut.get(supplier.supplierId)
 
-        assertEquals(bankAccount, actual)
+        assertEquals(supplier, actual)
     }
 }

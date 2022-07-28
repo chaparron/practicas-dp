@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit
 
 object DynamoTestSupport {
 
-    const val bankAccountTable = "bankAccountTable"
+    const val supplierTable = "supplierTable"
 
     internal fun dynamoDbClient(endpoint: String): DynamoDbClient =
         DynamoDbClient
