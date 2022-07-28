@@ -65,6 +65,7 @@ Globals:
         NEW_RELIC_DEBUG: true
         NEW_RELIC_LAMBDA_EXTENSION_ENABLED: !FindInMap [ Config, !Ref EnvironmentStackName, NewRelicLambdaExtensionEnabled ]
         FORCE_UPDATE: 1
+        SUPPLIER_TABLE: !Ref SupplierTable
 
     DeploymentPreference:
       Type: AllAtOnce
@@ -195,9 +196,6 @@ Resources:
       DeadLetterQueue:
         Type: "SQS"
         TargetArn: !GetAtt SupplierListenerFunctionDLQ.Arn
-      Environment:
-        Variables:
-          SUPPLIER_TABLE: !Ref SupplierTable
 #      Events:
 #        PayoutEvent:
 #          Type: SNS
