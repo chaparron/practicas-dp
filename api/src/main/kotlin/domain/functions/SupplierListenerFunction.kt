@@ -3,20 +3,20 @@ package domain.functions
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestHandler
 import com.amazonaws.services.lambda.runtime.events.SNSEvent
-import domain.model.BankAccount
+import domain.model.Supplier
 import domain.model.SupplierEvent
-import domain.services.BankAccountService
+import domain.services.SupplierService
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 
-class BankAccountListenerFunction(
+class SupplierListenerFunction(
     private val jsonMapper: Json,
-    val bankAccountService: BankAccountService
+    val supplierService: SupplierService
 ) : RequestHandler<SNSEvent, Unit> {
 
     companion object {
-        private val logger = LoggerFactory.getLogger(BankAccountListenerFunction::class.java)
+        private val logger = LoggerFactory.getLogger(SupplierListenerFunction::class.java)
     }
 
     override fun handleRequest(event: SNSEvent, context: Context) {
@@ -26,14 +26,14 @@ class BankAccountListenerFunction(
             }.let {
                 deserialize(it.sns.message)
             }.let {
-                bankAccountService.save(it).also { response ->
-                    logger.info("BankAccount saved {}", response)
+                supplierService.save(it).also { response ->
+                    logger.info("Supplier saved {}", response)
                 }
             }
         }
     }
 
-    private fun deserialize(message: String): BankAccount {
-        return jsonMapper.decodeFromString<SupplierEvent>(message).toBankAccount()
+    private fun deserialize(message: String): Supplier {
+        return jsonMapper.decodeFromString<SupplierEvent>(message).toSupplier()
     }
 }

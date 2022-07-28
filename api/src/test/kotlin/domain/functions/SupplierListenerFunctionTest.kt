@@ -1,14 +1,14 @@
 package domain.functions
 
-import anyBankAccount
+import anySupplier
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.SNSEvent
 import configuration.Configuration
 import configuration.TestConfiguration
-import domain.model.BankAccount
+import domain.model.Supplier
 import domain.model.BankAccountEvent
 import domain.model.SupplierEvent
-import domain.services.BankAccountService
+import domain.services.SupplierService
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -21,20 +21,20 @@ import randomString
 import kotlin.test.assertFailsWith
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class BankAccountListenerFunctionTest {
+class SupplierListenerFunctionTest {
 
     private lateinit var configuration: Configuration
     private lateinit var json: Json
-    private lateinit var bankAccountService: BankAccountService
+    private lateinit var supplierService: SupplierService
     private val context: Context = mock()
-    private lateinit var sut: BankAccountListenerFunction
+    private lateinit var sut: SupplierListenerFunction
 
     @BeforeEach
     fun setUp() {
         configuration = TestConfiguration.mockedInstance()
         json = configuration.jsonMapper
-        bankAccountService = configuration.bankAccountListenerFunction.bankAccountService
-        sut = configuration.bankAccountListenerFunction
+        supplierService = configuration.supplierListenerFunction.supplierService
+        sut = configuration.supplierListenerFunction
     }
 
     @Test
@@ -47,9 +47,9 @@ class BankAccountListenerFunctionTest {
     }
 
     @Test
-    fun `propagates exception when bank account service fails`() {
+    fun `propagates exception when supplier service fails`() {
         val event = buildSnsEvent()
-        whenever(bankAccountService.save(any())).thenThrow(RuntimeException())
+        whenever(supplierService.save(any())).thenThrow(RuntimeException())
 
         assertFailsWith<RuntimeException> {
             sut.handleRequest(event, context)
@@ -69,27 +69,28 @@ class BankAccountListenerFunctionTest {
             sut.handleRequest(event, context)
         }
 
-        verifyNoInteractions(bankAccountService)
+        verifyNoInteractions(supplierService)
     }
 
-    private fun buildSnsEvent(): SNSEvent = json.encodeToString(anyBankAccount().toSupplierEvent()).let {
+    private fun buildSnsEvent(): SNSEvent = json.encodeToString(anySupplier().toSupplierEvent()).let {
         SNSEvent().withRecords(listOf(
             SNSEvent.SNSRecord().withSns(SNSEvent.SNS().withMessage((it)))
         ))
     }
 
-    private fun BankAccount.toSupplierEvent(): SupplierEvent {
+    private fun Supplier.toSupplierEvent(): SupplierEvent {
         return SupplierEvent(
             supplierId = supplierId,
+            state = state,
             bankAccount = BankAccountEvent(
-                number = number,
+                number = bankAccountNumber,
                 indianFinancialSystemCode = indianFinancialSystemCode
             )
         )
     }
 
     private fun verifyServiceInvocation(event: SNSEvent) {
-        verify(bankAccountService).save(json.decodeFromString<SupplierEvent>(event.records.first().sns.message).toBankAccount())
+        verify(supplierService).save(json.decodeFromString<SupplierEvent>(event.records.first().sns.message).toSupplier())
     }
 
 }

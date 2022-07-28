@@ -3,7 +3,7 @@ package configuration
 private const val LIST_DELIMITER = ","
 
 enum class EnvironmentVariable {
-    BANK_ACCOUNT_TABLE,
+    SUPPLIER_TABLE,
     JPMC_AES_ENCRYPTION_KEY,
     JPMC_SHAE256_HASH_KEY,
     JPMC_PASS_CODE,

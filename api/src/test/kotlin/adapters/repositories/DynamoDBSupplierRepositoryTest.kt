@@ -1,6 +1,6 @@
 package adapters.repositories
 
-import anyBankAccount
+import anySupplier
 import adapters.infrastructure.CreateTableRequest
 import adapters.infrastructure.DynamoDbContainer
 import adapters.infrastructure.DynamoTestSupport
@@ -17,7 +17,7 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 
 @Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class DynamoDBBankAccountRepositoryTest {
+internal class DynamoDBSupplierRepositoryTest {
 
     companion object {
         @JvmStatic
@@ -27,12 +27,12 @@ internal class DynamoDBBankAccountRepositoryTest {
 
     private lateinit var dynamoDbClient: DynamoDbClient
 
-    private lateinit var sut: DynamoDBBankAccountRepository
+    private lateinit var sut: DynamoDBSupplierRepository
 
     @BeforeAll
     fun setUp() {
         dynamoDbClient = DynamoTestSupport.dynamoDbClient(container.endpoint())
-        sut = DynamoDBBankAccountRepository(dynamoDbClient, bankAccountTable)
+        sut = DynamoDBSupplierRepository(dynamoDbClient, bankAccountTable)
 
         CreateTableRequest(
             tableName = bankAccountTable,
@@ -43,7 +43,7 @@ internal class DynamoDBBankAccountRepositoryTest {
 
     @Test
     fun `finds saved bank account by supplierId`() {
-        val saved = sut.save(anyBankAccount())
+        val saved = sut.save(anySupplier())
 
         val retrieved = sut.get(saved.supplierId)
 
@@ -54,7 +54,7 @@ internal class DynamoDBBankAccountRepositoryTest {
     fun `throws BankAccountPayoutNotFound when bank account does not exist`() {
         val supplierId = randomString()
 
-        assertFailsWith<BankAccountPayoutNotFound> {
+        assertFailsWith<SupplierNotFound> {
             sut.get(supplierId)
         }
     }

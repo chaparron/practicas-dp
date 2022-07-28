@@ -183,21 +183,21 @@ Resources:
               Headers:
                 - Authorization
 
-  BankAccountListenerFunction:
+  SupplierListenerFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: "api"
-      Handler: "domain.functions.BankAccountListenerFunction"
+      Handler: "domain.functions.SupplierListenerFunction"
       Role: !GetAtt LambdaExecutionRole.Arn
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: !Ref BankAccountTable
+            TableName: !Ref SupplierTable
       DeadLetterQueue:
         Type: "SQS"
-        TargetArn: !GetAtt BankAccountListenerFunctionDLQ.Arn
+        TargetArn: !GetAtt SupplierListenerFunctionDLQ.Arn
       Environment:
         Variables:
-          BANK_ACCOUNT_TABLE: !Ref BankAccountTable
+          SUPPLIER_TABLE: !Ref SupplierTable
 #      Events:
 #        PayoutEvent:
 #          Type: SNS
@@ -208,10 +208,10 @@ Resources:
 #              TYPE:
 #                - "***"
 
-  BankAccountListenerFunctionDLQ:
+  SupplierListenerFunctionDLQ:
     Type: AWS::SQS::Queue
 
-  BankAccountTable:
+  SupplierTable:
     Type: AWS::DynamoDB::Table
     Properties:
       PointInTimeRecoverySpecification:

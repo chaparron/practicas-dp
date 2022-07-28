@@ -1,7 +1,7 @@
 package configuration
 
-import adapters.repositories.BankAccountRepository
-import adapters.repositories.DynamoDBBankAccountRepository
+import adapters.repositories.SupplierRepository
+import adapters.repositories.DynamoDBSupplierRepository
 import adapters.rest.validations.Security
 import com.wabi2b.jpmc.sdk.security.cipher.aes.encrypt.AesEncrypterService
 import com.wabi2b.jpmc.sdk.security.hash.sha256.DigestHashCalculator
@@ -10,9 +10,9 @@ import com.wabi2b.serializers.BigDecimalToFloatSerializer
 import com.wabi2b.serializers.InstantSerializer
 import com.wabi2b.serializers.URISerializer
 import com.wabi2b.serializers.UUIDStringSerializer
-import domain.functions.BankAccountListenerFunction
-import domain.services.BankAccountService
-import domain.services.DefaultBankAccountService
+import domain.functions.SupplierListenerFunction
+import domain.services.SupplierService
+import domain.services.DefaultSupplierService
 import domain.services.SaleInformationService
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
@@ -56,23 +56,23 @@ object MainConfiguration : Configuration {
         EnvironmentVariable.jpmcStateValidationConfig()
     }
 
-    override val bankAccountListenerFunction: BankAccountListenerFunction by lazy {
-        BankAccountListenerFunction(
+    override val supplierListenerFunction: SupplierListenerFunction by lazy {
+        SupplierListenerFunction(
             jsonMapper = jsonMapper,
-            bankAccountService = bankAccountService
+            supplierService = supplierService
         )
     }
 
-    private val bankAccountService: BankAccountService by lazy {
-        DefaultBankAccountService(
-            bankAccountRepository = bankAccountRepository
+    private val supplierService: SupplierService by lazy {
+        DefaultSupplierService(
+            supplierRepository = supplierRepository
         )
     }
 
-    private val bankAccountRepository: BankAccountRepository by lazy {
-        DynamoDBBankAccountRepository(
+    private val supplierRepository: SupplierRepository by lazy {
+        DynamoDBSupplierRepository(
             dynamoDbClient = dynamoDbClient,
-            tableName = EnvironmentVariable.BANK_ACCOUNT_TABLE.get()
+            tableName = EnvironmentVariable.SUPPLIER_TABLE.get()
         )
     }
 

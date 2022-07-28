@@ -3,8 +3,9 @@ package domain.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class BankAccount(
+data class Supplier(
     val supplierId: String,
-    val number: String,
+    val state: String,
+    val bankAccountNumber: String,
     val indianFinancialSystemCode: String
 )

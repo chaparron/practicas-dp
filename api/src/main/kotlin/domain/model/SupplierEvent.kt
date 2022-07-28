@@ -14,11 +14,12 @@ data class BankAccountEvent (
 data class SupplierEvent(
     @SerialName("id")
     val supplierId: String,
+    val state: String,
     @SerialName("bankAccountDataEvent")
     val bankAccount: BankAccountEvent
 
 ) {
-    fun toBankAccount() : BankAccount {
-        return BankAccount(supplierId, bankAccount.number, bankAccount.indianFinancialSystemCode)
+    fun toSupplier() : Supplier {
+        return Supplier(supplierId, state, bankAccount.number, bankAccount.indianFinancialSystemCode)
     }
 }

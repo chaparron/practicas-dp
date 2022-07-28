@@ -1,10 +1,11 @@
-import domain.model.BankAccount
+import domain.model.Supplier
 import java.util.UUID
 
 fun randomString() = UUID.randomUUID().toString()
 
-fun anyBankAccount() = BankAccount(
+fun anySupplier() = Supplier(
     supplierId = randomString(),
-    number = randomString(),
+    state = randomString(),
+    bankAccountNumber = randomString(),
     indianFinancialSystemCode = randomString()
 )

@@ -30,7 +30,12 @@ enum class DynamoDBAttribute {
     /**
      * code
      */
-    C;
+    C,
+
+    /**
+     * state
+     */
+    S;
 
     val param: String by lazy { this.name }
 }
