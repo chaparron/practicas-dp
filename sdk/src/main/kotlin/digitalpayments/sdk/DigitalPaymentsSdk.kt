@@ -16,12 +16,12 @@ import wabi.sdk.impl.CustomHttpErrorHandler
 import java.net.URI
 import java.util.*
 
-interface JpmcSdk {
+interface DigitalPaymentsSdk {
     fun getSaleInformation(amount: String, accessToken: String): Mono<SaleInformationResponse>
     fun getPaymentProviders(supplierId: String, accessToken: String): Mono<List<Provider>>
 }
 
-class HttpJpmcSdk(root: URI) : JpmcSdk {
+class HttpDigitalPaymentsSdk(root: URI) : DigitalPaymentsSdk {
 
     private val mapper = SdkConfiguration.jsonMapper
 

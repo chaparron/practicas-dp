@@ -4,7 +4,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.matching.EqualToPattern
 import digitalpayments.sdk.builders.apiResponse.ErrorResponseBuilder.buildApiRequestErrorResponse
 import digitalpayments.sdk.configuration.SdkConfiguration
-import digitalpayments.sdk.model.Provider
+import digitalpayments.sdk.model.SaleInformationResponse
 import domain.model.errors.JpmcErrorReason
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
@@ -20,48 +20,48 @@ import wabi.sdk.Forbidden
 import wabi.sdk.GenericSdkError
 import java.net.URI
 
-class HttpJpmcSdkPaymentProviderTest : AbstractSdkTest() {
+class HttpDigitalPaymentsSdkSaleInformationTest : AbstractSdkTest() {
     companion object {
-        private const val PATH = "/dp/paymentProviders"
-        private const val SUPPLIER_ID_KEY = "supplierId"
-        private const val SUPPLIER_ID = "12345"
+        private const val PATH = "/dp/jpmc/saleInformation"
+        private const val AMOUNT_KEY = "amount"
+        private const val AMOUNT = "12345"
         private const val ACCESS_TOKEN = "dummy.jwt.token"
     }
 
     private val root = URI.create("http://localhost:${port()}")
-    private val jpmcSdk: JpmcSdk = HttpJpmcSdk(root)
+    private val digitalPaymentsSdk: DigitalPaymentsSdk = HttpDigitalPaymentsSdk(root)
     private val mapper = SdkConfiguration.jsonMapper
 
     @Test
-    fun `given bad request when getPaymentProvider then throw access denied with statusCode is 401`() {
+    fun `given bad request when getSaleInformation then throw access denied with statusCode is 401`() {
         stubFor(
             any(urlPathEqualTo(PATH)).willReturn(aResponse().withStatus(HttpStatus.UNAUTHORIZED.value()))
         )
 
         StepVerifier
-            .create(jpmcSdk.getPaymentProviders(SUPPLIER_ID, ACCESS_TOKEN))
+            .create(digitalPaymentsSdk.getSaleInformation(AMOUNT, ACCESS_TOKEN))
             .verifyError(AccessDenied::class)
     }
 
     @Test
-    fun `given bad request when getPaymentProvider then throw forbidden with statusCode is 403`() {
+    fun `given bad request when getSaleInformation then throw forbidden with statusCode is 403`() {
         stubFor(
             any(urlPathEqualTo(PATH)).willReturn(aResponse().withStatus(HttpStatus.FORBIDDEN.value()))
         )
 
         StepVerifier
-            .create(jpmcSdk.getPaymentProviders(SUPPLIER_ID, ACCESS_TOKEN))
+            .create(digitalPaymentsSdk.getSaleInformation(AMOUNT, ACCESS_TOKEN))
             .verifyError(Forbidden::class)
     }
 
     @Test
-    fun `given bad request when getPaymentProvider then throw BadRequest with statusCode is 400`() {
+    fun `given bad request when getSaleInformation then throw BadRequest with statusCode is 400`() {
 
-        val response = buildApiRequestErrorResponse(JpmcErrorReason.MISSING_AMOUNT, SUPPLIER_ID_KEY)
+        val response = buildApiRequestErrorResponse(JpmcErrorReason.MISSING_AMOUNT, AMOUNT_KEY)
 
         stubFor(
             any(urlPathEqualTo(PATH))
-                .withQueryParam(SUPPLIER_ID_KEY, equalTo(SUPPLIER_ID))
+                .withQueryParam(AMOUNT_KEY, equalTo(AMOUNT))
                 .withHeader(HttpHeaders.CONTENT_TYPE, EqualToPattern(MediaType.APPLICATION_JSON_VALUE))
                 .withHeader(HttpHeaders.AUTHORIZATION, EqualToPattern("Bearer $ACCESS_TOKEN"))
                 .willReturn(
@@ -73,7 +73,7 @@ class HttpJpmcSdkPaymentProviderTest : AbstractSdkTest() {
         )
 
         StepVerifier
-            .create(jpmcSdk.getPaymentProviders(SUPPLIER_ID, ACCESS_TOKEN))
+            .create(digitalPaymentsSdk.getSaleInformation(AMOUNT, ACCESS_TOKEN))
             .verifyErrorSatisfies {
                 assertTrue(it is GenericSdkError)
                 val ex = it as GenericSdkError
@@ -87,20 +87,20 @@ class HttpJpmcSdkPaymentProviderTest : AbstractSdkTest() {
     }
 
     @Test
-    fun `given valid request when getPaymentProvider then return success ProviderList`() {
+    fun `given valid request when getSaleInformation then return success saleInformationResponse`() {
 
-        val response = listOf(Provider.JP_MORGAN)
+        val response = SaleInformationResponse(bankId = "", merchantId = "", terminalId = "", encData = "")
 
         stubFor(
             any(urlPathEqualTo(PATH))
-                .withQueryParam(SUPPLIER_ID_KEY, equalTo(SUPPLIER_ID))
+                .withQueryParam(AMOUNT_KEY, equalTo(AMOUNT))
                 .withHeader(HttpHeaders.CONTENT_TYPE, EqualToPattern(MediaType.APPLICATION_JSON_VALUE))
                 .withHeader(HttpHeaders.AUTHORIZATION, EqualToPattern("Bearer $ACCESS_TOKEN"))
                 .willReturn(ok(mapper.encodeToString(response)))
         )
 
         StepVerifier
-            .create(jpmcSdk.getPaymentProviders(SUPPLIER_ID, ACCESS_TOKEN))
+            .create(digitalPaymentsSdk.getSaleInformation(AMOUNT, ACCESS_TOKEN))
             .expectNext(response)
             .verifyComplete()
 
