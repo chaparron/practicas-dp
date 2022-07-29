@@ -105,7 +105,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: "api"
-      Handler: "adapters.rest.JpmcApiGateway"
+      Handler: "adapters.rest.DigitalPaymentsApiGateway"
       Tracing: Active
       Role: !GetAtt LambdaExecutionRole.Arn
       ProvisionedConcurrencyConfig:
