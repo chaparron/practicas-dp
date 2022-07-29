@@ -27,7 +27,7 @@ import wabi.rest2lambda.CONTENT_TYPE
 
 @ExtendWith(MockitoExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class JpmcApiGatewayTest {
+class DigitalPaymentsApiGatewayTest {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -35,7 +35,7 @@ class JpmcApiGatewayTest {
     private lateinit var context: Context
 
     private val configuration = TestConfiguration.mockedInstance()
-    private val handler = JpmcApiGateway(configuration)
+    private val handler = DigitalPaymentsApiGateway(configuration)
 
     companion object {
         private const val STATE = "IN-MH"

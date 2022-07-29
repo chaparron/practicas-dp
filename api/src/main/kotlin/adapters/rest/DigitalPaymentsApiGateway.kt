@@ -6,12 +6,14 @@ import adapters.rest.handler.JpmcSaleInformationHandler
 import adapters.rest.handler.JpmcSaleInformationHandler.Companion.SALE_INFORMATION_PATH
 import adapters.rest.handler.PaymentProvidersHandler
 import adapters.rest.handler.PaymentProvidersHandler.Companion.PAYMENT_PROVIDERS_PATH
+import adapters.rest.handler.RestErrorHandler
 import configuration.Configuration
 import configuration.MainConfiguration
 import wabi.rest2lambda.ApiGatewayProxy
+import wabi.rest2lambda.ErrorHandler
 import wabi.rest2lambda.RestMappings
 
-class JpmcApiGateway(
+class DigitalPaymentsApiGateway(
     private val configuration: Configuration = MainConfiguration
 ) : ApiGatewayProxy() {
     init {
@@ -39,4 +41,8 @@ class JpmcApiGateway(
             path = PROCESS_INFORMATION_PATH,
             handler = JpmcProcessInformationHandler()
         )
+
+    override fun getErrorHandler(): ErrorHandler {
+        return RestErrorHandler(configuration.jsonMapper)
+    }
 }
