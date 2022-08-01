@@ -18,6 +18,7 @@ class DynamoDBSupplierRepository(
 
     companion object {
         private val logger = LoggerFactory.getLogger(DynamoDBSupplierRepository::class.java)
+        private const val pkValue = "SupplierID"
     }
 
     override fun save(supplier: Supplier): Supplier {
@@ -46,7 +47,8 @@ class DynamoDBSupplierRepository(
     )
 
     private fun String.asPkAttribute() = mapOf(
-        DynamoDBAttribute.PK.param to this.toAttributeValue()
+        DynamoDBAttribute.PK.param to pkValue.toAttributeValue(),
+        DynamoDBAttribute.SK.param to this.toAttributeValue()
     )
 
     private fun Map<String, AttributeValue>.asSupplier() =
