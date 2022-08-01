@@ -32,21 +32,23 @@ class DynamoDBSupplierRepository(
 
     override fun get(supplierId: String): Supplier =
         dynamoDbClient.getItem {
-            it.tableName(tableName).key(supplierId.asPkAttribute())
+            it.tableName(tableName).key(supplierId.asGetItemKey())
         }.let {  response ->
             response.takeIf { it.hasItem() }?.item()?.asSupplier() ?: throw SupplierNotFound(supplierId)
         }
 
     private fun Supplier.asDynamoItem() = mapOf(
         DynamoDBAttribute.PK.param to this.supplierId.toAttributeValue(),
+        DynamoDBAttribute.SK.param to this.supplierId.toAttributeValue(),
         DynamoDBAttribute.SI.param to this.supplierId.toAttributeValue(),
         DynamoDBAttribute.S.param to this.state.toAttributeValue(),
         DynamoDBAttribute.N.param to this.bankAccountNumber.toAttributeValue(),
         DynamoDBAttribute.C.param to this.indianFinancialSystemCode.toAttributeValue()
     )
 
-    private fun String.asPkAttribute() = mapOf(
-        DynamoDBAttribute.PK.param to this.toAttributeValue()
+    private fun String.asGetItemKey() = mapOf(
+        DynamoDBAttribute.PK.param to this.toAttributeValue(),
+        DynamoDBAttribute.SK.param to this.toAttributeValue()
     )
 
     private fun Map<String, AttributeValue>.asSupplier() =

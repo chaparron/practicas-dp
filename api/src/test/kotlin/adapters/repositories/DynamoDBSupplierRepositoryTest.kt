@@ -36,8 +36,11 @@ internal class DynamoDBSupplierRepositoryTest {
 
         CreateTableRequest(
             tableName = supplierTable,
-            attributes = listOf(CreateTableRequest.Param(DynamoDBAttribute.PK.param)),
-            pk = DynamoDBAttribute.PK.param
+            attributes = listOf(
+                CreateTableRequest.Param(DynamoDBAttribute.PK.param),
+                CreateTableRequest.Param(DynamoDBAttribute.SK.param)),
+            pk = DynamoDBAttribute.PK.param,
+            sk = DynamoDBAttribute.SK.param
         ).doExecuteWith(dynamoDbClient, DynamoTestSupport::createTable)
     }
 
