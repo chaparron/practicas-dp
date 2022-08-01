@@ -39,6 +39,7 @@ class DynamoDBSupplierRepository(
 
     private fun Supplier.asDynamoItem() = mapOf(
         DynamoDBAttribute.PK.param to this.supplierId.toAttributeValue(),
+        DynamoDBAttribute.SI.param to this.supplierId.toAttributeValue(),
         DynamoDBAttribute.S.param to this.state.toAttributeValue(),
         DynamoDBAttribute.N.param to this.bankAccountNumber.toAttributeValue(),
         DynamoDBAttribute.C.param to this.indianFinancialSystemCode.toAttributeValue()
@@ -50,7 +51,7 @@ class DynamoDBSupplierRepository(
 
     private fun Map<String, AttributeValue>.asSupplier() =
         Supplier(
-            supplierId = this[DynamoDBAttribute.PK.param]?.s()!!,
+            supplierId = this[DynamoDBAttribute.SI.param]?.s()!!,
             state = this[DynamoDBAttribute.S.param]?.s()!!,
             bankAccountNumber = this[DynamoDBAttribute.N.param]?.s()!!,
             indianFinancialSystemCode = this[DynamoDBAttribute.C.param]?.s()!!

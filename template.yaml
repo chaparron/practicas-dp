@@ -196,15 +196,15 @@ Resources:
       DeadLetterQueue:
         Type: "SQS"
         TargetArn: !GetAtt SupplierListenerFunctionDLQ.Arn
-#      Events:
-#        PayoutEvent:
-#          Type: SNS
-#          Properties:
-#            Topic:
-#              Fn::ImportValue: !Sub "${EnvironmentStackName}-*****"
-#            FilterPolicy:
-#              TYPE:
-#                - "***"
+  #      Events:
+  #        PayoutEvent:
+  #          Type: SNS
+  #          Properties:
+  #            Topic:
+  #              Fn::ImportValue: !Sub "${EnvironmentStackName}-*****"
+  #            FilterPolicy:
+  #              TYPE:
+  #                - "***"
 
   SupplierListenerFunctionDLQ:
     Type: AWS::SQS::Queue
@@ -217,8 +217,12 @@ Resources:
       KeySchema:
         - AttributeName: "PK"
           KeyType: "HASH"
+        - AttributeName: "SK"
+          KeyType: "RANGE"
       AttributeDefinitions:
         - AttributeName: "PK"
+          AttributeType: "S"
+        - AttributeName: "SK"
           AttributeType: "S"
       BillingMode: "PAY_PER_REQUEST"
 
