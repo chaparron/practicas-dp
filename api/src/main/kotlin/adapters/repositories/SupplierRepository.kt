@@ -18,7 +18,6 @@ class DynamoDBSupplierRepository(
 
     companion object {
         private val logger = LoggerFactory.getLogger(DynamoDBSupplierRepository::class.java)
-        private const val pkValue = "SupplierID"
     }
 
     override fun save(supplier: Supplier): Supplier {
@@ -40,20 +39,18 @@ class DynamoDBSupplierRepository(
 
     private fun Supplier.asDynamoItem() = mapOf(
         DynamoDBAttribute.PK.param to this.supplierId.toAttributeValue(),
-        DynamoDBAttribute.SI.param to this.supplierId.toAttributeValue(),
         DynamoDBAttribute.S.param to this.state.toAttributeValue(),
         DynamoDBAttribute.N.param to this.bankAccountNumber.toAttributeValue(),
         DynamoDBAttribute.C.param to this.indianFinancialSystemCode.toAttributeValue()
     )
 
     private fun String.asPkAttribute() = mapOf(
-        DynamoDBAttribute.PK.param to pkValue.toAttributeValue(),
-        DynamoDBAttribute.SK.param to this.toAttributeValue()
+        DynamoDBAttribute.PK.param to this.toAttributeValue()
     )
 
     private fun Map<String, AttributeValue>.asSupplier() =
         Supplier(
-            supplierId = this[DynamoDBAttribute.SI.param]?.s()!!,
+            supplierId = this[DynamoDBAttribute.PK.param]?.s()!!,
             state = this[DynamoDBAttribute.S.param]?.s()!!,
             bankAccountNumber = this[DynamoDBAttribute.N.param]?.s()!!,
             indianFinancialSystemCode = this[DynamoDBAttribute.C.param]?.s()!!
