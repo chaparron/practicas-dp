@@ -7,7 +7,7 @@ import com.amazonaws.services.lambda.runtime.tests.annotations.Events
 import com.amazonaws.services.lambda.runtime.tests.annotations.HandlerParams
 import com.amazonaws.services.lambda.runtime.tests.annotations.Responses
 import configuration.TestConfiguration
-import domain.model.SaleInformation
+import domain.model.CreatePaymentResponse
 import domain.services.providers.Provider
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.JsonElement
@@ -42,7 +42,7 @@ class DigitalPaymentsApiGatewayTest {
     }
 
     @Nested
-    inner class GetSaleInformation {
+    inner class GetCreatePaymentResponse {
         @ParameterizedTest
         @HandlerParams(
             events = Events(folder = "aws/rest/commons/events", type = APIGatewayProxyRequestEvent::class),
@@ -70,7 +70,7 @@ class DigitalPaymentsApiGatewayTest {
         ) {
             givenSecurityCheckStubs(expectedResponse)
             whenExpectedSaleInformationResponseContext(
-                expectedResponse.statusCode, event.queryStringParameters["amount"]
+                expectedResponse.statusCode, event.body
             )
 
             val response = handler.handleRequest(event, context)
@@ -80,15 +80,15 @@ class DigitalPaymentsApiGatewayTest {
             )
         }
 
-        private fun whenExpectedSaleInformationResponseContext(statusCode: Int, amount: String?) {
-            val saleInformationService = configuration.jpmcSaleInformationService
-            logger.trace("Stubbing response $statusCode-$amount")
+        private fun whenExpectedSaleInformationResponseContext(statusCode: Int, body: String?) {
+            val saleInformationService = configuration.jpmcCreatePaymentService
+            logger.trace("Stubbing response $statusCode-$body")
             when (statusCode) {
                 200 -> doReturn(
-                    SaleInformation(
+                    CreatePaymentResponse(
                         bankId = "", merchantId = "", terminalId = "", encData = ""
                     )
-                ).whenever(saleInformationService).getSaleInformation(any())
+                ).whenever(saleInformationService).createPayment(any())
             }
         }
     }

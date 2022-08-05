@@ -1,8 +1,8 @@
 {
-  "body": "",
+  "body": "{\"supplierOrderId\":\"616\",\"amount\":\"161\",\"totalAmount\":\"400\"}",
   "resource": "/{proxy+}",
-  "path": "/dp/jpmc/saleInformation",
-  "httpMethod": "GET",
+  "path": "/dp/jpmc/createPayment",
+  "httpMethod": "POST",
   "isBase64Encoded": true,
   "queryStringParameters": {
     "amount": "666"

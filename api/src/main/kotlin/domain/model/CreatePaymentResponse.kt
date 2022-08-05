@@ -1,7 +1,7 @@
 package domain.model
 
 @kotlinx.serialization.Serializable
-data class SaleInformation(
+data class CreatePaymentResponse(
     val bankId: String,
     val merchantId: String,
     val terminalId: String,

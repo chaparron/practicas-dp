@@ -3,11 +3,12 @@ package domain.services
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleRequest
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleService
 import configuration.EnvironmentVariable.JpmcConfiguration
-import domain.model.SaleInformation
+import domain.model.CreatePaymentRequest
+import domain.model.CreatePaymentResponse
 import domain.model.errors.FunctionalityNotAvailable
 import java.util.*
 
-class JpmcSaleInformationService(
+class JpmcCreatePaymentService(
     private val saleServiceSdk: SaleService,
     private val configuration: JpmcConfiguration
 ) {
@@ -16,8 +17,8 @@ class JpmcSaleInformationService(
     }
 
     @Throws(FunctionalityNotAvailable::class)
-    fun getSaleInformation(amount: String): SaleInformation {
-        return saleServiceSdk.getSaleInformation(buildRequest(amount)).toSaleInformation()
+    fun createPayment(request: CreatePaymentRequest): CreatePaymentResponse {
+        return saleServiceSdk.getSaleInformation(buildRequest(request.amount)).toCreatePaymentResponse()
     }
 
     private fun buildRequest(amount: String) = SaleRequest(
@@ -34,11 +35,11 @@ class JpmcSaleInformationService(
         returnUrl = configuration.returnUrl
     )
 
-    private fun com.wabi2b.jpmc.sdk.usecase.sale.SaleInformation.toSaleInformation() = SaleInformation(
-        bankId = "$bankId",
-        merchantId = "$merchantId",
-        terminalId = "$terminalId",
-        encData = "$encData"
+    private fun com.wabi2b.jpmc.sdk.usecase.sale.SaleInformation.toCreatePaymentResponse() = CreatePaymentResponse(
+        bankId = bankId,
+        merchantId = merchantId,
+        terminalId = terminalId,
+        encData = encData
     )
 
 }

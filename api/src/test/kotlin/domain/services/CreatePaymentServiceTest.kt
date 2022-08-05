@@ -1,5 +1,6 @@
 package domain.services
 
+import anyCreatePaymentRequest
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleInformation
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleService
 import configuration.EnvironmentVariable
@@ -15,7 +16,7 @@ import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 
 @ExtendWith(MockitoExtension::class)
-class JpmcSaleInformationServiceTest {
+class CreatePaymentServiceTest {
 
     @Mock
     private lateinit var saleServiceSdk: SaleService
@@ -24,15 +25,16 @@ class JpmcSaleInformationServiceTest {
     private lateinit var configuration: EnvironmentVariable.JpmcConfiguration
 
     @InjectMocks
-    private lateinit var sut: JpmcSaleInformationService
+    private lateinit var sut: JpmcCreatePaymentService
 
     @Test
-    fun `given a valid request when getSaleInformation then return valid information`() {
+    fun `given a valid request when createPayment then return valid information`() {
         val saleInformation = anySaleInformation()
         whenever(saleServiceSdk.getSaleInformation(any())).thenReturn(saleInformation)
         wheneverForConfigurations()
+        val request = anyCreatePaymentRequest()
 
-        val response = sut.getSaleInformation("2995")
+        val response = sut.createPayment(request)
 
         assertAll(
             "Check values",

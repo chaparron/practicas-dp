@@ -1,11 +1,13 @@
 package adapters.rest.handler
 
+import anyCreatePaymentRequest
 import apiGatewayEventRequest
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
-import domain.model.SaleInformation
+import domain.model.CreatePaymentRequest
+import domain.model.CreatePaymentResponse
 import domain.model.errors.FunctionalityNotAvailable
-import domain.services.JpmcSaleInformationService
+import domain.services.JpmcCreatePaymentService
 import domain.services.state.StateValidatorService
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.BeforeEach
@@ -21,17 +23,17 @@ import kotlin.test.assertEquals
 
 @ExtendWith(MockitoExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class JpmcSaleInformationHandlerTest {
+class JpmcCreatePaymentHandlerTest {
 
     private var context: Context = mock()
-    private var service: JpmcSaleInformationService = mock()
+    private var service: JpmcCreatePaymentService = mock()
     private var jsonMapper: Json = Json { ignoreUnknownKeys = true }
     private var stateValidatorService: StateValidatorService = mock()
 
-    private lateinit var sut: JpmcSaleInformationHandler
+    private lateinit var sut: JpmcCreatePaymentHandler
 
     companion object {
-        private const val PATH = "/dp/jpmc/saleInformation"
+        private const val PATH = "/dp/jpmc/createPayment"
         private const val ACCESS_TOKEN = "my-token"
 
         private const val BANK_ID = "X"
@@ -48,25 +50,26 @@ class JpmcSaleInformationHandlerTest {
     @BeforeEach
     fun setUp() {
         Mockito.reset(service, stateValidatorService)
-        sut = JpmcSaleInformationHandler(service, jsonMapper, stateValidatorService)
+        sut = JpmcCreatePaymentHandler(service, jsonMapper, stateValidatorService)
     }
 
     @Test
-    fun `given state validation ok when getSaleInformation then return valid information `() {
-        whenever(service.getSaleInformation(any()))
-            .thenReturn(SaleInformation(BANK_ID, MERCHANT_ID, TERMINAL_ID, ENC_DATA))
+    fun `given state validation ok when createPayment then return valid response `() {
+        val request = anyCreatePaymentRequest()
 
-        val response = sut.handleRequest(anyApiGatewayProxyRequestEvent(), context)
+        whenever(service.createPayment(any()))
+            .thenReturn(CreatePaymentResponse(BANK_ID, MERCHANT_ID, TERMINAL_ID, ENC_DATA))
+
+        val response = sut.handleRequest(anyApiGatewayProxyRequestEvent(request), context)
 
         assertEquals(EXPECTED_JSON_RESPONSE, response.body)
 
         verify(stateValidatorService, times(1)).validate(any<APIGatewayProxyRequestEvent>())
-
-        verify(service).getSaleInformation(any())
+        verify(service).createPayment(request)
     }
 
     @Test
-    fun `given state validation ko when getSaleInformation then throw custom exception FunctionalityNotAvailable`() {
+    fun `given state validation ko when createPayment then throw custom exception FunctionalityNotAvailable`() {
         whenever(stateValidatorService.validate(any<APIGatewayProxyRequestEvent>())).thenThrow(FunctionalityNotAvailable())
 
         assertThrows<FunctionalityNotAvailable> { sut.handleRequest(anyApiGatewayProxyRequestEvent(), context) }
@@ -74,13 +77,15 @@ class JpmcSaleInformationHandlerTest {
         verifyNoInteractions(service)
     }
 
-    private fun anyApiGatewayProxyRequestEvent(): APIGatewayProxyRequestEvent = apiGatewayEventRequest(
-        method = HttpMethod.DELETE,
+    private fun anyApiGatewayProxyRequestEvent(
+        request: CreatePaymentRequest = anyCreatePaymentRequest()
+    ): APIGatewayProxyRequestEvent = apiGatewayEventRequest(
+        method = HttpMethod.POST,
         path = PATH,
         authorization = ACCESS_TOKEN,
-        queryParameters = mapOf(
-            AMOUNT_KEY to AMOUNT
-        )
+        body = """
+            {"supplierOrderId":"${request.supplierOrderId}","amount":"${request.amount}","totalAmount":"${request.totalAmount}"}
+        """.trimIndent()
     )
 
 }

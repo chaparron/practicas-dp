@@ -2,8 +2,8 @@ package adapters.rest
 
 import adapters.rest.handler.JpmcProcessInformationHandler
 import adapters.rest.handler.JpmcProcessInformationHandler.Companion.PROCESS_INFORMATION_PATH
-import adapters.rest.handler.JpmcSaleInformationHandler
-import adapters.rest.handler.JpmcSaleInformationHandler.Companion.SALE_INFORMATION_PATH
+import adapters.rest.handler.JpmcCreatePaymentHandler
+import adapters.rest.handler.JpmcCreatePaymentHandler.Companion.CREATE_PAYMENT_PATH
 import adapters.rest.handler.PaymentProvidersHandler
 import adapters.rest.handler.PaymentProvidersHandler.Companion.PAYMENT_PROVIDERS_PATH
 import adapters.rest.handler.RestErrorHandler
@@ -21,10 +21,10 @@ class DigitalPaymentsApiGateway(
     }
 
     override fun setupMappings(builder: RestMappings.Builder): RestMappings.Builder = builder
-        .get(
-            path = SALE_INFORMATION_PATH,
-            handler = JpmcSaleInformationHandler(
-                service = configuration.jpmcSaleInformationService,
+        .post(
+            path = CREATE_PAYMENT_PATH,
+            handler = JpmcCreatePaymentHandler(
+                service = configuration.jpmcCreatePaymentService,
                 jsonMapper = configuration.jsonMapper,
                 stateValidatorService = configuration.stateValidatorService
             )

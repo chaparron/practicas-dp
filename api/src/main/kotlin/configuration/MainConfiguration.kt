@@ -12,7 +12,7 @@ import com.wabi2b.serializers.URISerializer
 import com.wabi2b.serializers.UUIDStringSerializer
 import domain.functions.SupplierListenerFunction
 import domain.services.DefaultSupplierService
-import domain.services.JpmcSaleInformationService
+import domain.services.JpmcCreatePaymentService
 import domain.services.state.StateValidatorService
 import domain.services.SupplierService
 import domain.services.providers.PaymentProviderService
@@ -43,9 +43,9 @@ object MainConfiguration : Configuration {
         }
     }
 
-    override val jpmcSaleInformationService: JpmcSaleInformationService by lazy {
+    override val jpmcCreatePaymentService: JpmcCreatePaymentService by lazy {
         with(EnvironmentVariable.jpmcConfiguration()) {
-            JpmcSaleInformationService(
+            JpmcCreatePaymentService(
                 saleServiceSdk = SaleService(
                     hashCalculator = DigestHashCalculator(this.sha256HashKey), //TODO this key must be in a Secret
                     encrypter = AesEncrypterService(this.aesEncryptionKey) //TODO this key must be in a Secret
