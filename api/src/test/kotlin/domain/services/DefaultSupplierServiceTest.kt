@@ -1,6 +1,6 @@
 package domain.services
 
-import adapters.repositories.SupplierRepository
+import adapters.repositories.supplier.SupplierRepository
 import anySupplier
 import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test

@@ -1,4 +1,4 @@
-package adapters.repositories
+package adapters.repositories.supplier
 
 import domain.model.Supplier
 import org.slf4j.LoggerFactory
@@ -39,25 +39,25 @@ class DynamoDBSupplierRepository(
         }
 
     private fun Supplier.asDynamoItem() = mapOf(
-        DynamoDBAttribute.PK.param to (pkValuePrefix + this.supplierId).toAttributeValue(),
-        DynamoDBAttribute.SK.param to this.supplierId.toAttributeValue(),
-        DynamoDBAttribute.SI.param to this.supplierId.toAttributeValue(),
-        DynamoDBAttribute.S.param to this.state.toAttributeValue(),
-        DynamoDBAttribute.N.param to this.bankAccountNumber.toAttributeValue(),
-        DynamoDBAttribute.C.param to this.indianFinancialSystemCode.toAttributeValue()
+        DynamoDBSupplierAttribute.PK.param to (pkValuePrefix + this.supplierId).toAttributeValue(),
+        DynamoDBSupplierAttribute.SK.param to this.supplierId.toAttributeValue(),
+        DynamoDBSupplierAttribute.SI.param to this.supplierId.toAttributeValue(),
+        DynamoDBSupplierAttribute.S.param to this.state.toAttributeValue(),
+        DynamoDBSupplierAttribute.N.param to this.bankAccountNumber.toAttributeValue(),
+        DynamoDBSupplierAttribute.C.param to this.indianFinancialSystemCode.toAttributeValue()
     )
 
     private fun String.asGetItemKey() = mapOf(
-        DynamoDBAttribute.PK.param to (pkValuePrefix + this).toAttributeValue(),
-        DynamoDBAttribute.SK.param to this.toAttributeValue()
+        DynamoDBSupplierAttribute.PK.param to (pkValuePrefix + this).toAttributeValue(),
+        DynamoDBSupplierAttribute.SK.param to this.toAttributeValue()
     )
 
     private fun Map<String, AttributeValue>.asSupplier() =
         Supplier(
-            supplierId = this[DynamoDBAttribute.SI.param]?.s()!!,
-            state = this[DynamoDBAttribute.S.param]?.s()!!,
-            bankAccountNumber = this[DynamoDBAttribute.N.param]?.s()!!,
-            indianFinancialSystemCode = this[DynamoDBAttribute.C.param]?.s()!!
+            supplierId = this[DynamoDBSupplierAttribute.SI.param]?.s()!!,
+            state = this[DynamoDBSupplierAttribute.S.param]?.s()!!,
+            bankAccountNumber = this[DynamoDBSupplierAttribute.N.param]?.s()!!,
+            indianFinancialSystemCode = this[DynamoDBSupplierAttribute.C.param]?.s()!!
         )
 }
 

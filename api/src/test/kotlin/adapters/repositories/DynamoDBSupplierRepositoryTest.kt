@@ -5,6 +5,9 @@ import adapters.infrastructure.CreateTableRequest
 import adapters.infrastructure.DynamoDbContainer
 import adapters.infrastructure.DynamoTestSupport
 import adapters.infrastructure.DynamoTestSupport.supplierTable
+import adapters.repositories.supplier.DynamoDBSupplierAttribute
+import adapters.repositories.supplier.DynamoDBSupplierRepository
+import adapters.repositories.supplier.SupplierNotFound
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import org.junit.jupiter.api.BeforeAll
@@ -37,10 +40,10 @@ internal class DynamoDBSupplierRepositoryTest {
         CreateTableRequest(
             tableName = supplierTable,
             attributes = listOf(
-                CreateTableRequest.Param(DynamoDBAttribute.PK.param),
-                CreateTableRequest.Param(DynamoDBAttribute.SK.param)),
-            pk = DynamoDBAttribute.PK.param,
-            sk = DynamoDBAttribute.SK.param
+                CreateTableRequest.Param(DynamoDBSupplierAttribute.PK.param),
+                CreateTableRequest.Param(DynamoDBSupplierAttribute.SK.param)),
+            pk = DynamoDBSupplierAttribute.PK.param,
+            sk = DynamoDBSupplierAttribute.SK.param
         ).doExecuteWith(dynamoDbClient, DynamoTestSupport::createTable)
     }
 

@@ -1,6 +1,6 @@
-package adapters.repositories
+package adapters.repositories.supplier
 
-enum class DynamoDBAttribute {
+enum class DynamoDBSupplierAttribute {
 
     /**
      * partition key

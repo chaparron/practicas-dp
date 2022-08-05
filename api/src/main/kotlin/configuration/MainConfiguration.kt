@@ -1,7 +1,9 @@
 package configuration
 
-import adapters.repositories.DynamoDBSupplierRepository
-import adapters.repositories.SupplierRepository
+import adapters.repositories.jpmc.DynamoDbJpmcPaymentRepository
+import adapters.repositories.jpmc.JpmcPaymentRepository
+import adapters.repositories.supplier.DynamoDBSupplierRepository
+import adapters.repositories.supplier.SupplierRepository
 import adapters.rest.validations.Security
 import com.wabi2b.jpmc.sdk.security.cipher.aes.encrypt.AesEncrypterService
 import com.wabi2b.jpmc.sdk.security.hash.sha256.DigestHashCalculator
@@ -50,9 +52,17 @@ object MainConfiguration : Configuration {
                     hashCalculator = DigestHashCalculator(this.sha256HashKey), //TODO this key must be in a Secret
                     encrypter = AesEncrypterService(this.aesEncryptionKey) //TODO this key must be in a Secret
                 ),
-                configuration = this
+                configuration = this,
+                jpmcRepository = jpmcPaymentRepository
             )
         }
+    }
+
+    private val jpmcPaymentRepository: JpmcPaymentRepository by lazy {
+        DynamoDbJpmcPaymentRepository(
+            dynamoDbClient = dynamoDbClient,
+            tableName = EnvironmentVariable.JPMC_PAYMENT_TABLE.get()
+        )
     }
 
     override val jpmcStateValidationConfig: EnvironmentVariable.JpmcStateValidationConfig by lazy {

@@ -7,10 +7,14 @@ import domain.model.CreatePaymentRequest
 import domain.model.CreatePaymentResponse
 import domain.model.errors.FunctionalityNotAvailable
 import java.util.*
+import adapters.repositories.jpmc.JpmcPaymentRepository
+import domain.model.JpmcPayment
+import domain.model.PaymentStatus
 
 class JpmcCreatePaymentService(
     private val saleServiceSdk: SaleService,
-    private val configuration: JpmcConfiguration
+    private val configuration: JpmcConfiguration,
+    private val jpmcRepository: JpmcPaymentRepository
 ) {
     companion object {
         private const val TRANSACTION_TYPE = "Pay"
@@ -18,12 +22,28 @@ class JpmcCreatePaymentService(
 
     @Throws(FunctionalityNotAvailable::class)
     fun createPayment(request: CreatePaymentRequest): CreatePaymentResponse {
-        return saleServiceSdk.getSaleInformation(buildRequest(request.amount)).toCreatePaymentResponse()
+
+        //FIXME We need obtain this value in task WM-1222
+        val paymentId = UUID.randomUUID().toString()
+
+        return saleServiceSdk.getSaleInformation(buildRequest(request.amount, paymentId))
+            .toCreatePaymentResponse()
+            .also {
+                jpmcRepository.save(
+                    JpmcPayment(
+                        supplierOrderId = request.supplierOrderId,
+                        txnRefNo = paymentId,
+                        totalAmount = request.totalAmount,
+                        amount = request.amount,
+                        status = PaymentStatus.IN_PROGRESS
+                    )
+                )
+            }
     }
 
-    private fun buildRequest(amount: String) = SaleRequest(
+    private fun buildRequest(amount: String, paymentId: String) = SaleRequest(
         version = configuration.version,
-        txnRefNo = UUID.randomUUID().toString(),
+        txnRefNo = paymentId,
         amount = amount,
         passCode = configuration.passCode, //TODO this passCode must be in a Secret
         bankId = configuration.bankId,

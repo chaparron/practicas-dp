@@ -1,6 +1,6 @@
 package domain.services
 
-import adapters.repositories.SupplierRepository
+import adapters.repositories.supplier.SupplierRepository
 import domain.model.Supplier
 import org.slf4j.LoggerFactory
 
