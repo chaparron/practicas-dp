@@ -230,20 +230,20 @@ Resources:
 
   JpmcPaymentTable:
     Type: AWS::DynamoDB::Table
-      Properties:
-        PointInTimeRecoverySpecification:
-          PointInTimeRecoveryEnabled: true
-        KeySchema:
-          - AttributeName: "PK"
-            KeyType: "HASH"
-          - AttributeName: "SK"
-            KeyType: "RANGE"
-        AttributeDefinitions:
-          - AttributeName: "PK"
-            AttributeType: "S"
-          - AttributeName: "SK"
-            AttributeType: "S"
-        BillingMode: "PAY_PER_REQUEST"
+    Properties:
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      KeySchema:
+        - AttributeName: "PK"
+          KeyType: "HASH"
+        - AttributeName: "SK"
+          KeyType: "RANGE"
+      AttributeDefinitions:
+        - AttributeName: "PK"
+          AttributeType: "S"
+        - AttributeName: "SK"
+          AttributeType: "S"
+      BillingMode: "PAY_PER_REQUEST"
 
 Outputs:
   ApiRootURL:
