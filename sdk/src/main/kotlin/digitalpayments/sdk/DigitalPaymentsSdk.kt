@@ -1,9 +1,11 @@
 package digitalpayments.sdk
 
+import com.fasterxml.jackson.databind.JsonNode
 import digitalpayments.sdk.configuration.SdkConfiguration
 import digitalpayments.sdk.model.CreatePaymentRequest
 import digitalpayments.sdk.model.Provider
 import digitalpayments.sdk.model.CreatePaymentResponse
+import digitalpayments.sdk.model.UpdatePaymentRequest
 import kotlinx.serialization.decodeFromString
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpHeaders.AUTHORIZATION
@@ -20,6 +22,7 @@ import org.springframework.web.reactive.function.BodyInserters
 
 interface DigitalPaymentsSdk {
     fun createPayment(createPaymentRequest: CreatePaymentRequest, accessToken: String): Mono<CreatePaymentResponse>
+    fun updatePayment(updatePaymentRequest: UpdatePaymentRequest, accessToken: String): Mono<Boolean>
     fun getPaymentProviders(supplierId: String, accessToken: String): Mono<List<Provider>>
 }
 
@@ -35,7 +38,10 @@ class HttpDigitalPaymentsSdk(root: URI) : DigitalPaymentsSdk {
 
     private val detailedHttpErrorHandler = CustomHttpErrorHandler()
 
-    override fun createPayment(createPaymentRequest: CreatePaymentRequest, accessToken: String): Mono<CreatePaymentResponse> =
+    override fun createPayment(
+        createPaymentRequest: CreatePaymentRequest,
+        accessToken: String
+    ): Mono<CreatePaymentResponse> =
         webClient.post()
             .uri("/dp/jpmc/createPayment")
             .header(AUTHORIZATION, "Bearer $accessToken")
@@ -48,6 +54,18 @@ class HttpDigitalPaymentsSdk(root: URI) : DigitalPaymentsSdk {
                 mapper.decodeFromString<CreatePaymentResponse>(responseBody)
             }
             .switchIfEmpty(Mono.error(UnexpectedResponse("Unexpected error retrieving payment information for $createPaymentRequest")))
+
+    override fun updatePayment(updatePaymentRequest: UpdatePaymentRequest, accessToken: String): Mono<Boolean> =
+        webClient.post()
+            .uri("/dp/jpmc/updatePayment")
+            .header(AUTHORIZATION, "Bearer $accessToken")
+            .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .body(BodyInserters.fromObject(updatePaymentRequest))
+            .retrieve()
+            .onStatus(HttpStatus::isError, detailedHttpErrorHandler::handle)
+            .bodyToMono(JsonNode::class.java)
+            .thenReturn(true)
+
 
     override fun getPaymentProviders(supplierId: String, accessToken: String): Mono<List<Provider>> =
         webClient.get()
