@@ -6,6 +6,7 @@ import digitalpayments.sdk.model.CreatePaymentRequest
 import digitalpayments.sdk.model.Provider
 import digitalpayments.sdk.model.CreatePaymentResponse
 import digitalpayments.sdk.model.UpdatePaymentRequest
+import digitalpayments.sdk.model.UpdatePaymentResponse
 import kotlinx.serialization.decodeFromString
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpHeaders.AUTHORIZATION
@@ -22,7 +23,7 @@ import org.springframework.web.reactive.function.BodyInserters
 
 interface DigitalPaymentsSdk {
     fun createPayment(createPaymentRequest: CreatePaymentRequest, accessToken: String): Mono<CreatePaymentResponse>
-    fun updatePayment(updatePaymentRequest: UpdatePaymentRequest, accessToken: String): Mono<Boolean>
+    fun updatePayment(updatePaymentRequest: UpdatePaymentRequest, accessToken: String): Mono<UpdatePaymentResponse>
     fun getPaymentProviders(supplierId: String, accessToken: String): Mono<List<Provider>>
 }
 
@@ -55,7 +56,7 @@ class HttpDigitalPaymentsSdk(root: URI) : DigitalPaymentsSdk {
             }
             .switchIfEmpty(Mono.error(UnexpectedResponse("Unexpected error retrieving payment information for $createPaymentRequest")))
 
-    override fun updatePayment(updatePaymentRequest: UpdatePaymentRequest, accessToken: String): Mono<Boolean> =
+    override fun updatePayment(updatePaymentRequest: UpdatePaymentRequest, accessToken: String): Mono<UpdatePaymentResponse> =
         webClient.post()
             .uri("/dp/jpmc/updatePayment")
             .header(AUTHORIZATION, "Bearer $accessToken")
@@ -64,7 +65,16 @@ class HttpDigitalPaymentsSdk(root: URI) : DigitalPaymentsSdk {
             .retrieve()
             .onStatus(HttpStatus::isError, detailedHttpErrorHandler::handle)
             .bodyToMono(JsonNode::class.java)
-            .thenReturn(true)
+            .thenReturn(
+                UpdatePaymentResponse(
+                    paymentId = "",
+                    supplierOrderId = "",
+                    amount = "",
+                    totalAmount = "",
+                    responseCode = "",
+                    message = ""
+                )
+            )
 
 
     override fun getPaymentProviders(supplierId: String, accessToken: String): Mono<List<Provider>> =
