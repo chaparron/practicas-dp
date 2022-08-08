@@ -3,6 +3,6 @@ package digitalpayments.sdk.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-class UpdatePaymentRequest(
+data class UpdatePaymentRequest(
     val encData: String
 )
