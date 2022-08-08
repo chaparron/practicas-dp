@@ -32,7 +32,7 @@ dependencies {
 
     val wabiAuthorizerVersion: String by project
 //    val wabipaySupermoneySdkVersion: String by project
-    val wabi2bSdkVersion: String by project
+    val wabi2bJpmcSdkVersion: String by project
     val wabiAuthSdkVersion: String by project
     val wabiSerializersVersion: String by project
     val wabi2bPaymentsSdkVersion: String by project
@@ -74,7 +74,7 @@ dependencies {
 
     // wabi2b jpmc Sdk
 //    implementation("wabipay:supermoney-sdk:$wabipaySupermoneySdkVersion")
-    implementation("wabi2b:jpmc-sdk:$wabi2bSdkVersion")
+    implementation("wabi2b:jpmc-sdk:$wabi2bJpmcSdkVersion")
 
 
     // Auth0
