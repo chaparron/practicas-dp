@@ -125,8 +125,6 @@ Resources:
             Path: /{proxy+}
             RestApiId:
               Ref: ApiGatewayApi
-            Auth:
-              Authorizer: NONE
       Environment:
         Variables:
           PAYMENTS_ROOT:
