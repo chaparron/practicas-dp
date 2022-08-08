@@ -25,7 +25,7 @@ Mappings:
       JpmcAvailableFor: "IN-MH"
       JpmcStateValidationEnabled: true
       JpmcProvidersDummyEnabled: true
-      JpmcCreatePaymentDummyEnabled: false
+      JpmcCreatePaymentDummyEnabled: true
       JpmcUpdatePaymentDummyEnabled: true
     prod:
       SubnetsStr: "subnet-02892d9b9c9f13256,subnet-0d2c43077cc4fb646,subnet-0a31d7dcc515f14cb"
@@ -46,7 +46,7 @@ Mappings:
       JpmcAvailableFor: "IN-MH"
       JpmcStateValidationEnabled: true
       JpmcProvidersDummyEnabled: true
-      JpmcCreatePaymentDummyEnabled: false
+      JpmcCreatePaymentDummyEnabled: true
       JpmcUpdatePaymentDummyEnabled: true
 Globals:
   Function:
