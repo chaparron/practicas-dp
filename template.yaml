@@ -184,16 +184,7 @@ Resources:
     Properties:
       StageName: !Ref EnvironmentStackName
       Auth:
-        DefaultAuthorizer: W2BTokenAuthorizer
-        Authorizers:
-          W2BTokenAuthorizer:
-            FunctionArn:
-              Fn::ImportValue: !Sub "AuthorizerHandlerArn"
-            FunctionPayloadType: REQUEST
-            AuthorizerPayloadFormatVersion: 2.0
-            Identity:
-              Headers:
-                - Authorization
+        Authorizer: NONE
 
   SupplierListenerFunction:
     Type: AWS::Serverless::Function
