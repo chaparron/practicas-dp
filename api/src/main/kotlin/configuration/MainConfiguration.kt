@@ -13,12 +13,10 @@ import com.wabi2b.serializers.BigDecimalToFloatSerializer
 import com.wabi2b.serializers.InstantSerializer
 import com.wabi2b.serializers.URISerializer
 import com.wabi2b.serializers.UUIDStringSerializer
+import configuration.EnvironmentVariable.*
 import domain.functions.SupplierListenerFunction
-import domain.services.DefaultSupplierService
-import domain.services.JpmcCreatePaymentService
-import domain.services.JpmcUpdatePaymentService
+import domain.services.*
 import domain.services.state.StateValidatorService
-import domain.services.SupplierService
 import domain.services.providers.PaymentProviderService
 import domain.services.providers.jpmc.JpmProviderService
 import kotlinx.serialization.json.Json
@@ -27,6 +25,10 @@ import kotlinx.serialization.modules.contextual
 import org.slf4j.LoggerFactory
 import software.amazon.awssdk.http.urlconnection.UrlConnectionHttpClient
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
+import wabi2b.sdk.api.HttpWabi2bSdk
+import wabi2b.sdk.api.Wabi2bSdk
+import java.net.URI
+import java.time.Clock
 
 object MainConfiguration : Configuration {
 
@@ -55,7 +57,8 @@ object MainConfiguration : Configuration {
                     encrypter = AesEncrypterService(this.aesEncryptionKey) //TODO this key must be in a Secret
                 ),
                 configuration = this,
-                jpmcRepository = jpmcPaymentRepository
+                jpmcRepository = jpmcPaymentRepository,
+                tokenProvider = wabi2bTokenProvider
             )
         }
     }
@@ -63,11 +66,11 @@ object MainConfiguration : Configuration {
     private val jpmcPaymentRepository: JpmcPaymentRepository by lazy {
         DynamoDbJpmcPaymentRepository(
             dynamoDbClient = dynamoDbClient,
-            tableName = EnvironmentVariable.JPMC_PAYMENT_TABLE.get()
+            tableName = JPMC_PAYMENT_TABLE.get()
         )
     }
 
-    override val jpmcStateValidationConfig: EnvironmentVariable.JpmcStateValidationConfig by lazy {
+    override val jpmcStateValidationConfig: JpmcStateValidationConfig by lazy {
         EnvironmentVariable.jpmcStateValidationConfig()
     }
 
@@ -113,9 +116,28 @@ object MainConfiguration : Configuration {
     private val supplierRepository: SupplierRepository by lazy {
         DynamoDBSupplierRepository(
             dynamoDbClient = dynamoDbClient,
-            tableName = EnvironmentVariable.SUPPLIER_TABLE.get()
+            tableName = SUPPLIER_TABLE.get()
         )
     }
+
+    override val wabi2bTokenProvider: TokenProvider by lazy {
+        Wabi2bTokenProvider(
+            wabi2bSdk = wabi2bSdk,
+            dpClientUser = CLIENT_ID.get(),
+            dpClientSecret = CLIENT_PASSWORD.get(),
+            clock = clock
+        )
+    }
+
+    override val wabi2bSdk: Wabi2bSdk by lazy {
+        HttpWabi2bSdk
+            .builder()
+            .withBaseURI(URI.create(API_ROOT.get()))
+            .build()
+    }
+
+    override val clock: Clock = Clock.systemUTC()
+
 
     private val dynamoDbClient: DynamoDbClient by lazy {
         logger.info("Initializing DynamoDbClient")

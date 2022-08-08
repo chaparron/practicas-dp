@@ -27,6 +27,7 @@ Mappings:
       JpmcProvidersDummyEnabled: true
       JpmcCreatePaymentDummyEnabled: true
       JpmcUpdatePaymentDummyEnabled: true
+      ClientSecret: "qa/digital-payments"
     prod:
       SubnetsStr: "subnet-02892d9b9c9f13256,subnet-0d2c43077cc4fb646,subnet-0a31d7dcc515f14cb"
       ProvisionedExecutionsApiGatewayMinCapacity: 2
@@ -48,6 +49,7 @@ Mappings:
       JpmcProvidersDummyEnabled: true
       JpmcCreatePaymentDummyEnabled: true
       JpmcUpdatePaymentDummyEnabled: true
+      ClientSecret: "prod/digital-payments"
 Globals:
   Function:
     Runtime: "java11"
@@ -149,6 +151,8 @@ Resources:
           JPMC_CREATE_PAYMENT_DUMMY_ENABLED: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcCreatePaymentDummyEnabled ]
           JPMC_UPDATE_PAYMENT_DUMMY_ENABLED: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcUpdatePaymentDummyEnabled ]
           JPMC_PAYMENT_TABLE: !Ref JpmcPaymentTable
+          CLIENT_ID: "digital_payments"
+          CLIENT_PASSWORD: "WWyAh1D47U2Myeahs"
       Policies:
         - AWSSecretsManagerGetSecretValuePolicy:
             SecretArn: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:NEW_RELIC_LICENSE_KEY*"

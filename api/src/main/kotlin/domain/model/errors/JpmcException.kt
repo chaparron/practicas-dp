@@ -12,6 +12,11 @@ open class JpmcException(
             detail = reason.detail(detailItem),
             rootCause = rootCause
         )
+        fun unknown(detail: String = "Unknown", cause: Throwable? = null) = JpmcException(
+            reason = JpmcErrorReason.UNKNOWN,
+            detail = detail,
+            rootCause = cause
+        )
     }
 
 }

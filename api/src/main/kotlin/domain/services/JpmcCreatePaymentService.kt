@@ -14,7 +14,8 @@ import domain.model.PaymentStatus
 class JpmcCreatePaymentService(
     private val saleServiceSdk: SaleService,
     private val configuration: JpmcConfiguration,
-    private val jpmcRepository: JpmcPaymentRepository
+    private val jpmcRepository: JpmcPaymentRepository,
+    private val tokenProvider: TokenProvider
 ) {
     companion object {
         private const val TRANSACTION_TYPE = "Pay"
@@ -23,6 +24,7 @@ class JpmcCreatePaymentService(
     @Throws(FunctionalityNotAvailable::class)
     fun createPayment(request: CreatePaymentRequest): CreatePaymentResponse {
 
+        val dpToken = tokenProvider.getClientToken()
         //FIXME We need obtain this value in task WM-1222
         val paymentId = UUID.randomUUID().toString()
 

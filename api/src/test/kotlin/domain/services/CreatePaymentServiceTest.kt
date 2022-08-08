@@ -31,6 +31,9 @@ class CreatePaymentServiceTest {
     @Mock
     private lateinit var jpmcRepository: JpmcPaymentRepository
 
+    @Mock
+    private lateinit var tokenProvider: TokenProvider
+
     @InjectMocks
     private lateinit var sut: JpmcCreatePaymentService
 
@@ -39,6 +42,7 @@ class CreatePaymentServiceTest {
         val saleInformation = anySaleInformation()
         whenever(saleServiceSdk.getSaleInformation(any())).thenReturn(saleInformation)
         whenever(jpmcRepository.save(any())).thenReturn(anyJpmcPayment())
+        whenever(tokenProvider.getClientToken()).thenReturn(randomString())
         wheneverForConfigurations()
 
         val request = anyCreatePaymentRequest()
@@ -55,6 +59,7 @@ class CreatePaymentServiceTest {
 
         verify(saleServiceSdk).getSaleInformation(any())
         verify(jpmcRepository).save(any())
+        verify(tokenProvider).getClientToken()
         verifyForConfigurations()
     }
 
