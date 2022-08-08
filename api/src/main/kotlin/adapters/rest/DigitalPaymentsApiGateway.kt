@@ -8,6 +8,7 @@ import adapters.rest.handler.PaymentProvidersHandler
 import adapters.rest.handler.PaymentProvidersHandler.Companion.PAYMENT_PROVIDERS_PATH
 import adapters.rest.handler.RestErrorHandler
 import configuration.Configuration
+import configuration.EnvironmentVariable
 import configuration.MainConfiguration
 import wabi.rest2lambda.ApiGatewayProxy
 import wabi.rest2lambda.ErrorHandler

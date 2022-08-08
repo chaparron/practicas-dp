@@ -16,7 +16,8 @@ enum class EnvironmentVariable {
     JPMC_RETURN_URL,
     JPMC_VERSION,
     JPMC_AVAILABLE_FOR,
-    JPMC_STATE_VALIDATION_ENABLED;
+    JPMC_STATE_VALIDATION_ENABLED,
+    JPMC_PROVIDERS_DUMMY_ENABLED;
 
     companion object {
         fun jpmcConfiguration(): JpmcConfiguration =
@@ -41,6 +42,8 @@ enum class EnvironmentVariable {
                     .map { it.uppercase() },
                 enabled = JPMC_STATE_VALIDATION_ENABLED.get().toBoolean()
             )
+
+        fun jpmcProvidersDummyEnabled() = JPMC_PROVIDERS_DUMMY_ENABLED.get()
     }
 
 
