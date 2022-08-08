@@ -3,7 +3,9 @@ package adapters.rest.handler
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
+import configuration.EnvironmentVariable
 import domain.model.JpmcPaymentInformation
+import domain.model.UpdatePaymentResponse
 import domain.model.errors.JpmcErrorReason
 import domain.model.errors.JpmcException
 import domain.services.JpmcUpdatePaymentService
@@ -13,6 +15,7 @@ import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import wabi.rest2lambda.RestHandler
 import wabi.rest2lambda.ok
+import java.util.*
 
 class JpmcUpdatePaymentHandler(
     private val service: JpmcUpdatePaymentService,
@@ -28,14 +31,33 @@ class JpmcUpdatePaymentHandler(
     override fun handleRequest(request: APIGatewayProxyRequestEvent, context: Context): APIGatewayProxyResponseEvent {
         logger.trace("Received request: [${request.body}]")
 
-        return ok(service.update(map(request))
-            .also {
+        return if (EnvironmentVariable.jpmcUpdatePaymentDummyEnabled().toBoolean()) {
+            ok(UpdatePaymentResponse(
+                paymentId = UUID.randomUUID().toString(),
+                supplierOrderId = "666",
+                amount = "100",
+                totalAmount = "100",
+                responseCode = "00",
+                message = "Transaction Successful"
+            ).also {
                 logger.trace("Payment Updated: $it")
             }
-            .let {
-                jsonMapper.encodeToString(it)
-            }
-        )
+                .let {
+                    jsonMapper.encodeToString(it)
+                })
+
+        } else {
+            ok(service.update(map(request))
+                .also {
+                    logger.trace("Payment Updated: $it")
+                }
+                .let {
+                    jsonMapper.encodeToString(it)
+                }
+            )
+        }
+
+
     }
 
     private fun map(request: APIGatewayProxyRequestEvent): JpmcPaymentInformation =

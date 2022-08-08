@@ -17,7 +17,9 @@ enum class EnvironmentVariable {
     JPMC_VERSION,
     JPMC_AVAILABLE_FOR,
     JPMC_STATE_VALIDATION_ENABLED,
-    JPMC_PROVIDERS_DUMMY_ENABLED;
+    JPMC_PROVIDERS_DUMMY_ENABLED,
+    JPMC_CREATE_PAYMENT_DUMMY_ENABLED,
+    JPMC_UPDATE_PAYMENT_DUMMY_ENABLED;
 
     companion object {
         fun jpmcConfiguration(): JpmcConfiguration =
@@ -44,6 +46,8 @@ enum class EnvironmentVariable {
             )
 
         fun jpmcProvidersDummyEnabled() = JPMC_PROVIDERS_DUMMY_ENABLED.get()
+        fun jpmcCreatePaymentDummyEnabled() = JPMC_CREATE_PAYMENT_DUMMY_ENABLED.get()
+        fun jpmcUpdatePaymentDummyEnabled() = JPMC_UPDATE_PAYMENT_DUMMY_ENABLED.get()
     }
 
 

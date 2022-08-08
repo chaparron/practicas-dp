@@ -25,6 +25,8 @@ Mappings:
       JpmcAvailableFor: "IN-MH"
       JpmcStateValidationEnabled: true
       JpmcProvidersDummyEnabled: true
+      JpmcCreatePaymentDummyEnabled: false
+      JpmcUpdatePaymentDummyEnabled: true
     prod:
       SubnetsStr: "subnet-02892d9b9c9f13256,subnet-0d2c43077cc4fb646,subnet-0a31d7dcc515f14cb"
       ProvisionedExecutionsApiGatewayMinCapacity: 2
@@ -44,6 +46,8 @@ Mappings:
       JpmcAvailableFor: "IN-MH"
       JpmcStateValidationEnabled: true
       JpmcProvidersDummyEnabled: true
+      JpmcCreatePaymentDummyEnabled: false
+      JpmcUpdatePaymentDummyEnabled: true
 Globals:
   Function:
     Runtime: "java11"
@@ -142,6 +146,8 @@ Resources:
           JPMC_AVAILABLE_FOR: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcAvailableFor ]
           JPMC_STATE_VALIDATION_ENABLED: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcStateValidationEnabled ]
           JPMC_PROVIDERS_DUMMY_ENABLED: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcProvidersDummyEnabled ]
+          JPMC_CREATE_PAYMENT_DUMMY_ENABLED: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcCreatePaymentDummyEnabled ]
+          JPMC_UPDATE_PAYMENT_DUMMY_ENABLED: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcUpdatePaymentDummyEnabled ]
           JPMC_PAYMENT_TABLE: !Ref JpmcPaymentTable
       Policies:
         - AWSSecretsManagerGetSecretValuePolicy:
