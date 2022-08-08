@@ -26,7 +26,7 @@ class JpmcCreatePaymentService(
         //FIXME We need obtain this value in task WM-1222
         val paymentId = UUID.randomUUID().toString()
 
-        return saleServiceSdk.getSaleInformation(buildRequest(request.amount, paymentId))
+        return saleServiceSdk.getSaleInformation(buildRequest(request, paymentId))
             .toCreatePaymentResponse()
             .also {
                 jpmcRepository.save(
@@ -41,10 +41,10 @@ class JpmcCreatePaymentService(
             }
     }
 
-    private fun buildRequest(amount: String, paymentId: String) = SaleRequest(
+    private fun buildRequest(request: CreatePaymentRequest, paymentId: String) = SaleRequest(
         version = configuration.version,
         txnRefNo = paymentId,
-        amount = amount,
+        amount = request.amount,
         passCode = configuration.passCode, //TODO this passCode must be in a Secret
         bankId = configuration.bankId,
         terminalId = configuration.terminalId,
@@ -52,7 +52,9 @@ class JpmcCreatePaymentService(
         mCC = configuration.mcc,
         currency = configuration.currency,
         txnType = TRANSACTION_TYPE,
-        returnUrl = configuration.returnUrl
+        returnUrl = configuration.returnUrl,
+        supplierOrderId = request.supplierOrderId,
+        totalAmount = request.totalAmount
     )
 
     private fun com.wabi2b.jpmc.sdk.usecase.sale.SaleInformation.toCreatePaymentResponse() = CreatePaymentResponse(
