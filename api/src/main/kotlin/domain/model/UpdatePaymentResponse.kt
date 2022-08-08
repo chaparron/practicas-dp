@@ -1,14 +1,14 @@
-package digitalpayments.sdk.model
+package domain.model
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UpdatePaymentResponse(
+class UpdatePaymentResponse (
     val paymentId: String?,
     val supplierOrderId: String,
     val amount: String,
     val totalAmount: String,
     val responseCode: String,
     val message: String
-)
+    )
 

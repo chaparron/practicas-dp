@@ -39,7 +39,10 @@ class DigitalPaymentsApiGateway(
         )
         .post(
             path = PROCESS_INFORMATION_PATH,
-            handler = JpmcUpdatePaymentHandler()
+            handler = JpmcUpdatePaymentHandler(
+                service = configuration.jpmcUpdatePaymentService,
+                jsonMapper = configuration.jsonMapper
+            )
         )
 
     override fun getErrorHandler(): ErrorHandler {

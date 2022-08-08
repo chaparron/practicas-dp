@@ -40,8 +40,6 @@ class JpmcCreatePaymentHandlerTest {
         private const val MERCHANT_ID = "X"
         private const val TERMINAL_ID = "X"
         private const val ENC_DATA = "X"
-        private const val AMOUNT_KEY = "amount"
-        private const val AMOUNT = "12345"
 
         private const val EXPECTED_JSON_RESPONSE =
             "{\"bankId\":\"$BANK_ID\",\"merchantId\":\"$MERCHANT_ID\",\"terminalId\":\"$TERMINAL_ID\",\"encData\":\"$ENC_DATA\"}"

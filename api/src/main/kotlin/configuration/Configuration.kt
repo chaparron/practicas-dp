@@ -2,6 +2,7 @@ package configuration
 
 import domain.functions.SupplierListenerFunction
 import domain.services.JpmcCreatePaymentService
+import domain.services.JpmcUpdatePaymentService
 import domain.services.state.StateValidatorService
 import domain.services.providers.PaymentProviderService
 import kotlinx.serialization.json.Json
@@ -13,4 +14,5 @@ interface Configuration {
     val supplierListenerFunction: SupplierListenerFunction
     val stateValidatorService: StateValidatorService
     val paymentProviderService: PaymentProviderService
+    val jpmcUpdatePaymentService: JpmcUpdatePaymentService
 }

@@ -5,6 +5,7 @@ import adapters.repositories.jpmc.JpmcPaymentRepository
 import adapters.repositories.supplier.DynamoDBSupplierRepository
 import adapters.repositories.supplier.SupplierRepository
 import adapters.rest.validations.Security
+import com.wabi2b.jpmc.sdk.security.cipher.aes.decrypt.AesDecrypterService
 import com.wabi2b.jpmc.sdk.security.cipher.aes.encrypt.AesEncrypterService
 import com.wabi2b.jpmc.sdk.security.hash.sha256.DigestHashCalculator
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleService
@@ -15,6 +16,7 @@ import com.wabi2b.serializers.UUIDStringSerializer
 import domain.functions.SupplierListenerFunction
 import domain.services.DefaultSupplierService
 import domain.services.JpmcCreatePaymentService
+import domain.services.JpmcUpdatePaymentService
 import domain.services.state.StateValidatorService
 import domain.services.SupplierService
 import domain.services.providers.PaymentProviderService
@@ -90,6 +92,16 @@ object MainConfiguration : Configuration {
                 stateValidator = stateValidatorService
             )
         )
+    }
+
+    override val jpmcUpdatePaymentService: JpmcUpdatePaymentService by lazy {
+        with(EnvironmentVariable.jpmcConfiguration()) {
+            JpmcUpdatePaymentService(
+                decrypter = AesDecrypterService(this.aesEncryptionKey),
+                jsonMapper = jsonMapper,
+                repository = jpmcPaymentRepository
+            )
+        }
     }
 
     private val supplierService: SupplierService by lazy {
