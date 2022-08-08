@@ -1,7 +1,7 @@
 package adapters.rest
 
-import adapters.rest.handler.JpmcProcessInformationHandler
-import adapters.rest.handler.JpmcProcessInformationHandler.Companion.PROCESS_INFORMATION_PATH
+import adapters.rest.handler.JpmcUpdatePaymentHandler
+import adapters.rest.handler.JpmcUpdatePaymentHandler.Companion.PROCESS_INFORMATION_PATH
 import adapters.rest.handler.JpmcCreatePaymentHandler
 import adapters.rest.handler.JpmcCreatePaymentHandler.Companion.CREATE_PAYMENT_PATH
 import adapters.rest.handler.PaymentProvidersHandler
@@ -39,7 +39,7 @@ class DigitalPaymentsApiGateway(
         )
         .post(
             path = PROCESS_INFORMATION_PATH,
-            handler = JpmcProcessInformationHandler()
+            handler = JpmcUpdatePaymentHandler()
         )
 
     override fun getErrorHandler(): ErrorHandler {

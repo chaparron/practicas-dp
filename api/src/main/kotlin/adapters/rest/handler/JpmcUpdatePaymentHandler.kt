@@ -5,10 +5,10 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import wabi.rest2lambda.RestHandler
 
-class JpmcProcessInformationHandler : RestHandler {
+class JpmcUpdatePaymentHandler : RestHandler {
 
     companion object {
-        const val PROCESS_INFORMATION_PATH = "/jpmc/processInformation"
+        const val PROCESS_INFORMATION_PATH = "/dp/jpmc/updatePayment"
     }
 
     override fun handleRequest(input: APIGatewayProxyRequestEvent?, context: Context?): APIGatewayProxyResponseEvent {
