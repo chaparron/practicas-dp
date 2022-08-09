@@ -1,5 +1,6 @@
 package domain.services
 
+import adapters.repositories.jpmc.DynamoDbJpmcPaymentRepository
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleRequest
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleService
 import configuration.EnvironmentVariable.JpmcConfiguration
@@ -10,6 +11,7 @@ import java.util.*
 import adapters.repositories.jpmc.JpmcPaymentRepository
 import domain.model.JpmcPayment
 import domain.model.PaymentStatus
+import org.slf4j.LoggerFactory
 
 class JpmcCreatePaymentService(
     private val saleServiceSdk: SaleService,
@@ -19,12 +21,14 @@ class JpmcCreatePaymentService(
 ) {
     companion object {
         private const val TRANSACTION_TYPE = "Pay"
+        private val logger = LoggerFactory.getLogger(JpmcCreatePaymentService::class.java)
     }
 
     @Throws(FunctionalityNotAvailable::class)
     fun createPayment(request: CreatePaymentRequest): CreatePaymentResponse {
 
         val dpToken = tokenProvider.getClientToken()
+        logger.debug("Client token: $dpToken")
         //FIXME We need obtain this value in task WM-1222
         val paymentId = UUID.randomUUID().toString()
 
