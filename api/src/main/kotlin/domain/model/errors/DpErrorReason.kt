@@ -1,9 +1,9 @@
 package domain.model.errors
 
 import domain.model.errors.ErrorType.BAD_REQUEST
-import domain.model.errors.JpmcErrorReason.DetailBuilder.missingProperty
+import domain.model.errors.DpErrorReason.DetailBuilder.missingProperty
 
-enum class JpmcErrorReason(
+enum class DpErrorReason(
     val type: ErrorType,
     private val pattern: (Any?) -> String
 ) {

@@ -6,8 +6,8 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import configuration.EnvironmentVariable
 import domain.model.JpmcPaymentInformation
 import domain.model.UpdatePaymentResponse
-import domain.model.errors.JpmcErrorReason
-import domain.model.errors.JpmcException
+import domain.model.errors.DpErrorReason
+import domain.model.errors.DpException
 import domain.services.JpmcUpdatePaymentService
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -65,8 +65,8 @@ class JpmcUpdatePaymentHandler(
             jsonMapper.decodeFromString<JpmcPaymentInformation>(request.body)
         }.getOrElse { exception ->
             when (exception) {
-                is JpmcException -> throw exception
-                else -> throw JpmcException.from(reason = JpmcErrorReason.UNKNOWN, rootCause = exception)
+                is DpException -> throw exception
+                else -> throw DpException.from(reason = DpErrorReason.UNKNOWN, rootCause = exception)
             }
         }
 }

@@ -6,7 +6,7 @@ import digitalpayments.sdk.builders.apiResponse.ErrorResponseBuilder.buildApiReq
 import digitalpayments.sdk.configuration.SdkConfiguration
 import digitalpayments.sdk.model.CreatePaymentRequest
 import digitalpayments.sdk.model.CreatePaymentResponse
-import domain.model.errors.JpmcErrorReason
+import domain.model.errors.DpErrorReason
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.serialization.encodeToString
@@ -69,7 +69,7 @@ class HttpDigitalPaymentsSdkCreatePaymentResponseTest : AbstractSdkTest() {
     @Test
     fun `given bad request when createPayment then throw BadRequest with statusCode is 400`() {
 
-        val response = buildApiRequestErrorResponse(JpmcErrorReason.MISSING_AMOUNT, AMOUNT_KEY)
+        val response = buildApiRequestErrorResponse(DpErrorReason.MISSING_AMOUNT, AMOUNT_KEY)
 
         stubFor(
             any(urlPathEqualTo(PATH))

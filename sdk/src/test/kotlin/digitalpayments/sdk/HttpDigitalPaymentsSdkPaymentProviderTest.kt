@@ -5,7 +5,7 @@ import com.github.tomakehurst.wiremock.matching.EqualToPattern
 import digitalpayments.sdk.builders.apiResponse.ErrorResponseBuilder.buildApiRequestErrorResponse
 import digitalpayments.sdk.configuration.SdkConfiguration
 import digitalpayments.sdk.model.Provider
-import domain.model.errors.JpmcErrorReason
+import domain.model.errors.DpErrorReason
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.serialization.encodeToString
@@ -57,7 +57,7 @@ class HttpDigitalPaymentsSdkPaymentProviderTest : AbstractSdkTest() {
     @Test
     fun `given bad request when getPaymentProvider then throw BadRequest with statusCode is 400`() {
 
-        val response = buildApiRequestErrorResponse(JpmcErrorReason.MISSING_AMOUNT, SUPPLIER_ID_KEY)
+        val response = buildApiRequestErrorResponse(DpErrorReason.MISSING_AMOUNT, SUPPLIER_ID_KEY)
 
         stubFor(
             any(urlPathEqualTo(PATH))

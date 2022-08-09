@@ -1,6 +1,6 @@
 package domain.services
 
-import domain.model.errors.JpmcException
+import domain.model.errors.DpException
 import org.slf4j.LoggerFactory
 import wabi2b.sdk.api.Wabi2bSdk
 import wabi2b.sdk.api.dto.UserLogin
@@ -51,7 +51,7 @@ class Wabi2bTokenProvider(
         expiresOn.isBefore(clock.instant().minusSeconds(SAFE_EXPIRATION_THRESHOLD))
 
     private fun requestTokenToSdk() = wabi2bSdk.clientLogin(dpClientUser, dpClientSecret).block()
-        ?: throw JpmcException.unknown( "Could not get a digital payments client token")
+        ?: throw DpException.unknown( "Could not get a digital payments client token")
 
     data class CachedUserLogin(
         val accessToken: String,

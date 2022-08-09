@@ -1,7 +1,7 @@
 package digitalpayments.sdk.builders.apiResponse
 
-import domain.model.errors.JpmcException
-import domain.model.errors.JpmcErrorReason
+import domain.model.errors.DpException
+import domain.model.errors.DpErrorReason
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -10,17 +10,17 @@ import wabi.sdk.impl.DetailedError
 object ErrorResponseBuilder {
 
     fun buildApiDetailedError(
-        reason: JpmcErrorReason = JpmcErrorReason.UNKNOWN,
+        reason: DpErrorReason = DpErrorReason.UNKNOWN,
         detail: String? = "Dummy detail"
     ) = DetailedError(reason.name, detail)
 
-    fun buildApiRequestErrorResponse(reason: JpmcErrorReason, property: String) =
-        buildApiRequestErrorResponse(JpmcException.from(reason = reason, detailItem = property))
+    fun buildApiRequestErrorResponse(reason: DpErrorReason, property: String) =
+        buildApiRequestErrorResponse(DpException.from(reason = reason, detailItem = property))
 
-    private fun buildApiRequestErrorResponse(exception: JpmcException) =
+    private fun buildApiRequestErrorResponse(exception: DpException) =
         ErrorResponse(listOf(exception.toError()))
 
-    private fun JpmcException.toError() = JpmcError(
+    private fun DpException.toError() = DpError(
         type = this.reason.name,
         entity = "",
         property = "",
@@ -30,7 +30,7 @@ object ErrorResponseBuilder {
 
     fun ErrorResponse.toSdkResponse() = ErrorResponse(
         errors = this.errors.map {
-            JpmcError(
+            DpError(
                 type = it.type,
                 entity = it.entity,
                 property = it.property,
@@ -48,10 +48,10 @@ object ErrorResponseBuilder {
 }
 
 @Serializable
-data class ErrorResponse(val errors: List<JpmcError>)
+data class ErrorResponse(val errors: List<DpError>)
 
 @Serializable
-data class JpmcError(
+data class DpError(
     val type: String? = null,
     val entity: String,
     val property: String,

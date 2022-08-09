@@ -5,7 +5,7 @@ import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import configuration.EnvironmentVariable
-import domain.model.errors.JpmcErrorReason
+import domain.model.errors.DpErrorReason
 import domain.services.state.StateValidatorService
 import domain.services.providers.PaymentProviderService
 import domain.services.providers.Provider
@@ -40,7 +40,7 @@ class PaymentProvidersHandler(
                 })
         } else {
             val supplierId = input.queryStringParameters[SUPPLIER_ID_PARAM]
-                .required(JpmcErrorReason.MISSING_SUPPLIER_ID)
+                .required(DpErrorReason.MISSING_SUPPLIER_ID)
 
             val state = stateValidatorService.getState(input)
 

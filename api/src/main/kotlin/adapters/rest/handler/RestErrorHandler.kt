@@ -3,7 +3,7 @@ package adapters.rest.handler
 import adapters.rest.model.errors.DigitalPaymentsDetailedError
 import adapters.rest.validations.Security
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
-import domain.model.errors.JpmcException
+import domain.model.errors.DpException
 import domain.model.errors.ErrorType.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -21,7 +21,7 @@ class RestErrorHandler(private val jsonMapper: Json) : ErrorHandler {
     override fun handle(error: Throwable): APIGatewayProxyResponseEvent {
         logger.error("Attempt to handler error.", error)
         return when (error) {
-            is JpmcException -> {
+            is DpException -> {
                 val detailedError = DigitalPaymentsDetailedError(reason = error.reason, detail = error.detail)
                 when (error.reason.type) {
                     BAD_REQUEST -> customError(detailedError, 400)

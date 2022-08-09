@@ -6,7 +6,7 @@ import digitalpayments.sdk.builders.apiResponse.ErrorResponseBuilder.buildApiReq
 import digitalpayments.sdk.configuration.SdkConfiguration
 import digitalpayments.sdk.model.UpdatePaymentResponse
 import digitalpayments.sdk.model.UpdatePaymentRequest
-import domain.model.errors.JpmcErrorReason
+import domain.model.errors.DpErrorReason
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.serialization.encodeToString
@@ -64,7 +64,7 @@ class HttpDigitalPaymentsSdkUpdatePaymentResponseTest : AbstractSdkTest() {
     @Test
     fun `given bad request when updatePayment then throw BadRequest with statusCode is 400`() {
 
-        val response = buildApiRequestErrorResponse(JpmcErrorReason.UNKNOWN, "")
+        val response = buildApiRequestErrorResponse(DpErrorReason.UNKNOWN, "")
 
         stubFor(
             any(urlPathEqualTo(PATH))

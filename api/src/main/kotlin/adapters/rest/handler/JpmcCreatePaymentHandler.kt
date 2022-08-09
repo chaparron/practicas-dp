@@ -7,7 +7,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import configuration.EnvironmentVariable
 import domain.model.CreatePaymentRequest
 import domain.model.CreatePaymentResponse
-import domain.model.errors.JpmcErrorReason
+import domain.model.errors.DpErrorReason
 import domain.services.JpmcCreatePaymentService
 import domain.services.state.StateValidatorService
 import kotlinx.serialization.Serializable
@@ -65,9 +65,9 @@ class JpmcCreatePaymentHandler(
     }
 
     private fun CreatePaymentHandlerRequest.toCreatePaymentRequest() = CreatePaymentRequest(
-        supplierOrderId = supplierOrderId.required(JpmcErrorReason.MISSING_SUPPLIER_ID),
-        amount = amount.required(JpmcErrorReason.MISSING_AMOUNT),
-        totalAmount = totalAmount.required(JpmcErrorReason.MISSING_TOTAL_AMOUNT)
+        supplierOrderId = supplierOrderId.required(DpErrorReason.MISSING_SUPPLIER_ID),
+        amount = amount.required(DpErrorReason.MISSING_AMOUNT),
+        totalAmount = totalAmount.required(DpErrorReason.MISSING_TOTAL_AMOUNT)
     )
 
     @Serializable

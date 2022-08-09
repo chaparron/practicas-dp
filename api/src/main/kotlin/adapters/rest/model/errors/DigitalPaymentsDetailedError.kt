@@ -1,11 +1,11 @@
 package adapters.rest.model.errors
 
-import domain.model.errors.JpmcErrorReason
+import domain.model.errors.DpErrorReason
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class DigitalPaymentsDetailedError(
-    val reason: JpmcErrorReason,
+    val reason: DpErrorReason,
     val detail: String? = null
 )
 
