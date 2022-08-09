@@ -5,6 +5,7 @@ import anyCreatePaymentRequest
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleInformation
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleService
 import configuration.EnvironmentVariable
+import domain.model.CreatePaymentRequest
 import domain.model.JpmcPayment
 import domain.model.PaymentStatus
 import org.junit.jupiter.api.Test
@@ -18,6 +19,14 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import randomString
 import kotlin.test.assertEquals
+import org.mockito.internal.verification.Times
+import org.mockito.kotlin.times
+import reactor.core.publisher.Mono
+import wabi2b.payments.common.model.dto.PaymentId
+import wabi2b.payments.common.model.dto.PaymentRequestDto
+import wabi2b.payments.common.model.dto.PaymentType
+import wabi2b.payments.common.model.dto.StartPaymentRequestDto
+import wabi2b.payments.sdk.client.impl.WabiPaymentSdk
 
 @ExtendWith(MockitoExtension::class)
 class CreatePaymentServiceTest {
@@ -34,18 +43,26 @@ class CreatePaymentServiceTest {
     @Mock
     private lateinit var tokenProvider: TokenProvider
 
+    @Mock
+    private lateinit var paymentSdk: WabiPaymentSdk
+
     @InjectMocks
     private lateinit var sut: JpmcCreatePaymentService
 
     @Test
     fun `given a valid request when createPayment then return valid information and persist in DB`() {
         val saleInformation = anySaleInformation()
+        val anyPaymentId = PaymentId(100L)
+        val request = anyCreatePaymentRequest()
+        val paymentSdkRequest = request.toStartPaymentRequestDto()
+        val accessToken = randomString()
+
+        whenever(paymentSdk.startPayment(any(), any())).thenReturn(Mono.just(anyPaymentId))
         whenever(saleServiceSdk.getSaleInformation(any())).thenReturn(saleInformation)
         whenever(jpmcRepository.save(any())).thenReturn(anyJpmcPayment())
-        whenever(tokenProvider.getClientToken()).thenReturn(randomString())
+        whenever(tokenProvider.getClientToken()).thenReturn(accessToken)
         wheneverForConfigurations()
 
-        val request = anyCreatePaymentRequest()
 
         val response = sut.createPayment(request)
 
@@ -60,13 +77,13 @@ class CreatePaymentServiceTest {
         verify(saleServiceSdk).getSaleInformation(any())
         verify(jpmcRepository).save(any())
         verify(tokenProvider).getClientToken()
+        verify(paymentSdk, times(1)).startPayment(paymentSdkRequest, accessToken)
         verifyForConfigurations()
     }
 
     private fun anyJpmcPayment() = JpmcPayment(
         supplierOrderId = randomString(),
         txnRefNo = randomString(),
-        totalAmount = "292",
         amount = "40",
         status = PaymentStatus.IN_PROGRESS
     )
@@ -100,4 +117,10 @@ class CreatePaymentServiceTest {
         verify(configuration).currency
         verify(configuration).returnUrl
     }
+
+    private fun CreatePaymentRequest.toStartPaymentRequestDto() = StartPaymentRequestDto(
+        supplierOrderId = supplierOrderId,
+        paidAmount = amount.toBigDecimal(),
+        paymentType = PaymentType.DIGITAL_PAYMENT
+    )
 }

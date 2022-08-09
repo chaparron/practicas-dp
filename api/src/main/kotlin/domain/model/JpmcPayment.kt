@@ -3,7 +3,6 @@ package domain.model
 data class JpmcPayment(
     val supplierOrderId: String,
     val txnRefNo: String,
-    val totalAmount: String,
     val amount: String,
     val paymentOption: String? = null,
     val responseCode: String? = null,

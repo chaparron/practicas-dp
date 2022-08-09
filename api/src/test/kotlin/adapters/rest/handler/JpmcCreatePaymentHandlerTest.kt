@@ -82,7 +82,7 @@ class JpmcCreatePaymentHandlerTest {
         path = PATH,
         authorization = ACCESS_TOKEN,
         body = """
-            {"supplierOrderId":"${request.supplierOrderId}","amount":"${request.amount}","totalAmount":"${request.totalAmount}"}
+            {"supplierOrderId":"${request.supplierOrderId}","amount":"${request.amount}","totalAmount":""}
         """.trimIndent()
     )
 

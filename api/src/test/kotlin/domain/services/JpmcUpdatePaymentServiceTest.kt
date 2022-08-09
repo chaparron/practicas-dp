@@ -49,7 +49,6 @@ class JpmcUpdatePaymentServiceTest {
             { assertEquals(encData.txnRefNo, response.paymentId) },
             { assertEquals(encData.supplierOrderId, response.supplierOrderId) },
             { assertEquals(encData.amount, response.amount) },
-            { assertEquals(encData.totalAmount, response.totalAmount) },
             { assertEquals(encData.responseCode, response.responseCode) },
             { assertEquals(encData.message, response.message) },
         )
@@ -61,7 +60,6 @@ class JpmcUpdatePaymentServiceTest {
     private fun anyJpmcPayment() = JpmcPayment(
         txnRefNo = randomString(),
         amount = randomString(),
-        totalAmount = randomString(),
         paymentOption = randomString(),
         responseCode = randomString(),
         message = randomString(),
@@ -93,7 +91,6 @@ class JpmcUpdatePaymentServiceTest {
         currency = randomString(),
         paymentOption = randomString(),
         secureHash = randomString(),
-        supplierOrderId = randomString(),
-        totalAmount = randomString()
+        supplierOrderId = randomString()
     )
 }

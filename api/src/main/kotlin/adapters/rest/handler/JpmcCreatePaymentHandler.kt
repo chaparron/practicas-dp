@@ -67,7 +67,6 @@ class JpmcCreatePaymentHandler(
     private fun CreatePaymentHandlerRequest.toCreatePaymentRequest() = CreatePaymentRequest(
         supplierOrderId = supplierOrderId.required(DpErrorReason.MISSING_SUPPLIER_ID),
         amount = amount.required(DpErrorReason.MISSING_AMOUNT),
-        totalAmount = totalAmount.required(DpErrorReason.MISSING_TOTAL_AMOUNT)
     )
 
     @Serializable

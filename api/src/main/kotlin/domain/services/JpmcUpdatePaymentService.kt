@@ -27,7 +27,6 @@ class JpmcUpdatePaymentService(
                 txnRefNo = encData.txnRefNo,
                 supplierOrderId = encData.supplierOrderId!!,
                 amount = encData.amount,
-                totalAmount = encData.totalAmount!!,
                 paymentOption = encData.paymentOption,
                 responseCode = encData.responseCode,
                 message = encData.message,
@@ -43,7 +42,6 @@ class JpmcUpdatePaymentService(
             paymentId = encData.txnRefNo,
             supplierOrderId = encData.supplierOrderId!!,
             amount = encData.amount,
-            totalAmount = encData.totalAmount!!,
             responseCode = encData.responseCode,
             message = encData.message
         )

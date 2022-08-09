@@ -41,7 +41,7 @@ class JpmcUpdatePaymentHandlerTest {
         private const val MESSAGE = "X"
 
         private const val EXPECTED_JSON_RESPONSE =
-            "{\"paymentId\":\"${PAYMENT_ID}\",\"supplierOrderId\":\"${SUPPLIER_ORDER_ID}\",\"amount\":\"${AMOUNT}\",\"totalAmount\":\"${TOTAL_AMOUNT}\",\"responseCode\":\"${RESPONSE_CODE}\",\"message\":\"${MESSAGE}\"}"
+            "{\"paymentId\":\"${PAYMENT_ID}\",\"supplierOrderId\":\"${SUPPLIER_ORDER_ID}\",\"amount\":\"${AMOUNT}\",\"responseCode\":\"${RESPONSE_CODE}\",\"message\":\"${MESSAGE}\"}"
 
     }
 
@@ -60,7 +60,6 @@ class JpmcUpdatePaymentHandlerTest {
                     PAYMENT_ID,
                     SUPPLIER_ORDER_ID,
                     AMOUNT,
-                    TOTAL_AMOUNT,
                     RESPONSE_CODE,
                     MESSAGE
                 )

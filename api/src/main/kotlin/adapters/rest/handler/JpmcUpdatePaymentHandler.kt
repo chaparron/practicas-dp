@@ -36,7 +36,6 @@ class JpmcUpdatePaymentHandler(
                 paymentId = UUID.randomUUID().toString(),
                 supplierOrderId = "666",
                 amount = "100",
-                totalAmount = "100",
                 responseCode = "00",
                 message = "Transaction Successful"
             ).also {

@@ -29,6 +29,8 @@ import wabi2b.sdk.api.HttpWabi2bSdk
 import wabi2b.sdk.api.Wabi2bSdk
 import java.net.URI
 import java.time.Clock
+import wabi2b.payments.sdk.client.impl.WabiPaymentSdk
+
 
 object MainConfiguration : Configuration {
 
@@ -58,7 +60,8 @@ object MainConfiguration : Configuration {
                 ),
                 configuration = this,
                 jpmcRepository = jpmcPaymentRepository,
-                tokenProvider = wabi2bTokenProvider
+                tokenProvider = wabi2bTokenProvider,
+                paymentSdk = paymentSdk
             )
         }
     }
@@ -149,5 +152,15 @@ object MainConfiguration : Configuration {
                     .build()
             )
             .build()
+    }
+
+    private val paymentSdk: WabiPaymentSdk by lazy {
+        PAYMENTS_ROOT.get()
+            .let { paymentsUrl ->
+                WabiPaymentSdk(paymentsUrl)
+                    .also {
+                        logger.trace("PaymentSdk initialized for: $paymentsUrl")
+                    }
+            }
     }
 }

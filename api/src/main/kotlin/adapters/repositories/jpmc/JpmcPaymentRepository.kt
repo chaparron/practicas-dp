@@ -35,7 +35,6 @@ class DynamoDbJpmcPaymentRepository(
         DynamoDBJpmcAttribute.SOI.param to this.supplierOrderId.toAttributeValue(),
         DynamoDBJpmcAttribute.TX.param to this.txnRefNo.toAttributeValue(),
         DynamoDBJpmcAttribute.A.param to this.amount.toAttributeValue(),
-        DynamoDBJpmcAttribute.TA.param to this.totalAmount.toAttributeValue(),
         DynamoDBJpmcAttribute.PO.param to this.paymentOption?.toAttributeValue(),
         DynamoDBJpmcAttribute.RC.param to this.responseCode?.toAttributeValue(),
         DynamoDBJpmcAttribute.M.param to this.message?.toAttributeValue(),

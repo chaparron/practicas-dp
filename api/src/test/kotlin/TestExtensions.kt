@@ -25,6 +25,5 @@ fun apiGatewayEventRequest(
 
 fun anyCreatePaymentRequest() = CreatePaymentRequest(
     supplierOrderId = randomString(),
-    amount = "100",
-    totalAmount = "200"
+    amount = "100"
 )
