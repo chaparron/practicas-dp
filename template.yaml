@@ -25,7 +25,7 @@ Mappings:
       JpmcAvailableFor: "IN-MH"
       JpmcStateValidationEnabled: true
       JpmcProvidersDummyEnabled: true
-      JpmcCreatePaymentDummyEnabled: true
+      JpmcCreatePaymentDummyEnabled: false
       JpmcUpdatePaymentDummyEnabled: true
       ClientSecret: "qa/digital-payments"
     prod:
