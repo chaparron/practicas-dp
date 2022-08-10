@@ -27,7 +27,8 @@ class DigitalPaymentsApiGateway(
             handler = JpmcCreatePaymentHandler(
                 service = configuration.jpmcCreatePaymentService,
                 jsonMapper = configuration.jsonMapper,
-                stateValidatorService = configuration.stateValidatorService
+                stateValidatorService = configuration.stateValidatorService,
+                createPaymentDummyEnabled = EnvironmentVariable.jpmcCreatePaymentDummyEnabled().toBoolean()
             )
         )
         .get(

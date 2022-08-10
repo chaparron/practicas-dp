@@ -22,6 +22,7 @@ class JpmcCreatePaymentHandler(
     private val service: JpmcCreatePaymentService,
     private val jsonMapper: Json,
     private val stateValidatorService: StateValidatorService,
+    private val createPaymentDummyEnabled: Boolean
 ) : RestHandler {
 
     companion object {
@@ -32,7 +33,7 @@ class JpmcCreatePaymentHandler(
 
     override fun handleRequest(input: APIGatewayProxyRequestEvent, context: Context): APIGatewayProxyResponseEvent {
 
-        return if (EnvironmentVariable.jpmcCreatePaymentDummyEnabled().toBoolean()) {
+        return if (createPaymentDummyEnabled) {
             ok(
                 CreatePaymentResponse(
                     bankId = "000004",

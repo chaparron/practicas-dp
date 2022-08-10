@@ -29,6 +29,7 @@ class JpmcCreatePaymentHandlerTest {
     private var service: JpmcCreatePaymentService = mock()
     private var jsonMapper: Json = Json { ignoreUnknownKeys = true }
     private var stateValidatorService: StateValidatorService = mock()
+    private var createPaymentDummyEnabled = false
 
     private lateinit var sut: JpmcCreatePaymentHandler
 
@@ -48,7 +49,7 @@ class JpmcCreatePaymentHandlerTest {
     @BeforeEach
     fun setUp() {
         Mockito.reset(service, stateValidatorService)
-        sut = JpmcCreatePaymentHandler(service, jsonMapper, stateValidatorService)
+        sut = JpmcCreatePaymentHandler(service, jsonMapper, stateValidatorService, createPaymentDummyEnabled)
     }
 
     @Test
