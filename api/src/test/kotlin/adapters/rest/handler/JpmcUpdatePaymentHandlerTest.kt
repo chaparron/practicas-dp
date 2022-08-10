@@ -36,7 +36,6 @@ class JpmcUpdatePaymentHandlerTest {
         private const val PAYMENT_ID = "X"
         private const val SUPPLIER_ORDER_ID = "X"
         private const val AMOUNT = "X"
-        private const val TOTAL_AMOUNT = "X"
         private const val RESPONSE_CODE = "X"
         private const val MESSAGE = "X"
 
