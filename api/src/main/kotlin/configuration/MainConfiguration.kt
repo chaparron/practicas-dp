@@ -127,7 +127,8 @@ object MainConfiguration : Configuration {
             UpdatePaymentService(
                 decrypter = AesDecrypterService(this.aesEncryptionKey),
                 jsonMapper = jsonMapper,
-                repository = jpmcPaymentRepository
+                repository = jpmcPaymentRepository,
+                wabiPaymentAsyncNotificationSdk = wabiPaymentAsyncNotificationSdk
             )
         }
     }

@@ -1,12 +1,12 @@
 package adapters.repositories.jpmc
 
-import domain.model.JpmcPayment
+import domain.model.Payment
 import org.slf4j.LoggerFactory
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import toAttributeValue
 
 interface JpmcPaymentRepository {
-    fun save(jpmcPayment: JpmcPayment): JpmcPayment
+    fun save(payment: Payment): Payment
 }
 
 class DynamoDbJpmcPaymentRepository(
@@ -19,21 +19,21 @@ class DynamoDbJpmcPaymentRepository(
         private const val pkValuePrefix = "jpmc#"
     }
 
-    override fun save(jpmcPayment: JpmcPayment): JpmcPayment {
+    override fun save(payment: Payment): Payment {
         return dynamoDbClient.putItem {
-            logger.trace("Saving Jpmc payment $jpmcPayment")
-            it.tableName(tableName).item(jpmcPayment.asDynamoItem())
+            logger.trace("Saving Jpmc payment $payment")
+            it.tableName(tableName).item(payment.asDynamoItem())
         }.let {
-            logger.trace("Saved jpmcPayment $jpmcPayment")
-            jpmcPayment
+            logger.trace("Saved jpmcPayment $payment")
+            payment
         }
     }
 
-    private fun JpmcPayment.asDynamoItem() = mapOf(
-        DynamoDBJpmcAttribute.PK.param to (pkValuePrefix + this.txnRefNo).toAttributeValue(),
-        DynamoDBJpmcAttribute.SK.param to this.txnRefNo.toAttributeValue(),
+    private fun Payment.asDynamoItem() = mapOf(
+        DynamoDBJpmcAttribute.PK.param to (pkValuePrefix + this.paymentId).toAttributeValue(),
+        DynamoDBJpmcAttribute.SK.param to this.paymentId.toAttributeValue(),
         DynamoDBJpmcAttribute.SOI.param to this.supplierOrderId.toAttributeValue(),
-        DynamoDBJpmcAttribute.TX.param to this.txnRefNo.toAttributeValue(),
+        DynamoDBJpmcAttribute.TX.param to this.paymentId.toAttributeValue(),
         DynamoDBJpmcAttribute.A.param to this.amount.toAttributeValue(),
         DynamoDBJpmcAttribute.PO.param to this.paymentOption?.toAttributeValue(),
         DynamoDBJpmcAttribute.RC.param to this.responseCode?.toAttributeValue(),

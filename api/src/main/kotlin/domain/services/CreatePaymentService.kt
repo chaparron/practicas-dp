@@ -8,7 +8,7 @@ import domain.model.CreatePaymentResponse
 import domain.model.errors.FunctionalityNotAvailable
 import adapters.repositories.jpmc.JpmcPaymentRepository
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleInformation
-import domain.model.JpmcPayment
+import domain.model.Payment
 import domain.model.PaymentStatus
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.Mono
@@ -49,9 +49,9 @@ class CreatePaymentService(
         }.onSuccess {
             logger.trace("Payment created: $it")
             jpmcRepository.save(
-                JpmcPayment(
+                Payment(
                     supplierOrderId = context.request.supplierOrderId,
-                    txnRefNo = paymentId,
+                    paymentId = paymentId,
                     amount = context.request.amount,
                     status = PaymentStatus.IN_PROGRESS
                 )

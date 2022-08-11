@@ -1,8 +1,8 @@
 package domain.model
 
-data class JpmcPayment(
+data class Payment(
     val supplierOrderId: String,
-    val txnRefNo: String,
+    val paymentId: String,
     val amount: String,
     val paymentOption: String? = null,
     val responseCode: String? = null,
@@ -12,5 +12,5 @@ data class JpmcPayment(
 )
 
 enum class PaymentStatus {
-    IN_PROGRESS, PAID, ERROR
+    IN_PROGRESS, PAID, ERROR, EXPIRED
 }

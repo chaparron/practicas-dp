@@ -6,7 +6,7 @@ import com.wabi2b.jpmc.sdk.usecase.sale.SaleInformation
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleService
 import configuration.EnvironmentVariable
 import domain.model.CreatePaymentRequest
-import domain.model.JpmcPayment
+import domain.model.Payment
 import domain.model.PaymentStatus
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
@@ -64,7 +64,7 @@ class CreatePaymentServiceTest {
         whenever(paymentSdk.startPayment(paymentSdkRequest, accessToken)).thenReturn(Mono.just(anyPaymentId))
         whenever(expirationService.init(anyPaymentId.value.toString())).thenReturn(anyPaymentId.value.toString())
         whenever(saleServiceSdk.getSaleInformation(any())).thenReturn(saleInformation)
-        whenever(jpmcRepository.save(any())).thenReturn(anyJpmcPayment())
+        whenever(jpmcRepository.save(any())).thenReturn(anyPayment())
         wheneverForConfigurations()
 
         val response = sut.createPayment(request)
@@ -123,9 +123,9 @@ class CreatePaymentServiceTest {
         }
     }
 
-    private fun anyJpmcPayment() = JpmcPayment(
+    private fun anyPayment() = Payment(
         supplierOrderId = randomString(),
-        txnRefNo = randomString(),
+        paymentId = randomString(),
         amount = "40",
         status = PaymentStatus.IN_PROGRESS
     )
