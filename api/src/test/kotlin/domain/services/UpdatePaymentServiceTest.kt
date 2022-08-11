@@ -20,7 +20,7 @@ import randomString
 import kotlin.test.assertEquals
 
 @ExtendWith(MockitoExtension::class)
-class JpmcUpdatePaymentServiceTest {
+class UpdatePaymentServiceTest {
 
     @Mock
     private lateinit var decrypter: AesDecrypterService
@@ -32,7 +32,7 @@ class JpmcUpdatePaymentServiceTest {
     private lateinit var repository: JpmcPaymentRepository
 
     @InjectMocks
-    private lateinit var sut: JpmcUpdatePaymentService
+    private lateinit var sut: UpdatePaymentService
 
     @Test
     fun `given a valid encData when update then save information in database`() {

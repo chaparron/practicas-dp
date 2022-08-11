@@ -81,7 +81,7 @@ class DigitalPaymentsApiGatewayTest {
         }
 
         private fun whenExpectedSaleInformationResponseContext(statusCode: Int, body: String?) {
-            val saleInformationService = configuration.jpmcCreatePaymentService
+            val saleInformationService = configuration.createPaymentService
             logger.trace("Stubbing response $statusCode-$body")
             when (statusCode) {
                 200 -> doReturn(

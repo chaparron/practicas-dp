@@ -11,7 +11,7 @@ import domain.model.UpdatePaymentResponse
 import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 
-class JpmcUpdatePaymentService(
+class UpdatePaymentService(
     private val decrypter: AesDecrypterService,
     private val jsonMapper: Json,
     private val repository: JpmcPaymentRepository,

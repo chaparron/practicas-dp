@@ -159,6 +159,9 @@ Resources:
           CLIENT_PASSWORD: "WWyAh1D47U2Myeahs"
           PAYMENT_EXPIRATION_QUEUE_URL: !Ref PaymentExpirationQueue
           PAYMENT_EXPIRATION_DELAY_IN_SECONDS: !FindInMap [ Config, !Ref EnvironmentStackName, DelayInSeconds ]
+          PAYMENT_UPDATED_TOPIC_ARN:
+            Fn::ImportValue:
+              !Sub "${EnvironmentStackName}-PaymentUpdatedTopic"
       Policies:
         - AWSSecretsManagerGetSecretValuePolicy:
             SecretArn: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:NEW_RELIC_LICENSE_KEY*"
@@ -277,6 +280,26 @@ Resources:
     Type: 'AWS::SQS::Queue'
     Properties:
       MessageRetentionPeriod: !FindInMap [ Config, !Ref EnvironmentStackName, RetentionPeriod ]
+
+  PaymentExpirationListenerDLQ:
+    Type: 'AWS::SQS::Queue'
+    Properties:
+      MessageRetentionPeriod: !FindInMap [ Config, !Ref EnvironmentStackName, RetentionPeriod ]
+
+  PaymentExpirationListener:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: "api"
+      Handler: "domain.functions.PaymentExpirationListener"
+      Role: !GetAtt LambdaExecutionRole.Arn
+      DeadLetterQueue:
+        Type: "SQS"
+        TargetArn: !GetAtt PaymentExpirationListenerDLQ.Arn
+      Events:
+        PaymentExpirationMessage:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt PaymentExpirationQueue.Arn
 
 Outputs:
   ApiRootURL:

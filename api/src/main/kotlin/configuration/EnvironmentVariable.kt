@@ -26,7 +26,8 @@ enum class EnvironmentVariable {
     PAYMENTS_ROOT,
     REGION,
     PAYMENT_EXPIRATION_QUEUE_URL,
-    PAYMENT_EXPIRATION_DELAY_IN_SECONDS;
+    PAYMENT_EXPIRATION_DELAY_IN_SECONDS,
+    PAYMENT_UPDATED_TOPIC_ARN;
 
     companion object {
         fun jpmcConfiguration(): JpmcConfiguration =

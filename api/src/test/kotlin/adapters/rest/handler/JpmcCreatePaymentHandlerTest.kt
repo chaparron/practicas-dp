@@ -7,7 +7,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import domain.model.CreatePaymentRequest
 import domain.model.CreatePaymentResponse
 import domain.model.errors.FunctionalityNotAvailable
-import domain.services.JpmcCreatePaymentService
+import domain.services.CreatePaymentService
 import domain.services.state.StateValidatorService
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.BeforeEach
@@ -26,7 +26,7 @@ import kotlin.test.assertEquals
 class JpmcCreatePaymentHandlerTest {
 
     private var context: Context = mock()
-    private var service: JpmcCreatePaymentService = mock()
+    private var service: CreatePaymentService = mock()
     private var jsonMapper: Json = Json { ignoreUnknownKeys = true }
     private var stateValidatorService: StateValidatorService = mock()
     private var createPaymentDummyEnabled = false

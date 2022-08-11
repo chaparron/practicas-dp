@@ -2,8 +2,8 @@ package configuration
 
 import adapters.rest.validations.Security
 import domain.functions.SupplierListenerFunction
-import domain.services.JpmcCreatePaymentService
-import domain.services.JpmcUpdatePaymentService
+import domain.services.CreatePaymentService
+import domain.services.UpdatePaymentService
 import domain.services.PaymentExpirationService
 import domain.services.TokenProvider
 import domain.services.state.StateValidatorService
@@ -16,12 +16,12 @@ import java.time.Clock
 class TestConfiguration(
     override val jsonMapper: Json = MainConfiguration.jsonMapper,
     val authorizerWrapper: Security.AuthorizerWrapper = mock(),
-    override val jpmcCreatePaymentService: JpmcCreatePaymentService = mock(),
+    override val createPaymentService: CreatePaymentService = mock(),
     override val jpmcStateValidationConfig: EnvironmentVariable.JpmcStateValidationConfig = mock(),
     override val supplierListenerFunction: SupplierListenerFunction = SupplierListenerFunction(jsonMapper, mock()),
     override val stateValidatorService: StateValidatorService = mock(),
     override val paymentProviderService: PaymentProviderService = mock(),
-    override val jpmcUpdatePaymentService: JpmcUpdatePaymentService = mock(),
+    override val updatePaymentService: UpdatePaymentService = mock(),
     override val wabi2bTokenProvider: TokenProvider = mock(),
     override val wabi2bSdk: Wabi2bSdk = mock(),
     override val clock: Clock = mock(),

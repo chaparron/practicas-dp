@@ -33,6 +33,7 @@ import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsPro
 import software.amazon.awssdk.http.SdkHttpClient
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.sqs.SqsClient
+import wabi2b.payment.async.notification.sdk.WabiPaymentAsyncNotificationSdk
 import wabi2b.payments.sdk.client.impl.WabiPaymentSdk
 
 
@@ -60,9 +61,9 @@ object MainConfiguration : Configuration {
         }
     }
 
-    override val jpmcCreatePaymentService: JpmcCreatePaymentService by lazy {
+    override val createPaymentService: CreatePaymentService by lazy {
         with(EnvironmentVariable.jpmcConfiguration()) {
-            JpmcCreatePaymentService(
+            CreatePaymentService(
                 saleServiceSdk = SaleService(
                     hashCalculator = DigestHashCalculator(this.sha256HashKey), //TODO this key must be in a Secret
                     encrypter = AesEncrypterService(this.aesEncryptionKey) //TODO this key must be in a Secret
@@ -80,7 +81,8 @@ object MainConfiguration : Configuration {
         DefaultPaymentExpirationService(
             sqsClient = sqsClient(),
             delaySeconds = PAYMENT_EXPIRATION_DELAY_IN_SECONDS.get().toInt(),
-            queueUrl = PAYMENT_EXPIRATION_QUEUE_URL.get()
+            queueUrl = PAYMENT_EXPIRATION_QUEUE_URL.get(),
+            wabiPaymentAsyncNotificationSdk = wabiPaymentAsyncNotificationSdk
         )
     }
 
@@ -120,9 +122,9 @@ object MainConfiguration : Configuration {
         )
     }
 
-    override val jpmcUpdatePaymentService: JpmcUpdatePaymentService by lazy {
+    override val updatePaymentService: UpdatePaymentService by lazy {
         with(EnvironmentVariable.jpmcConfiguration()) {
-            JpmcUpdatePaymentService(
+            UpdatePaymentService(
                 decrypter = AesDecrypterService(this.aesEncryptionKey),
                 jsonMapper = jsonMapper,
                 repository = jpmcPaymentRepository
@@ -174,6 +176,17 @@ object MainConfiguration : Configuration {
         PAYMENTS_ROOT.get()
             .let { paymentsUrl ->
                 WabiPaymentSdk(paymentsUrl).logInit("PaymentSdk initialized for: $paymentsUrl")
+            }
+    }
+
+    private val wabiPaymentAsyncNotificationSdk: WabiPaymentAsyncNotificationSdk by lazy {
+        PAYMENT_UPDATED_TOPIC_ARN.get()
+            .let { topicArn ->
+                WabiPaymentAsyncNotificationSdk(
+                    paymentUpdatedTopicArn = topicArn
+                ).also {
+                    logger.trace("WabiPaymentAsyncNotificationSdk initialized for: $topicArn")
+                }
             }
     }
 

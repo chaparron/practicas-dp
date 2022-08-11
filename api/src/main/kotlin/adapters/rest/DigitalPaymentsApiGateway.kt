@@ -25,7 +25,7 @@ class DigitalPaymentsApiGateway(
         .post(
             path = CREATE_PAYMENT_PATH,
             handler = JpmcCreatePaymentHandler(
-                service = configuration.jpmcCreatePaymentService,
+                service = configuration.createPaymentService,
                 jsonMapper = configuration.jsonMapper,
                 stateValidatorService = configuration.stateValidatorService,
                 createPaymentDummyEnabled = EnvironmentVariable.jpmcCreatePaymentDummyEnabled().toBoolean()
@@ -42,7 +42,7 @@ class DigitalPaymentsApiGateway(
         .post(
             path = PROCESS_INFORMATION_PATH,
             handler = JpmcUpdatePaymentHandler(
-                service = configuration.jpmcUpdatePaymentService,
+                service = configuration.updatePaymentService,
                 jsonMapper = configuration.jsonMapper
             )
         )

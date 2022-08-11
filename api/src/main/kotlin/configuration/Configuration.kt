@@ -1,8 +1,8 @@
 package configuration
 
 import domain.functions.SupplierListenerFunction
-import domain.services.JpmcCreatePaymentService
-import domain.services.JpmcUpdatePaymentService
+import domain.services.CreatePaymentService
+import domain.services.UpdatePaymentService
 import domain.services.PaymentExpirationService
 import domain.services.TokenProvider
 import domain.services.state.StateValidatorService
@@ -13,12 +13,12 @@ import java.time.Clock
 
 interface Configuration {
     val jsonMapper: Json
-    val jpmcCreatePaymentService: JpmcCreatePaymentService
+    val createPaymentService: CreatePaymentService
     val jpmcStateValidationConfig: EnvironmentVariable.JpmcStateValidationConfig
     val supplierListenerFunction: SupplierListenerFunction
     val stateValidatorService: StateValidatorService
     val paymentProviderService: PaymentProviderService
-    val jpmcUpdatePaymentService: JpmcUpdatePaymentService
+    val updatePaymentService: UpdatePaymentService
     val wabi2bTokenProvider: TokenProvider
     val wabi2bSdk: Wabi2bSdk
     val clock: Clock

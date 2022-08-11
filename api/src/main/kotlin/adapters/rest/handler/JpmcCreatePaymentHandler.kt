@@ -4,11 +4,10 @@ import adapters.rest.validations.RequestValidations.required
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
-import configuration.EnvironmentVariable
 import domain.model.CreatePaymentRequest
 import domain.model.CreatePaymentResponse
 import domain.model.errors.DpErrorReason
-import domain.services.JpmcCreatePaymentService
+import domain.services.CreatePaymentService
 import domain.services.state.StateValidatorService
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -19,7 +18,7 @@ import wabi.rest2lambda.RestHandler
 import wabi.rest2lambda.ok
 
 class JpmcCreatePaymentHandler(
-    private val service: JpmcCreatePaymentService,
+    private val service: CreatePaymentService,
     private val jsonMapper: Json,
     private val stateValidatorService: StateValidatorService,
     private val createPaymentDummyEnabled: Boolean

@@ -11,13 +11,11 @@ import com.wabi2b.jpmc.sdk.usecase.sale.SaleInformation
 import domain.model.JpmcPayment
 import domain.model.PaymentStatus
 import org.slf4j.LoggerFactory
-import reactor.core.publisher.Mono
-import wabi2b.payments.common.model.dto.PaymentId
 import wabi2b.payments.common.model.dto.PaymentType
 import wabi2b.payments.common.model.dto.StartPaymentRequestDto
 import wabi2b.payments.sdk.client.impl.WabiPaymentSdk
 
-class JpmcCreatePaymentService(
+class CreatePaymentService(
     private val saleServiceSdk: SaleService,
     private val configuration: JpmcConfiguration,
     private val jpmcRepository: JpmcPaymentRepository,
@@ -27,7 +25,7 @@ class JpmcCreatePaymentService(
 ) {
     companion object {
         private const val TRANSACTION_TYPE = "Pay"
-        private val logger = LoggerFactory.getLogger(JpmcCreatePaymentService::class.java)
+        private val logger = LoggerFactory.getLogger(CreatePaymentService::class.java)
     }
 
     @Throws(FunctionalityNotAvailable::class)

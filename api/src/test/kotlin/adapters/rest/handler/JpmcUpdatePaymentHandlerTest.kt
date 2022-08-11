@@ -5,7 +5,7 @@ import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import domain.model.JpmcPaymentInformation
 import domain.model.UpdatePaymentResponse
-import domain.services.JpmcUpdatePaymentService
+import domain.services.UpdatePaymentService
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -24,7 +24,7 @@ import randomString
 class JpmcUpdatePaymentHandlerTest {
 
     private var context: Context = mock()
-    private var service: JpmcUpdatePaymentService = mock()
+    private var service: UpdatePaymentService = mock()
     private var jsonMapper: Json = Json { ignoreUnknownKeys = true }
 
     private lateinit var sut: JpmcUpdatePaymentHandler

@@ -8,7 +8,7 @@ import domain.model.JpmcPaymentInformation
 import domain.model.UpdatePaymentResponse
 import domain.model.errors.DpErrorReason
 import domain.model.errors.DpException
-import domain.services.JpmcUpdatePaymentService
+import domain.services.UpdatePaymentService
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -18,7 +18,7 @@ import wabi.rest2lambda.ok
 import java.util.*
 
 class JpmcUpdatePaymentHandler(
-    private val service: JpmcUpdatePaymentService,
+    private val service: UpdatePaymentService,
     private val jsonMapper: Json,
 ) : RestHandler {
 

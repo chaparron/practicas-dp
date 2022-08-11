@@ -1,0 +1,26 @@
+package domain.functions
+
+import com.amazonaws.services.lambda.runtime.Context
+import com.amazonaws.services.lambda.runtime.RequestHandler
+import com.amazonaws.services.lambda.runtime.events.SQSEvent
+import domain.services.PaymentExpirationService
+import org.slf4j.LoggerFactory
+
+class PaymentExpirationListener(
+    private val paymentExpirationService: PaymentExpirationService
+): RequestHandler<SQSEvent, Unit> {
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(PaymentExpirationListener::class.java)
+    }
+    override fun handleRequest(input: SQSEvent, context: Context?) {
+        logger.info("PaymentId expired event received: $input")
+        input.records.forEach { record ->
+            record.also {
+                logger.info("Received SQS PaymentId expired message: $record")
+        }.body.let {
+                paymentExpirationService.expire(it)
+            }
+        }
+    }
+}

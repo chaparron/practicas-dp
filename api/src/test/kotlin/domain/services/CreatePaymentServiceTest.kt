@@ -50,7 +50,7 @@ class CreatePaymentServiceTest {
     private lateinit var expirationService: PaymentExpirationService
 
     @InjectMocks
-    private lateinit var sut: JpmcCreatePaymentService
+    private lateinit var sut: CreatePaymentService
 
     @Test
     fun `given a valid request when createPayment then return valid information and persist in DB`() {

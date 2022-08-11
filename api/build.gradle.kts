@@ -37,6 +37,7 @@ dependencies {
     val wabiSerializersVersion: String by project
     val wabi2bPaymentsSdkVersion: String by project
     val wabiApiSdkVersion: String by project
+    val wabiPaymentAsyncNotificationSdk: String by project
 
     val kotlinxSerializationVersion: String by project
 
@@ -84,6 +85,9 @@ dependencies {
     //wabi2b services
     implementation("wabi2b:payments-sdk:$wabi2bPaymentsSdkVersion")
     implementation("wabi2b.sdk:wabi2b-api-sdk:$wabiApiSdkVersion")
+    implementation("wabi2b:payment-async-notification-sdk:$wabiPaymentAsyncNotificationSdk") {
+        exclude("wabi2b.payments.common", "common")
+    }
 
     // security
     implementation("wabi2b:wabi2b-authorizer:$wabiAuthorizerVersion")
