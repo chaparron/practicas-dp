@@ -157,7 +157,7 @@ Resources:
           JPMC_PAYMENT_TABLE: !Ref JpmcPaymentTable
           CLIENT_ID: "digital_payments"
           CLIENT_PASSWORD: "WWyAh1D47U2Myeahs"
-          PAYMENT_EXPIRATION_QUEUE_URL: !Ref FallbackSmsStatusChangedQueue
+          PAYMENT_EXPIRATION_QUEUE_URL: !Ref PaymentExpirationQueue
           PAYMENT_EXPIRATION_DELAY_IN_SECONDS: !FindInMap [ Config, !Ref EnvironmentStackName, DelayInSeconds ]
       Policies:
         - AWSSecretsManagerGetSecretValuePolicy:
