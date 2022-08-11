@@ -108,6 +108,21 @@ class CreatePaymentServiceTest {
 
     }
 
+    @Test
+    fun `should fail on empty paymentSdk responses`() {
+        val request = anyCreatePaymentRequest()
+        val paymentSdkRequest = request.toStartPaymentRequestDto()
+        val accessToken = randomString()
+
+        whenever(tokenProvider.getClientToken()).thenReturn(accessToken)
+        whenever(paymentSdk.startPayment(paymentSdkRequest, accessToken))
+            .thenReturn(Mono.empty())
+
+        assertThrows<IllegalStateException> {
+            sut.createPayment(request)
+        }
+    }
+
     private fun anyJpmcPayment() = JpmcPayment(
         supplierOrderId = randomString(),
         txnRefNo = randomString(),
