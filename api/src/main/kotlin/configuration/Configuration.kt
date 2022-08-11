@@ -3,6 +3,7 @@ package configuration
 import domain.functions.SupplierListenerFunction
 import domain.services.JpmcCreatePaymentService
 import domain.services.JpmcUpdatePaymentService
+import domain.services.PaymentExpirationService
 import domain.services.TokenProvider
 import domain.services.state.StateValidatorService
 import domain.services.providers.PaymentProviderService
@@ -21,4 +22,5 @@ interface Configuration {
     val wabi2bTokenProvider: TokenProvider
     val wabi2bSdk: Wabi2bSdk
     val clock: Clock
+    val paymentExpirationService: PaymentExpirationService
 }

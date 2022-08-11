@@ -23,7 +23,10 @@ enum class EnvironmentVariable {
     CLIENT_ID,
     CLIENT_PASSWORD,
     API_ROOT,
-    PAYMENTS_ROOT;
+    PAYMENTS_ROOT,
+    REGION,
+    PAYMENT_EXPIRATION_QUEUE_URL,
+    PAYMENT_EXPIRATION_DELAY_IN_SECONDS;
 
     companion object {
         fun jpmcConfiguration(): JpmcConfiguration =

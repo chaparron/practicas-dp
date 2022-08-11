@@ -28,6 +28,8 @@ Mappings:
       JpmcCreatePaymentDummyEnabled: true
       JpmcUpdatePaymentDummyEnabled: true
       ClientSecret: "qa/digital-payments"
+      DelayInSeconds: 15
+      RetentionPeriod: 3600
     prod:
       SubnetsStr: "subnet-02892d9b9c9f13256,subnet-0d2c43077cc4fb646,subnet-0a31d7dcc515f14cb"
       ProvisionedExecutionsApiGatewayMinCapacity: 2
@@ -50,6 +52,8 @@ Mappings:
       JpmcCreatePaymentDummyEnabled: true
       JpmcUpdatePaymentDummyEnabled: true
       ClientSecret: "prod/digital-payments"
+      DelayInSeconds: 15
+      RetentionPeriod: 345600
 Globals:
   Function:
     Runtime: "java11"
@@ -153,6 +157,8 @@ Resources:
           JPMC_PAYMENT_TABLE: !Ref JpmcPaymentTable
           CLIENT_ID: "digital_payments"
           CLIENT_PASSWORD: "WWyAh1D47U2Myeahs"
+          PAYMENT_EXPIRATION_QUEUE_URL: !Ref FallbackSmsStatusChangedQueue
+          PAYMENT_EXPIRATION_DELAY_IN_SECONDS: !FindInMap [ Config, !Ref EnvironmentStackName, DelayInSeconds ]
       Policies:
         - AWSSecretsManagerGetSecretValuePolicy:
             SecretArn: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:NEW_RELIC_LICENSE_KEY*"
@@ -161,6 +167,7 @@ Resources:
               !Sub "${EnvironmentStackName}-RejectedInvoiceTopicArn"
         - DynamoDBCrudPolicy:
             TableName: !Ref JpmcPaymentTable
+
   ApiGatewayHandlerScalableTarget:
     Type: AWS::ApplicationAutoScaling::ScalableTarget
     Properties:
@@ -257,6 +264,19 @@ Resources:
         - AttributeName: "SK"
           AttributeType: "S"
       BillingMode: "PAY_PER_REQUEST"
+
+  PaymentExpirationQueue:
+    Type: 'AWS::SQS::Queue'
+    Properties:
+      VisibilityTimeout: 360
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt PaymentExpirationQueueDLQ.Arn
+        maxReceiveCount: 2
+
+  PaymentExpirationQueueDLQ:
+    Type: 'AWS::SQS::Queue'
+    Properties:
+      MessageRetentionPeriod: !FindInMap [ Config, !Ref EnvironmentStackName, RetentionPeriod ]
 
 Outputs:
   ApiRootURL:

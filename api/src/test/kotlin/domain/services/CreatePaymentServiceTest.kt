@@ -19,11 +19,11 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import randomString
 import kotlin.test.assertEquals
-import org.mockito.internal.verification.Times
+import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.times
+import org.mockito.kotlin.verifyNoInteractions
 import reactor.core.publisher.Mono
 import wabi2b.payments.common.model.dto.PaymentId
-import wabi2b.payments.common.model.dto.PaymentRequestDto
 import wabi2b.payments.common.model.dto.PaymentType
 import wabi2b.payments.common.model.dto.StartPaymentRequestDto
 import wabi2b.payments.sdk.client.impl.WabiPaymentSdk
@@ -46,6 +46,9 @@ class CreatePaymentServiceTest {
     @Mock
     private lateinit var paymentSdk: WabiPaymentSdk
 
+    @Mock
+    private lateinit var expirationService: PaymentExpirationService
+
     @InjectMocks
     private lateinit var sut: JpmcCreatePaymentService
 
@@ -57,12 +60,12 @@ class CreatePaymentServiceTest {
         val paymentSdkRequest = request.toStartPaymentRequestDto()
         val accessToken = randomString()
 
-        whenever(paymentSdk.startPayment(any(), any())).thenReturn(Mono.just(anyPaymentId))
+        whenever(tokenProvider.getClientToken()).thenReturn(accessToken)
+        whenever(paymentSdk.startPayment(paymentSdkRequest, accessToken)).thenReturn(Mono.just(anyPaymentId))
+        whenever(expirationService.init(anyPaymentId.value.toString())).thenReturn(anyPaymentId.value.toString())
         whenever(saleServiceSdk.getSaleInformation(any())).thenReturn(saleInformation)
         whenever(jpmcRepository.save(any())).thenReturn(anyJpmcPayment())
-        whenever(tokenProvider.getClientToken()).thenReturn(accessToken)
         wheneverForConfigurations()
-
 
         val response = sut.createPayment(request)
 
@@ -74,11 +77,35 @@ class CreatePaymentServiceTest {
             { assertEquals(saleInformation.encData, response.encData) },
         )
 
-        verify(saleServiceSdk).getSaleInformation(any())
-        verify(jpmcRepository).save(any())
-        verify(tokenProvider).getClientToken()
+        verify(saleServiceSdk, times(1)).getSaleInformation(any())
+        verify(jpmcRepository, times(1)).save(any())
+        verify(tokenProvider, times(1)).getClientToken()
         verify(paymentSdk, times(1)).startPayment(paymentSdkRequest, accessToken)
+        verify(expirationService, times(1)).init(anyPaymentId.value.toString())
         verifyForConfigurations()
+    }
+
+    @Test
+    fun `Should throw AddToExpirationQueueException when expirationService fail`() {
+        val anyPaymentId = PaymentId(100L)
+        val request = anyCreatePaymentRequest()
+        val paymentSdkRequest = request.toStartPaymentRequestDto()
+        val accessToken = randomString()
+
+        whenever(tokenProvider.getClientToken()).thenReturn(accessToken)
+        whenever(paymentSdk.startPayment(paymentSdkRequest, accessToken)).thenReturn(Mono.just(anyPaymentId))
+        whenever(expirationService.init(anyPaymentId.value.toString())).thenThrow(AddToExpirationQueueException(anyPaymentId.value.toString()))
+
+        assertThrows<AddToExpirationQueueException> {
+            sut.createPayment(request)
+        }
+
+        verify(tokenProvider, times(1)).getClientToken()
+        verify(paymentSdk, times(1)).startPayment(paymentSdkRequest, accessToken)
+        verify(expirationService, times(1)).init(anyPaymentId.value.toString())
+        verifyNoInteractions(saleServiceSdk)
+        verifyNoInteractions(jpmcRepository)
+
     }
 
     private fun anyJpmcPayment() = JpmcPayment(

@@ -4,6 +4,7 @@ import adapters.rest.validations.Security
 import domain.functions.SupplierListenerFunction
 import domain.services.JpmcCreatePaymentService
 import domain.services.JpmcUpdatePaymentService
+import domain.services.PaymentExpirationService
 import domain.services.TokenProvider
 import domain.services.state.StateValidatorService
 import domain.services.providers.PaymentProviderService
@@ -23,7 +24,8 @@ class TestConfiguration(
     override val jpmcUpdatePaymentService: JpmcUpdatePaymentService = mock(),
     override val wabi2bTokenProvider: TokenProvider = mock(),
     override val wabi2bSdk: Wabi2bSdk = mock(),
-    override val clock: Clock = mock()
+    override val clock: Clock = mock(),
+    override val paymentExpirationService: PaymentExpirationService = mock()
 ) : Configuration {
 
     companion object {

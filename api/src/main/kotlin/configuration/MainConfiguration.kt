@@ -29,6 +29,10 @@ import wabi2b.sdk.api.HttpWabi2bSdk
 import wabi2b.sdk.api.Wabi2bSdk
 import java.net.URI
 import java.time.Clock
+import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider
+import software.amazon.awssdk.http.SdkHttpClient
+import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.sqs.SqsClient
 import wabi2b.payments.sdk.client.impl.WabiPaymentSdk
 
 
@@ -37,6 +41,11 @@ object MainConfiguration : Configuration {
     private val logger = LoggerFactory.getLogger(MainConfiguration::class.java)
 
     private val security: Security by lazy { Security() }
+
+    //aws clients
+    private lateinit var credentialsProvider: EnvironmentVariableCredentialsProvider
+    private lateinit var httpClient: SdkHttpClient
+    private lateinit var regionValue: Region
 
     override val jsonMapper: Json by lazy {
         Json {
@@ -61,10 +70,21 @@ object MainConfiguration : Configuration {
                 configuration = this,
                 jpmcRepository = jpmcPaymentRepository,
                 tokenProvider = wabi2bTokenProvider,
-                paymentSdk = paymentSdk
+                paymentSdk = paymentSdk,
+                paymentExpirationService = paymentExpirationService
             )
         }
     }
+
+    override val paymentExpirationService: PaymentExpirationService by lazy {
+        DefaultPaymentExpirationService(
+            sqsClient = sqsClient(),
+            delaySeconds = PAYMENT_EXPIRATION_DELAY_IN_SECONDS.get().toInt(),
+            queueUrl = PAYMENT_EXPIRATION_QUEUE_URL.get()
+        )
+    }
+
+
 
     private val jpmcPaymentRepository: JpmcPaymentRepository by lazy {
         DynamoDbJpmcPaymentRepository(
@@ -146,21 +166,46 @@ object MainConfiguration : Configuration {
         logger.info("Initializing DynamoDbClient")
         DynamoDbClient
             .builder()
-            .httpClient(
-                UrlConnectionHttpClient
-                    .builder()
-                    .build()
-            )
+            .httpClient(sdkHttpClient())
             .build()
     }
 
     private val paymentSdk: WabiPaymentSdk by lazy {
         PAYMENTS_ROOT.get()
             .let { paymentsUrl ->
-                WabiPaymentSdk(paymentsUrl)
-                    .also {
-                        logger.trace("PaymentSdk initialized for: $paymentsUrl")
-                    }
+                WabiPaymentSdk(paymentsUrl).logInit("PaymentSdk initialized for: $paymentsUrl")
             }
     }
+
+
+    private fun region(): Region {
+        if(!this::regionValue.isInitialized) {
+            regionValue = Region.of(REGION.get()).logInit("region")
+        }
+        return regionValue
+    }
+
+    private fun sqsClient(): SqsClient =
+        SqsClient
+            .builder()
+            .httpClient(sdkHttpClient())
+            .credentialsProvider(environmentVariableCredentialsProvider())
+            .region(region())
+            .build()
+
+    private fun sdkHttpClient(): SdkHttpClient {
+        if (!this::httpClient.isInitialized) {
+            httpClient = UrlConnectionHttpClient.builder().build().logInit("httpClient for type UrlConnectionHttpClient")
+        }
+        return httpClient
+    }
+
+    private fun environmentVariableCredentialsProvider(): EnvironmentVariableCredentialsProvider {
+        if (!this::credentialsProvider.isInitialized) {
+            credentialsProvider = EnvironmentVariableCredentialsProvider.create()
+        }
+        return credentialsProvider
+    }
+    private fun <T> T.logInit(message: String): T = this.also { logger.info("init {}", message) }
+
 }

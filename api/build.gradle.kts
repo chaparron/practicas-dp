@@ -102,6 +102,10 @@ dependencies {
         exclude("software.amazon.awssdk", "apache-client")
         exclude("software.amazon.awssdk", "netty-nio-client")
     }
+    implementation("software.amazon.awssdk:sqs") {
+        exclude("software.amazon.awssdk", "apache-client")
+        exclude("software.amazon.awssdk", "netty-nio-client")
+    }
 
     // logging
     implementation("org.slf4j:slf4j-api:$$slf4jVersion")

@@ -7,6 +7,7 @@ import domain.model.CreatePaymentRequest
 import domain.model.CreatePaymentResponse
 import domain.model.errors.FunctionalityNotAvailable
 import adapters.repositories.jpmc.JpmcPaymentRepository
+import com.wabi2b.jpmc.sdk.usecase.sale.SaleInformation
 import domain.model.JpmcPayment
 import domain.model.PaymentStatus
 import org.slf4j.LoggerFactory
@@ -21,7 +22,8 @@ class JpmcCreatePaymentService(
     private val configuration: JpmcConfiguration,
     private val jpmcRepository: JpmcPaymentRepository,
     private val tokenProvider: TokenProvider,
-    private val paymentSdk: WabiPaymentSdk
+    private val paymentSdk: WabiPaymentSdk,
+    private val paymentExpirationService: PaymentExpirationService
 ) {
     companion object {
         private const val TRANSACTION_TYPE = "Pay"
@@ -33,26 +35,27 @@ class JpmcCreatePaymentService(
 
         val dpToken = tokenProvider.getClientToken()
         logger.trace("Create payment initialized with client token: $dpToken")
-        val paymentId: Mono<PaymentId>
+        val paymentId: String
 
         return request.toStartPaymentRequestDto()
             .let {
-                paymentId = paymentSdk.startPayment(it, dpToken)
-        }.runCatching {
-                saleServiceSdk.getSaleInformation(buildRequest(request, this.toString())).toCreatePaymentResponse()
-        }.onSuccess {
+                paymentId = paymentSdk.startPayment(it, dpToken).block()!!.value.toString()
+                paymentExpirationService.init(paymentId)
+            }.runCatching {
+                saleServiceSdk.getSaleInformation(buildRequest(request, this)).toCreatePaymentResponse()
+            }.onSuccess {
                 logger.trace("Payment created: $it")
                 jpmcRepository.save(
                     JpmcPayment(
                         supplierOrderId = request.supplierOrderId,
-                        txnRefNo = paymentId.toString(),
+                        txnRefNo = paymentId,
                         amount = request.amount,
                         status = PaymentStatus.IN_PROGRESS
+                    )
                 )
-            )
-        }.onFailure {
+            }.onFailure {
                 logger.error("There was an error starting paymentId $paymentId. Exception: $it")
-        }.getOrThrow()
+            }.getOrThrow()
     }
 
     private fun buildRequest(request: CreatePaymentRequest, paymentId: String) = SaleRequest(
@@ -70,7 +73,7 @@ class JpmcCreatePaymentService(
         supplierOrderId = request.supplierOrderId
     )
 
-    private fun com.wabi2b.jpmc.sdk.usecase.sale.SaleInformation.toCreatePaymentResponse() = CreatePaymentResponse(
+    private fun SaleInformation.toCreatePaymentResponse() = CreatePaymentResponse(
         bankId = bankId,
         merchantId = merchantId,
         terminalId = terminalId,
