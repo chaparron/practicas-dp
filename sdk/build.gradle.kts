@@ -2,7 +2,7 @@ plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
     id("maven-publish")
-    id("yopdev.sdk-publisher") version "0.0.6"
+    id("yopdev.sdk-publisher") version "0.0.7"
 }
 
 sdkPublisher {
