@@ -147,4 +147,20 @@ dependencies {
     // Wabi
     implementation("yopdev:rest2lambda:1004-bf762288624a4811b08e4be067e4b1e512acc0c0")
 
+    configurations.all {
+        resolutionStrategy.eachDependency {
+            if (requested.group == "org.apache.logging.log4j" && requested.version!! <= "2.16.0") {
+                useVersion("2.16.0")
+                because("To avoid RCE vulnerability.")
+            }
+            if (requested.group == "ch.qos.logback" && requested.name == "logback-classic" && requested.version!! <= "1.2.8") {
+                useVersion("1.2.8")
+                because("To avoid RCE vulnerability.")
+            }
+            if (requested.group == "ch.qos.logback" && requested.name == "logback-core" && requested.version!! <= "1.2.8") {
+                useVersion("1.2.8")
+                because("To avoid RCE vulnerability.")
+            }
+        }
+    }
 }
