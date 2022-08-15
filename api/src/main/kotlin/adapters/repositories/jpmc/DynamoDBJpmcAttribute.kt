@@ -50,6 +50,18 @@ enum class DynamoDBJpmcAttribute {
      * EncData
      */
     ED,
+    /**
+     * Create At
+     */
+    C,
+    /**
+     * Last Updated At
+     */
+    LU,
+    /**
+     * status
+     */
+    ST
     ;
 
     val param: String by lazy { this.name }
