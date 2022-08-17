@@ -14,6 +14,7 @@ import wabi2b.payment.async.notification.sdk.WabiPaymentAsyncNotificationSdk
 import wabi2b.payments.common.model.dto.PaymentType
 import wabi2b.payments.common.model.dto.PaymentUpdated
 import wabi2b.payments.common.model.dto.type.PaymentResult
+import java.time.Instant
 
 class UpdatePaymentService(
     private val decrypter: AesDecrypterService,
@@ -53,8 +54,9 @@ class UpdatePaymentService(
         responseCode = responseCode,
         message = message,
         encData = encData,
-        status = if (responseCode == "00") PaymentStatus.PAID else PaymentStatus.ERROR,
-    )
+        status = if (responseCode == "00") PaymentStatus.PAID else PaymentStatus.ERROR
+    ).updated(Instant.now())
+
     private fun EncData.toPaymentUpdated() = PaymentUpdated(
         supplierOrderId = supplierOrderId!!.toLong(),
         paymentType = PaymentType.DIGITAL_PAYMENT,

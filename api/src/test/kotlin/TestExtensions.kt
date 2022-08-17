@@ -1,6 +1,7 @@
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import domain.model.CreatePaymentRequest
 import domain.model.Supplier
+import org.mockito.ArgumentCaptor
 import org.springframework.http.HttpMethod
 import java.util.UUID
 
@@ -27,3 +28,6 @@ fun anyCreatePaymentRequest() = CreatePaymentRequest(
     supplierOrderId = randomString(),
     amount = "100"
 )
+
+@Suppress("UNCHECKED_CAST")
+private fun <T> capture(captor: ArgumentCaptor<T>): T = captor.capture()

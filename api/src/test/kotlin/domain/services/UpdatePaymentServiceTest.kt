@@ -3,27 +3,24 @@ package domain.services
 import adapters.repositories.jpmc.JpmcPaymentRepository
 import com.wabi2b.jpmc.sdk.security.cipher.aes.decrypt.AesDecrypterService
 import com.wabi2b.jpmc.sdk.usecase.sale.EncData
-import domain.model.Payment
 import domain.model.JpmcPaymentInformation
+import domain.model.Payment
 import domain.model.PaymentStatus
-import kotlin.random.Random
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.InjectMocks
-import org.mockito.Mock
+import org.mockito.*
 import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.any
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 import randomString
-import kotlin.test.assertEquals
-import org.mockito.kotlin.times
 import wabi2b.payment.async.notification.sdk.WabiPaymentAsyncNotificationSdk
 import wabi2b.payments.common.model.dto.PaymentType
 import wabi2b.payments.common.model.dto.PaymentUpdated
 import wabi2b.payments.common.model.dto.type.PaymentResult
+import kotlin.random.Random
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 @ExtendWith(MockitoExtension::class)
 class UpdatePaymentServiceTest {
@@ -38,7 +35,10 @@ class UpdatePaymentServiceTest {
     private lateinit var repository: JpmcPaymentRepository
 
     @Mock
-    private lateinit var  wabiPaymentAsyncNotificationSdk: WabiPaymentAsyncNotificationSdk
+    private lateinit var wabiPaymentAsyncNotificationSdk: WabiPaymentAsyncNotificationSdk
+
+    @Captor
+    lateinit var paymentCaptor: ArgumentCaptor<Payment>
 
 
     @InjectMocks
@@ -50,7 +50,7 @@ class UpdatePaymentServiceTest {
 
     @Test
     fun `given a valid encData when update then save information in database`() {
-        val encData = anyEncData()
+        val encData = anyEncData(SUCCESS_RESPONSE_CODE)
         val paymentUpdated = PaymentUpdated(
             supplierOrderId = encData.supplierOrderId!!.toLong(),
             paymentType = PaymentType.DIGITAL_PAYMENT,
@@ -71,8 +71,13 @@ class UpdatePaymentServiceTest {
             { assertEquals(encData.message, response.message) },
         )
 
+        // Check some fields with captor
+        verify(repository).save(capture(paymentCaptor))
+        val payment = paymentCaptor.value
+        assertNotNull(paymentUpdated)
+        assertEquals(PaymentStatus.PAID, payment.status)
+
         verify(decrypter).decrypt<EncData>(any(), any())
-        verify(repository).save(any())
         verify(wabiPaymentAsyncNotificationSdk, times(1)).notify(paymentUpdated)
     }
 
@@ -91,12 +96,12 @@ class UpdatePaymentServiceTest {
         encData = randomString()
     )
 
-    private fun anyEncData() = EncData(
+    private fun anyEncData(responseCode: String) = EncData(
         txnRefNo = Random.nextLong().toString(),
         merchantId = randomString(),
         amount = randomString(),
         terminalId = randomString(),
-        responseCode = randomString(),
+        responseCode = responseCode,
         message = randomString(),
         mcc = randomString(),
         cardNum = randomString(),
