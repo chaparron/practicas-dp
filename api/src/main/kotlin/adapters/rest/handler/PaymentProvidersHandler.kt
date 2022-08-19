@@ -33,7 +33,7 @@ class PaymentProvidersHandler(
         return if (EnvironmentVariable.jpmcProvidersDummyEnabled().toBoolean()) {
             ok(listOf(Provider.JP_MORGAN)
                 .also {
-                    logger.warn("Provider Mock enabled!")
+                    logger.debug("Provider Mock enabled!")
                 }
                 .let {
                     jsonMapper.encodeToString(it)
