@@ -133,9 +133,9 @@ Resources:
               Ref: ApiGatewayApi
       Environment:
         Variables:
-          PAYMENTS_ROOT:
-            Fn::ImportValue:
-              !Sub "${EnvironmentStackName}-payments-ApiRootURL"
+          PAYMENTS_ROOT: "https://un0ln35f5d.execute-api.eu-central-1.amazonaws.com/qa/"
+          #  Fn::ImportValue:
+          #    !Sub "${EnvironmentStackName}-payments-ApiRootURL"
           API_ROOT:
             Fn::ImportValue:
               !Sub "${EnvironmentStackName}-api-ApiRootURL"
