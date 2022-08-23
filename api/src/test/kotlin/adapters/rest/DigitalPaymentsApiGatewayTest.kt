@@ -156,7 +156,6 @@ class DigitalPaymentsApiGatewayTest {
                 200, 404 -> {
                     whenever(authorizerWrapper.requestedByUser(any())).doReturn(true)
                     whenever(authorizerWrapper.matchAnyAuthority(any())).doReturn(true)
-                    whenever(authorizerWrapper.getState()).doReturn("IN-MH")
                 }
                 403 -> whenever(authorizerWrapper.requestedByUser(any())).doReturn(false)
                 else -> {

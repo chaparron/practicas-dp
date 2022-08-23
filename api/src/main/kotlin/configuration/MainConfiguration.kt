@@ -35,6 +35,8 @@ import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.sqs.SqsClient
 import wabi2b.payment.async.notification.sdk.WabiPaymentAsyncNotificationSdk
 import wabi2b.payments.sdk.client.impl.WabiPaymentSdk
+import wabi2b.sdk.customers.customer.CustomersSdk
+import wabi2b.sdk.customers.customer.HttpCustomersSdk
 
 
 object MainConfiguration : Configuration {
@@ -109,7 +111,8 @@ object MainConfiguration : Configuration {
     override val stateValidatorService: StateValidatorService by lazy {
         StateValidatorService(
             stateValidationConfig = jpmcStateValidationConfig,
-            security = security
+            security = security,
+            customersSdk = customersSdk
         )
     }
 
@@ -188,6 +191,13 @@ object MainConfiguration : Configuration {
                 ).also {
                     logger.trace("WabiPaymentAsyncNotificationSdk initialized for: $topicArn")
                 }
+            }
+    }
+
+    private val customersSdk: CustomersSdk by lazy {
+        CUSTOMERS_ROOT.get()
+            .let {
+                url -> HttpCustomersSdk(url).logInit("CustomersSdk initialized for: $url")
             }
     }
 

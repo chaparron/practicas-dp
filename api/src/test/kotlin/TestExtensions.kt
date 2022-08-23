@@ -4,6 +4,15 @@ import domain.model.Supplier
 import org.mockito.ArgumentCaptor
 import org.springframework.http.HttpMethod
 import java.util.UUID
+import kotlin.random.Random
+import wabi2b.dtos.customers.shared.AddressDto
+import wabi2b.dtos.customers.shared.CustomerDto
+import wabi2b.dtos.customers.shared.DayDto
+import wabi2b.dtos.customers.shared.HourRangeDto
+import wabi2b.dtos.customers.shared.RatingScoreDto
+import wabi2b.dtos.customers.shared.StoreType
+import wabi2b.dtos.customers.shared.UserIdDto
+import wabi2b.dtos.customers.shared.WorkingDaysDto
 
 fun randomString() = UUID.randomUUID().toString()
 
@@ -27,6 +36,27 @@ fun apiGatewayEventRequest(
 fun anyCreatePaymentRequest() = CreatePaymentRequest(
     supplierOrderId = randomString(),
     amount = "100"
+)
+
+fun anyCustomer(addresses: List<AddressDto>) = CustomerDto(
+    id = randomString(),
+    name = randomString(),
+    enabled = true,
+    legalId = randomString(),
+    customerStatus = randomString(),
+    user = UserIdDto(Random.nextLong()),
+    smsVerification = true,
+    marketingEnabled = true,
+    emailVerification = true,
+    countryId = randomString(),
+    customerTypeCode = randomString(),
+    customerTypeName = randomString(),
+    rating = RatingScoreDto(Random.nextFloat(), Random.nextInt(), Random.nextInt()),
+    addresses = addresses,
+    workingDays = WorkingDaysDto(listOf(DayDto(Random.nextInt(), true)), listOf(HourRangeDto(randomString(), randomString()))),
+    storeType = StoreType.MAIN_OFFICE,
+    permissionOnBranchOffice = true,
+    verificationDocuments = null
 )
 
 @Suppress("UNCHECKED_CAST")

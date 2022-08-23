@@ -139,6 +139,9 @@ Resources:
           API_ROOT:
             Fn::ImportValue:
               !Sub "${EnvironmentStackName}-api-ApiRootURL"
+          CUSTOMERS_ROOT:
+            Fn::ImportValue:
+              !Sub "${EnvironmentStackName}-customers-ApiRootURL"
           JPMC_AES_ENCRYPTION_KEY: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcAesEncryptionKey ]
           JPMC_SHAE256_HASH_KEY: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcSha256HashKey ]
           JPMC_PASS_CODE: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcPassCode ]

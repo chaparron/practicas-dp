@@ -146,6 +146,7 @@ dependencies {
 
     // Wabi
     implementation("yopdev:rest2lambda:1004-bf762288624a4811b08e4be067e4b1e512acc0c0")
+    implementation("com.wabi2b:customers-sdk:1148-8c7b6162c410a0f6249879c17392d0544b13a95a")
 
     configurations.all {
         resolutionStrategy.eachDependency {
