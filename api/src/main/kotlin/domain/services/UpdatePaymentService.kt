@@ -23,9 +23,8 @@ class UpdatePaymentService(
     private val wabiPaymentAsyncNotificationSdk: WabiPaymentAsyncNotificationSdk
 ) {
 
-    private val logger = LoggerFactory.getLogger(javaClass)
-
     companion object {
+        private val logger = LoggerFactory.getLogger(UpdatePaymentService::class.java)
         private const val SUCCESS_RESPONSE_CODE = "00"
     }
 

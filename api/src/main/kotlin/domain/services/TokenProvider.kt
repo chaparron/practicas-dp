@@ -18,9 +18,10 @@ class Wabi2bTokenProvider(
     private val clock: Clock
 ) : TokenProvider {
     private lateinit var clientAccessToken: CachedUserLogin
-    private val logger = LoggerFactory.getLogger(javaClass)
 
     companion object {
+        private val logger = LoggerFactory.getLogger(Wabi2bTokenProvider::class.java)
+
         /**
          * Wabi2b use to make token expired earlier to avoid edge cases
          */

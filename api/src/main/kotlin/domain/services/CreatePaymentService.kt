@@ -25,8 +25,8 @@ class CreatePaymentService(
     private val paymentExpirationService: PaymentExpirationService
 ) {
     companion object {
-        private const val TRANSACTION_TYPE = "Pay"
         private val logger = LoggerFactory.getLogger(CreatePaymentService::class.java)
+        private const val TRANSACTION_TYPE = "Pay"
     }
 
     @Throws(FunctionalityNotAvailable::class)

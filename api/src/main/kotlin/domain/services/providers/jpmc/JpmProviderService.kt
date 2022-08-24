@@ -2,6 +2,7 @@ package domain.services.providers.jpmc
 
 import domain.services.state.StateValidatorService
 import domain.services.SupplierService
+import domain.services.UpdatePaymentService
 import domain.services.providers.ProviderService
 import org.slf4j.LoggerFactory
 
@@ -10,7 +11,9 @@ class JpmProviderService(
     private val stateValidator: StateValidatorService
 ) : ProviderService {
 
-    private val logger = LoggerFactory.getLogger(javaClass)
+    companion object {
+        private val logger = LoggerFactory.getLogger(JpmProviderService::class.java)
+    }
 
     /**
      * This method return if the provider JPMorgan is accepted.

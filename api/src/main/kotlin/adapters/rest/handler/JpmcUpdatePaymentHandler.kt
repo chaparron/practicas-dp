@@ -9,6 +9,7 @@ import domain.model.UpdatePaymentResponse
 import domain.model.errors.DpErrorReason
 import domain.model.errors.DpException
 import domain.services.UpdatePaymentService
+import domain.services.Wabi2bTokenProvider
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -23,10 +24,10 @@ class JpmcUpdatePaymentHandler(
 ) : RestHandler {
 
     companion object {
+        private val logger = LoggerFactory.getLogger(JpmcUpdatePaymentHandler::class.java)
         const val PROCESS_INFORMATION_PATH = "/dp/jpmc/updatePayment"
     }
 
-    private val logger = LoggerFactory.getLogger(javaClass)
 
     override fun handleRequest(request: APIGatewayProxyRequestEvent, context: Context): APIGatewayProxyResponseEvent {
         logger.trace("Received request: [${request.body}]")

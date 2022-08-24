@@ -29,8 +29,6 @@ import wabi.rest2lambda.CONTENT_TYPE
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DigitalPaymentsApiGatewayTest {
 
-    private val logger = LoggerFactory.getLogger(javaClass)
-
     @Mock
     private lateinit var context: Context
 
@@ -38,6 +36,7 @@ class DigitalPaymentsApiGatewayTest {
     private val handler = DigitalPaymentsApiGateway(configuration)
 
     companion object {
+        private val logger = LoggerFactory.getLogger(DigitalPaymentsApiGatewayTest::class.java)
         private const val STATE = "IN-MH"
     }
 

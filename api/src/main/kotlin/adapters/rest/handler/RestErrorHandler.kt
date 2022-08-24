@@ -13,10 +13,10 @@ import wabi.rest2lambda.*
 class RestErrorHandler(private val jsonMapper: Json) : ErrorHandler {
 
     companion object {
+        private val logger = LoggerFactory.getLogger(RestErrorHandler::class.java)
         private val defaultHandler = DefaultErrorHandler()
     }
 
-    private val logger = LoggerFactory.getLogger(javaClass)
 
     override fun handle(error: Throwable): APIGatewayProxyResponseEvent {
         logger.error("Attempt to handler error.", error)

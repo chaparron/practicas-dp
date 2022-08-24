@@ -13,6 +13,7 @@ class PaymentExpirationListener(
     companion object {
         private val logger = LoggerFactory.getLogger(PaymentExpirationListener::class.java)
     }
+
     override fun handleRequest(input: SQSEvent, context: Context?) {
         logger.info("PaymentId expired event received: $input")
         input.records.forEach { record ->

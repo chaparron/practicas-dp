@@ -22,11 +22,11 @@ class PaymentProvidersHandler(
 ) : RestHandler {
 
     companion object {
+        private val logger = LoggerFactory.getLogger(PaymentProvidersHandler::class.java)
         const val PAYMENT_PROVIDERS_PATH = "/dp/paymentProviders"
         const val SUPPLIER_ID_PARAM = "supplierId"
     }
 
-    private val logger = LoggerFactory.getLogger(javaClass)
 
     override fun handleRequest(input: APIGatewayProxyRequestEvent, context: Context): APIGatewayProxyResponseEvent {
         // FIXME Delete mock as soon possible

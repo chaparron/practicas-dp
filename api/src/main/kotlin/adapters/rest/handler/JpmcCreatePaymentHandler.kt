@@ -8,6 +8,7 @@ import domain.model.CreatePaymentRequest
 import domain.model.CreatePaymentResponse
 import domain.model.errors.DpErrorReason
 import domain.services.CreatePaymentService
+import domain.services.Wabi2bTokenProvider
 import domain.services.state.StateValidatorService
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -25,10 +26,10 @@ class JpmcCreatePaymentHandler(
 ) : RestHandler {
 
     companion object {
+        private val logger = LoggerFactory.getLogger(JpmcCreatePaymentHandler::class.java)
         const val CREATE_PAYMENT_PATH = "/dp/jpmc/createPayment"
     }
 
-    private val logger = LoggerFactory.getLogger(javaClass)
 
     override fun handleRequest(input: APIGatewayProxyRequestEvent, context: Context): APIGatewayProxyResponseEvent {
 
