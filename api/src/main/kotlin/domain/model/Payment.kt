@@ -1,11 +1,16 @@
 package domain.model
 
+import java.math.BigDecimal
 import java.time.Instant
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Payment(
-    val supplierOrderId: String,
-    val paymentId: String,
-    val amount: String,
+    val supplierOrderId: Long,
+    val paymentId: Long,
+    @Contextual
+    val amount: BigDecimal,
     val paymentOption: String? = null,
     val responseCode: String? = null,
     val message: String? = null,
@@ -15,9 +20,9 @@ data class Payment(
     val lastUpdatedAt: String
 ) {
     constructor(
-        supplierOrderId: String,
-        paymentId: String,
-        amount: String,
+        supplierOrderId: Long,
+        paymentId: Long,
+        amount: BigDecimal,
         paymentOption: String? = null,
         responseCode: String? = null,
         message: String? = null,

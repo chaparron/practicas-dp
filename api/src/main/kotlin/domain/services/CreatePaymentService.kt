@@ -44,15 +44,15 @@ class CreatePaymentService(
         }.blockOptional().orElseThrow { IllegalStateException("response for $request must not be empty") }
     }
 
-    private fun doCreatePayment(paymentId: String, context: CreatePaymentContext): CreatePaymentResponse {
+    private fun doCreatePayment(paymentId: Long, context: CreatePaymentContext): CreatePaymentResponse {
         return paymentExpirationService.init(
             PaymentExpiration(
-                paymentId = paymentId.toLong(),
-                amount = context.request.amount.toBigDecimal(),
-                supplierOrderId = context.request.supplierOrderId.toLong()
+                paymentId = paymentId,
+                amount = context.request.amount,
+                supplierOrderId = context.request.supplierOrderId
             )
         ).runCatching {
-            saleServiceSdk.getSaleInformation(buildRequest(context.request, paymentId)).toCreatePaymentResponse()
+            saleServiceSdk.getSaleInformation(buildRequest(context.request, paymentId.toString())).toCreatePaymentResponse()
         }.onSuccess {
             logger.trace("Payment created: $it")
             jpmcRepository.save(
@@ -71,7 +71,7 @@ class CreatePaymentService(
     private fun buildRequest(request: CreatePaymentRequest, paymentId: String) = SaleRequest(
         version = configuration.version,
         txnRefNo = paymentId,
-        amount = request.amount,
+        amount = request.amount.toString(),
         passCode = configuration.passCode, //TODO this passCode must be in a Secret
         bankId = configuration.bankId,
         terminalId = configuration.terminalId,
@@ -80,7 +80,7 @@ class CreatePaymentService(
         currency = configuration.currency,
         txnType = TRANSACTION_TYPE,
         returnUrl = configuration.returnUrl,
-        supplierOrderId = request.supplierOrderId
+        supplierOrderId = request.supplierOrderId.toString()
     )
 
     private fun SaleInformation.toCreatePaymentResponse() = CreatePaymentResponse(
@@ -91,13 +91,13 @@ class CreatePaymentService(
     )
 
     private fun CreatePaymentRequest.toStartPaymentRequestDto() = StartPaymentRequestDto(
-        supplierOrderId = supplierOrderId,
-        amount = amount.toBigDecimal()
+        supplierOrderId = supplierOrderId.toString(),
+        amount = amount
     )
 
-    private fun retrievePaymentId(context: CreatePaymentContext): Mono<String> {
+    private fun retrievePaymentId(context: CreatePaymentContext): Mono<Long> {
         return paymentSdk.startPayment(context.request.toStartPaymentRequestDto(), context.accessToken).map {
-            it.value.toString()
+            it.value
         }
     }
 

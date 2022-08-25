@@ -6,6 +6,8 @@ import randomString
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import kotlin.test.assertEquals
+import randomBigDecimal
+import randomLong
 
 class PaymentTest {
 
@@ -49,9 +51,9 @@ class PaymentTest {
     private fun now(): Instant = Instant.now()
 
     private fun anyPayment(created: Instant = now()): Payment = Payment(
-        supplierOrderId = randomString(),
-        paymentId = randomString(),
-        amount = "616",
+        supplierOrderId = randomLong(),
+        paymentId = randomLong(),
+        amount = randomBigDecimal(),
         status = PaymentStatus.EXPIRED,
         created = created
     )

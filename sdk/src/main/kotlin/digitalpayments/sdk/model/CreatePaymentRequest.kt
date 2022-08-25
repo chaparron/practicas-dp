@@ -1,10 +1,12 @@
 package digitalpayments.sdk.model
 
+import java.math.BigDecimal
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class CreatePaymentRequest(
-    val supplierOrderId: String,
-    val amount: String,
-    val totalAmount: String
+    val supplierOrderId: Long,
+    @Contextual
+    val amount: BigDecimal
 )

@@ -50,9 +50,9 @@ class UpdatePaymentService(
     )
 
     private fun EncData.toPayment(encData: String) = Payment(
-        paymentId = txnRefNo,
-        supplierOrderId = supplierOrderId!!,
-        amount = amount,
+        paymentId = txnRefNo.toLong(),
+        supplierOrderId = supplierOrderId!!.toLong(),
+        amount = amount.toBigDecimal(),
         paymentOption = paymentOption,
         responseCode = responseCode,
         message = message,

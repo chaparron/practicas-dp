@@ -41,8 +41,8 @@ fun apiGatewayEventRequest(
     .withHttpMethod(method.name)
 
 fun anyCreatePaymentRequest() = CreatePaymentRequest(
-    supplierOrderId = randomLong().toString(),
-    amount = "100"
+    supplierOrderId = randomLong(),
+    amount = randomBigDecimal()
 )
 
 fun anyCustomer(addresses: List<AddressDto>) = CustomerDto(

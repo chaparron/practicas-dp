@@ -1,5 +1,6 @@
 package digitalpayments.sdk
 
+import anyCreatePaymentRequest
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.matching.EqualToPattern
 import digitalpayments.sdk.builders.apiResponse.ErrorResponseBuilder.buildApiRequestErrorResponse
@@ -20,6 +21,9 @@ import wabi.sdk.AccessDenied
 import wabi.sdk.Forbidden
 import wabi.sdk.GenericSdkError
 import java.net.URI
+import kotlin.random.Random
+import randomBigDecimal
+import randomLong
 
 class HttpDigitalPaymentsSdkCreatePaymentResponseTest : AbstractSdkTest() {
     companion object {
@@ -35,14 +39,9 @@ class HttpDigitalPaymentsSdkCreatePaymentResponseTest : AbstractSdkTest() {
     @Test
     fun `given bad request when createPayment then throw access denied with statusCode is 401`() {
         stubFor(
-            any(urlPathEqualTo(PATH)).willReturn(aResponse().withStatus(HttpStatus.UNAUTHORIZED.value()))
-        )
+            any(urlPathEqualTo(PATH)).willReturn(aResponse().withStatus(HttpStatus.UNAUTHORIZED.value()))        )
 
-        val request = CreatePaymentRequest(
-            supplierOrderId = "1234",
-            amount = "100",
-            totalAmount = "300"
-        )
+        val request = anyCreatePaymentRequest()
 
         StepVerifier
             .create(digitalPaymentsSdk.createPayment(request, ACCESS_TOKEN))
@@ -52,14 +51,9 @@ class HttpDigitalPaymentsSdkCreatePaymentResponseTest : AbstractSdkTest() {
     @Test
     fun `given bad request when createPayment then throw forbidden with statusCode is 403`() {
         stubFor(
-            any(urlPathEqualTo(PATH)).willReturn(aResponse().withStatus(HttpStatus.FORBIDDEN.value()))
-        )
+            any(urlPathEqualTo(PATH)).willReturn(aResponse().withStatus(HttpStatus.FORBIDDEN.value()))        )
 
-        val request = CreatePaymentRequest(
-            supplierOrderId = "1234",
-            amount = "100",
-            totalAmount = "300"
-        )
+        val request = anyCreatePaymentRequest()
 
         StepVerifier
             .create(digitalPaymentsSdk.createPayment(request, ACCESS_TOKEN))
@@ -83,11 +77,7 @@ class HttpDigitalPaymentsSdkCreatePaymentResponseTest : AbstractSdkTest() {
                 )
         )
 
-        val request = CreatePaymentRequest(
-            supplierOrderId = "1234",
-            amount = "100",
-            totalAmount = "300"
-        )
+        val request = anyCreatePaymentRequest()
 
         StepVerifier
             .create(digitalPaymentsSdk.createPayment(request, ACCESS_TOKEN))
@@ -115,11 +105,7 @@ class HttpDigitalPaymentsSdkCreatePaymentResponseTest : AbstractSdkTest() {
                 .willReturn(ok(mapper.encodeToString(response)))
         )
 
-        val request = CreatePaymentRequest(
-            supplierOrderId = "1234",
-            amount = "100",
-            totalAmount = "300"
-        )
+        val request = anyCreatePaymentRequest()
 
         StepVerifier
             .create(digitalPaymentsSdk.createPayment(request, ACCESS_TOKEN))

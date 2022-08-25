@@ -16,6 +16,8 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import java.time.Instant
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import randomBigDecimal
+import randomLong
 
 @Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -53,7 +55,7 @@ internal class DynamoDbJpmcPaymentRepositoryTest {
         /**control payment**/ anySavedPayment()
 
         //when
-        val actual = sut.findBy(payment.paymentId)
+        val actual = sut.findBy(payment.paymentId.toString())
 
         //then
         assertEquals(payment, actual)
@@ -78,9 +80,9 @@ internal class DynamoDbJpmcPaymentRepositoryTest {
     }
 
     private fun anyPayment(created: Instant = Instant.now()): Payment = Payment(
-        supplierOrderId = randomString(),
-        paymentId = randomString(),
-        amount = "161",
+        supplierOrderId = randomLong(),
+        paymentId = randomLong(),
+        amount = randomBigDecimal(),
         status = PaymentStatus.IN_PROGRESS,
         created = created
     )

@@ -24,6 +24,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import randomBigDecimal
+import randomLong
 import toPaymentMethod
 import wabi2b.payments.common.model.dto.type.PaymentMethod
 
@@ -108,14 +109,14 @@ class UpdatePaymentServiceTest {
     }
 
     private fun anyPayment() = Payment(
-        paymentId = Random.nextLong().toString(),
-        amount = randomString(),
+        paymentId = randomLong(),
+        amount = randomBigDecimal(),
         paymentOption = randomString(),
         responseCode = randomString(),
         message = randomString(),
         encData = randomString(),
         status = PaymentStatus.PAID,
-        supplierOrderId = Random.nextLong().toString()
+        supplierOrderId = randomLong()
     )
 
     private fun anyPaymentInformation() = JpmcPaymentInformation(

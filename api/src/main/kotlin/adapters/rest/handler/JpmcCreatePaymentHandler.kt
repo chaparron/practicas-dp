@@ -8,8 +8,9 @@ import domain.model.CreatePaymentRequest
 import domain.model.CreatePaymentResponse
 import domain.model.errors.DpErrorReason
 import domain.services.CreatePaymentService
-import domain.services.Wabi2bTokenProvider
 import domain.services.state.StateValidatorService
+import java.math.BigDecimal
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -29,7 +30,6 @@ class JpmcCreatePaymentHandler(
         private val logger = LoggerFactory.getLogger(JpmcCreatePaymentHandler::class.java)
         const val CREATE_PAYMENT_PATH = "/dp/jpmc/createPayment"
     }
-
 
     override fun handleRequest(input: APIGatewayProxyRequestEvent, context: Context): APIGatewayProxyResponseEvent {
 
@@ -70,10 +70,10 @@ class JpmcCreatePaymentHandler(
         amount = amount.required(DpErrorReason.MISSING_AMOUNT),
     )
 
-    @Serializable
-    class CreatePaymentHandlerRequest(
-        val supplierOrderId: String,
-        val amount: String,
-        val totalAmount: String
-    )
 }
+@Serializable
+data class CreatePaymentHandlerRequest(
+    val supplierOrderId: Long,
+    @Contextual
+    val amount: BigDecimal
+)

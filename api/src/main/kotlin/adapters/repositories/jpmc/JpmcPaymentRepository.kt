@@ -32,9 +32,9 @@ class DynamoDbJpmcPaymentRepository(
             it.tableName(tableName).key(paymentId.keys()).projectionExpression(findByProjectionExpression)
         }.takeIf { it.hasItem() }?.item()?.let {
             Payment(
-                supplierOrderId = it[DynamoDBJpmcAttribute.SOI]!!,
-                paymentId = it[DynamoDBJpmcAttribute.SK]!!,
-                amount = it[DynamoDBJpmcAttribute.A]!!,
+                supplierOrderId = it[DynamoDBJpmcAttribute.SOI]!!.toLong(),
+                paymentId = it[DynamoDBJpmcAttribute.SK]!!.toLong(),
+                amount = it[DynamoDBJpmcAttribute.A]!!.toBigDecimal(),
                 paymentOption = it[DynamoDBJpmcAttribute.PO],
                 responseCode = it[DynamoDBJpmcAttribute.RC],
                 message = it[DynamoDBJpmcAttribute.M],
@@ -56,10 +56,10 @@ class DynamoDbJpmcPaymentRepository(
         }
     }
 
-    private fun Payment.asDynamoItem() = this.paymentId.keys() + mapOf(
-        DynamoDBJpmcAttribute.SOI.param to this.supplierOrderId.toAttributeValue(),
-        DynamoDBJpmcAttribute.TX.param to this.paymentId.toAttributeValue(),
-        DynamoDBJpmcAttribute.A.param to this.amount.toAttributeValue(),
+    private fun Payment.asDynamoItem() = this.paymentId.toString().keys() + mapOf(
+        DynamoDBJpmcAttribute.SOI.param to this.supplierOrderId.toString().toAttributeValue(),
+        DynamoDBJpmcAttribute.TX.param to this.paymentId.toString().toAttributeValue(),
+        DynamoDBJpmcAttribute.A.param to this.amount.toString().toAttributeValue(),
         DynamoDBJpmcAttribute.PO.param to this.paymentOption?.toAttributeValue(),
         DynamoDBJpmcAttribute.RC.param to this.responseCode?.toAttributeValue(),
         DynamoDBJpmcAttribute.M.param to this.message?.toAttributeValue(),

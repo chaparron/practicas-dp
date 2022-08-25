@@ -20,6 +20,8 @@ import wabi.sdk.AccessDenied
 import wabi.sdk.Forbidden
 import wabi.sdk.GenericSdkError
 import java.net.URI
+import randomBigDecimal
+import randomLong
 
 class HttpDigitalPaymentsSdkUpdatePaymentResponseTest : AbstractSdkTest() {
     companion object {
@@ -101,8 +103,8 @@ class HttpDigitalPaymentsSdkUpdatePaymentResponseTest : AbstractSdkTest() {
 
         val response = UpdatePaymentResponse(
             paymentId = "",
-            supplierOrderId = "",
-            amount = "",
+            supplierOrderId = randomLong(),
+            amount = randomBigDecimal(),
             totalAmount = "",
             responseCode = "",
             message = ""

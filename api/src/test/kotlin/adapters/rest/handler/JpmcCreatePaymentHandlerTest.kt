@@ -4,6 +4,10 @@ import anyCreatePaymentRequest
 import apiGatewayEventRequest
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
+import com.wabi2b.serializers.BigDecimalSerializer
+import com.wabi2b.serializers.InstantSerializer
+import com.wabi2b.serializers.URISerializer
+import com.wabi2b.serializers.UUIDStringSerializer
 import domain.model.CreatePaymentRequest
 import domain.model.CreatePaymentResponse
 import domain.model.errors.FunctionalityNotAvailable
@@ -20,6 +24,8 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.*
 import org.springframework.http.HttpMethod
 import kotlin.test.assertEquals
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.contextual
 
 @ExtendWith(MockitoExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -27,7 +33,16 @@ class JpmcCreatePaymentHandlerTest {
 
     private var context: Context = mock()
     private var service: CreatePaymentService = mock()
-    private var jsonMapper: Json = Json { ignoreUnknownKeys = true }
+    private var jsonMapper: Json = Json {
+        encodeDefaults = true
+        ignoreUnknownKeys = true
+        serializersModule = SerializersModule {
+            contextual(InstantSerializer)
+            contextual(UUIDStringSerializer)
+            contextual(URISerializer)
+            contextual(BigDecimalSerializer)
+        }
+    }
     private var stateValidatorService: StateValidatorService = mock()
     private var createPaymentDummyEnabled = false
 

@@ -23,6 +23,8 @@ import kotlin.test.assertEquals
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verifyNoInteractions
+import randomBigDecimal
+import randomLong
 import reactor.core.publisher.Mono
 import wabi2b.payments.common.model.dto.PaymentId
 import wabi2b.payments.common.model.dto.PaymentType
@@ -60,7 +62,7 @@ class CreatePaymentServiceTest {
         val request = anyCreatePaymentRequest()
         val paymentSdkRequest = request.toStartPaymentRequestDto()
         val accessToken = randomString()
-        val paymentExpiration = PaymentExpiration(anyPaymentId.value, request.amount.toBigDecimal(),request.supplierOrderId.toLong())
+        val paymentExpiration = PaymentExpiration(anyPaymentId.value, request.amount,request.supplierOrderId)
 
         whenever(tokenProvider.getClientToken()).thenReturn(accessToken)
         whenever(paymentSdk.startPayment(paymentSdkRequest, accessToken)).thenReturn(Mono.just(anyPaymentId))
@@ -93,7 +95,7 @@ class CreatePaymentServiceTest {
         val request = anyCreatePaymentRequest()
         val paymentSdkRequest = request.toStartPaymentRequestDto()
         val accessToken = randomString()
-        val paymentExpiration = PaymentExpiration(anyPaymentId.value, request.amount.toBigDecimal(), request.supplierOrderId.toLong())
+        val paymentExpiration = PaymentExpiration(anyPaymentId.value, request.amount, request.supplierOrderId)
 
 
         whenever(tokenProvider.getClientToken()).thenReturn(accessToken)
@@ -128,9 +130,9 @@ class CreatePaymentServiceTest {
     }
 
     private fun anyPayment() = Payment(
-        supplierOrderId = randomString(),
-        paymentId = randomString(),
-        amount = "40",
+        supplierOrderId = randomLong(),
+        paymentId = randomLong(),
+        amount = randomBigDecimal(),
         status = PaymentStatus.IN_PROGRESS
     )
 
@@ -165,7 +167,7 @@ class CreatePaymentServiceTest {
     }
 
     private fun CreatePaymentRequest.toStartPaymentRequestDto() = StartPaymentRequestDto(
-        supplierOrderId = supplierOrderId,
-        amount = amount.toBigDecimal()
+        supplierOrderId = supplierOrderId.toString(),
+        amount = amount
     )
 }
