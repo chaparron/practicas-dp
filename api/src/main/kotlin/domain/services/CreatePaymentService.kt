@@ -46,7 +46,11 @@ class CreatePaymentService(
 
     private fun doCreatePayment(paymentId: String, context: CreatePaymentContext): CreatePaymentResponse {
         return paymentExpirationService.init(
-            PaymentExpiration(paymentId.toLong(), context.request.amount.toBigDecimal())
+            PaymentExpiration(
+                paymentId = paymentId.toLong(),
+                amount = context.request.amount.toBigDecimal(),
+                supplierOrderId = context.request.supplierOrderId.toLong()
+            )
         ).runCatching {
             saleServiceSdk.getSaleInformation(buildRequest(context.request, paymentId)).toCreatePaymentResponse()
         }.onSuccess {

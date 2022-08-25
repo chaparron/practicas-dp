@@ -60,7 +60,7 @@ class CreatePaymentServiceTest {
         val request = anyCreatePaymentRequest()
         val paymentSdkRequest = request.toStartPaymentRequestDto()
         val accessToken = randomString()
-        val paymentExpiration = PaymentExpiration(anyPaymentId.value, request.amount.toBigDecimal())
+        val paymentExpiration = PaymentExpiration(anyPaymentId.value, request.amount.toBigDecimal(),request.supplierOrderId.toLong())
 
         whenever(tokenProvider.getClientToken()).thenReturn(accessToken)
         whenever(paymentSdk.startPayment(paymentSdkRequest, accessToken)).thenReturn(Mono.just(anyPaymentId))
@@ -93,7 +93,7 @@ class CreatePaymentServiceTest {
         val request = anyCreatePaymentRequest()
         val paymentSdkRequest = request.toStartPaymentRequestDto()
         val accessToken = randomString()
-        val paymentExpiration = PaymentExpiration(anyPaymentId.value, request.amount.toBigDecimal())
+        val paymentExpiration = PaymentExpiration(anyPaymentId.value, request.amount.toBigDecimal(), request.supplierOrderId.toLong())
 
 
         whenever(tokenProvider.getClientToken()).thenReturn(accessToken)

@@ -21,6 +21,8 @@ fun randomString() = UUID.randomUUID().toString()
 
 fun randomBigDecimal(): BigDecimal = BigDecimal(Random.nextDouble()).setScale(2, RoundingMode.HALF_EVEN)
 
+fun randomLong() = Random.nextLong()
+
 fun anySupplier() = Supplier(
     supplierId = randomString(),
     state = randomString(),
@@ -39,7 +41,7 @@ fun apiGatewayEventRequest(
     .withHttpMethod(method.name)
 
 fun anyCreatePaymentRequest() = CreatePaymentRequest(
-    supplierOrderId = randomString(),
+    supplierOrderId = randomLong().toString(),
     amount = "100"
 )
 
@@ -64,7 +66,7 @@ fun anyCustomer(addresses: List<AddressDto>) = CustomerDto(
     verificationDocuments = null
 )
 
-fun anyPaymentExpiration() = PaymentExpiration(Random.nextLong(), randomBigDecimal())
+fun anyPaymentExpiration() = PaymentExpiration(Random.nextLong(), randomBigDecimal(), randomLong())
 
 @Suppress("UNCHECKED_CAST")
 private fun <T> capture(captor: ArgumentCaptor<T>): T = captor.capture()

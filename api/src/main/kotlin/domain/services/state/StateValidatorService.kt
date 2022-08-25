@@ -4,7 +4,6 @@ import adapters.rest.validations.Security
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import configuration.EnvironmentVariable
 import domain.model.errors.FunctionalityNotAvailable
-import domain.services.providers.jpmc.JpmProviderService
 import org.slf4j.LoggerFactory
 import wabi2b.dtos.customers.shared.CustomerDto
 import wabi2b.sdk.customers.customer.CustomersSdk

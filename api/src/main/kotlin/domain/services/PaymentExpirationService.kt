@@ -57,7 +57,7 @@ class DefaultPaymentExpirationService(
         }.getOrThrow()
     }
     private fun PaymentExpiration.toPaymentUpdate() = PaymentUpdated(
-        supplierOrderId = null,
+        supplierOrderId = supplierOrderId,
         paymentId = paymentId,
         paymentType = PaymentType.DIGITAL_PAYMENT,
         resultType = PaymentResult.EXPIRED,

@@ -14,6 +14,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import randomLong
 import software.amazon.awssdk.http.SdkHttpResponse
 import software.amazon.awssdk.services.sqs.SqsClient
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest
@@ -87,7 +88,7 @@ class PaymentExpirationServiceTest {
     fun `Should expire a paymentId`() {
         val somePaymentExpiration = anyPaymentExpiration()
         val paymentUpdate = PaymentUpdated(
-            supplierOrderId = null,
+            supplierOrderId = somePaymentExpiration.supplierOrderId,
             paymentId = somePaymentExpiration.paymentId,
             paymentType = PaymentType.DIGITAL_PAYMENT,
             resultType = PaymentResult.EXPIRED,
@@ -105,7 +106,7 @@ class PaymentExpirationServiceTest {
     fun `Throw PaymentExpireException when expire fails`() {
         val somePaymentExpiration = anyPaymentExpiration()
         val paymentUpdate = PaymentUpdated(
-            supplierOrderId = null,
+            supplierOrderId = somePaymentExpiration.supplierOrderId,
             paymentId = somePaymentExpiration.paymentId,
             paymentType = PaymentType.DIGITAL_PAYMENT,
             resultType = PaymentResult.EXPIRED,

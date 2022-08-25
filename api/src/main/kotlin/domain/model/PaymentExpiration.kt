@@ -8,5 +8,6 @@ import kotlinx.serialization.Serializable
 data class PaymentExpiration(
     val paymentId: Long,
     @Contextual
-    val amount: BigDecimal
+    val amount: BigDecimal,
+    val supplierOrderId: Long
 )
