@@ -1,10 +1,15 @@
 package domain.functions
 
+import anyPaymentExpiration
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.SQSEvent
+import configuration.MainConfiguration
+import domain.model.PaymentExpiration
 import domain.services.PaymentExpirationService
 import domain.services.PaymentExpireException
 import kotlin.test.assertFailsWith
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito.times
@@ -19,38 +24,41 @@ class PaymentExpirationListenerTest {
 
     private val paymentExpirationService: PaymentExpirationService = mock()
     private val context: Context = mock()
+    private val mapper: Json = MainConfiguration.jsonMapper
 
     private val sut = PaymentExpirationListener(
-        paymentExpirationService = paymentExpirationService
+        paymentExpirationService = paymentExpirationService,
+        mapper = mapper
     )
 
     @Test
     fun `Should handle a valid event`() {
-        val anyPaymentId = randomString()
-        val sqsEvent = buildSqsEvent(anyPaymentId)
+        val somePaymentExpiration = anyPaymentExpiration()
+        val sqsEvent = buildSqsEvent(somePaymentExpiration)
 
-        whenever(paymentExpirationService.expire(anyPaymentId)).thenReturn(true)
+        whenever(paymentExpirationService.expire(somePaymentExpiration)).thenReturn(true)
 
         sut.handleRequest(sqsEvent, context)
 
-        verify(paymentExpirationService, times (1)).expire(anyPaymentId)
+        verify(paymentExpirationService).expire(somePaymentExpiration)
     }
 
     @Test
     fun `Should propagates exception when paymentExpirationService fails`() {
-        val anyPaymentId = randomString()
-        val sqsEvent = buildSqsEvent(anyPaymentId)
+        val somePaymentExpiration = anyPaymentExpiration()
+        val sqsEvent = buildSqsEvent(somePaymentExpiration)
 
-        whenever(paymentExpirationService.expire(anyPaymentId)).thenThrow(PaymentExpireException(anyPaymentId, RuntimeException()))
+
+        whenever(paymentExpirationService.expire(somePaymentExpiration)).thenThrow(PaymentExpireException(somePaymentExpiration.paymentId.toString(), RuntimeException()))
 
         assertFailsWith<PaymentExpireException> {
             sut.handleRequest(sqsEvent, context)
         }
 
-        verify(paymentExpirationService, times (1)).expire(anyPaymentId)
+        verify(paymentExpirationService).expire(somePaymentExpiration)
     }
 
-    private fun buildSqsEvent(paymentId: String): SQSEvent = paymentId.let {
-        SQSEvent.SQSMessage().apply { body = it }.let { SQSEvent().apply { records = listOf(it) } }
+    private fun buildSqsEvent(paymentExpiration: PaymentExpiration): SQSEvent = paymentExpiration.let {
+        SQSEvent.SQSMessage().apply { body = mapper.encodeToString(paymentExpiration) }.let { SQSEvent().apply { records = listOf(it) } }
     }
 }

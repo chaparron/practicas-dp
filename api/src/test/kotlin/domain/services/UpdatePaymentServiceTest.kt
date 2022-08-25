@@ -6,6 +6,7 @@ import com.wabi2b.jpmc.sdk.usecase.sale.EncData
 import domain.model.JpmcPaymentInformation
 import domain.model.Payment
 import domain.model.PaymentStatus
+import domain.model.UpdatePaymentResponse
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
@@ -20,7 +21,11 @@ import wabi2b.payments.common.model.dto.PaymentUpdated
 import wabi2b.payments.common.model.dto.type.PaymentResult
 import kotlin.random.Random
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
+import randomBigDecimal
+import toPaymentMethod
+import wabi2b.payments.common.model.dto.type.PaymentMethod
 
 @ExtendWith(MockitoExtension::class)
 class UpdatePaymentServiceTest {
@@ -55,21 +60,26 @@ class UpdatePaymentServiceTest {
             supplierOrderId = encData.supplierOrderId!!.toLong(),
             paymentType = PaymentType.DIGITAL_PAYMENT,
             paymentId = encData.txnRefNo.toLong(),
-            resultType = if (encData.responseCode == SUCCESS_RESPONSE_CODE) PaymentResult.SUCCESS else PaymentResult.FAILED
+            resultType = if (encData.responseCode == SUCCESS_RESPONSE_CODE) PaymentResult.SUCCESS else PaymentResult.FAILED,
+            amount = encData.amount.toBigDecimal(),
+            paymentMethod = encData.paymentOption.toPaymentMethod()
         )
+
+        val expectedResponse = UpdatePaymentResponse(
+            paymentId = encData.txnRefNo,
+            supplierOrderId = encData.supplierOrderId!!,
+            amount = encData.amount,
+            responseCode = encData.responseCode,
+            message = encData.message
+        )
+
         whenever(decrypter.decrypt<EncData>(any(), any())).thenReturn(encData)
         whenever(repository.save(any())).thenReturn(anyPayment())
 
         val response = sut.update(anyPaymentInformation())
 
-        assertAll(
-            "Check values",
-            { assertEquals(encData.txnRefNo, response.paymentId) },
-            { assertEquals(encData.supplierOrderId, response.supplierOrderId) },
-            { assertEquals(encData.amount, response.amount) },
-            { assertEquals(encData.responseCode, response.responseCode) },
-            { assertEquals(encData.message, response.message) },
-        )
+
+        assertEquals(expectedResponse, response)
 
         // Check some fields with captor
         verify(repository).save(capture(paymentCaptor))
@@ -78,7 +88,23 @@ class UpdatePaymentServiceTest {
         assertEquals(PaymentStatus.PAID, payment.status)
 
         verify(decrypter).decrypt<EncData>(any(), any())
-        verify(wabiPaymentAsyncNotificationSdk, times(1)).notify(paymentUpdated)
+        verify(wabiPaymentAsyncNotificationSdk).notify(paymentUpdated)
+    }
+
+    @Test
+    fun `Given an encData with invalid payment method should throw InvalidPaymentMethod exception`() {
+        val encData = anyEncData(SUCCESS_RESPONSE_CODE, paymentMethod = randomString())
+
+        whenever(decrypter.decrypt<EncData>(any(), any())).thenReturn(encData)
+
+        assertFailsWith<InvalidPaymentMethodException> {
+            sut.update(anyPaymentInformation())
+        }
+
+        verify(decrypter).decrypt<EncData>(any(), any())
+        verifyNoInteractions(wabiPaymentAsyncNotificationSdk)
+        verifyNoInteractions(repository)
+
     }
 
     private fun anyPayment() = Payment(
@@ -96,10 +122,10 @@ class UpdatePaymentServiceTest {
         encData = randomString()
     )
 
-    private fun anyEncData(responseCode: String) = EncData(
+    private fun anyEncData(responseCode: String, paymentMethod: String = "cc") = EncData(
         txnRefNo = Random.nextLong().toString(),
         merchantId = randomString(),
-        amount = randomString(),
+        amount = randomBigDecimal().toString(),
         terminalId = randomString(),
         responseCode = responseCode,
         message = randomString(),
@@ -113,7 +139,7 @@ class UpdatePaymentServiceTest {
         authStatus = randomString(),
         bankId = randomString(),
         currency = randomString(),
-        paymentOption = randomString(),
+        paymentOption = paymentMethod,
         secureHash = randomString(),
         supplierOrderId = Random.nextLong().toString()
     )

@@ -1,6 +1,9 @@
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import domain.model.CreatePaymentRequest
+import domain.model.PaymentExpiration
 import domain.model.Supplier
+import java.math.BigDecimal
+import java.math.RoundingMode
 import org.mockito.ArgumentCaptor
 import org.springframework.http.HttpMethod
 import java.util.UUID
@@ -15,6 +18,8 @@ import wabi2b.dtos.customers.shared.UserIdDto
 import wabi2b.dtos.customers.shared.WorkingDaysDto
 
 fun randomString() = UUID.randomUUID().toString()
+
+fun randomBigDecimal(): BigDecimal = BigDecimal(Random.nextDouble()).setScale(2, RoundingMode.HALF_EVEN)
 
 fun anySupplier() = Supplier(
     supplierId = randomString(),
@@ -58,6 +63,8 @@ fun anyCustomer(addresses: List<AddressDto>) = CustomerDto(
     permissionOnBranchOffice = true,
     verificationDocuments = null
 )
+
+fun anyPaymentExpiration() = PaymentExpiration(Random.nextLong(), randomBigDecimal())
 
 @Suppress("UNCHECKED_CAST")
 private fun <T> capture(captor: ArgumentCaptor<T>): T = captor.capture()

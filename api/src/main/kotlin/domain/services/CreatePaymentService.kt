@@ -9,6 +9,7 @@ import domain.model.errors.FunctionalityNotAvailable
 import adapters.repositories.jpmc.JpmcPaymentRepository
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleInformation
 import domain.model.Payment
+import domain.model.PaymentExpiration
 import domain.model.PaymentStatus
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.Mono
@@ -44,7 +45,9 @@ class CreatePaymentService(
     }
 
     private fun doCreatePayment(paymentId: String, context: CreatePaymentContext): CreatePaymentResponse {
-        return paymentExpirationService.init(paymentId).runCatching {
+        return paymentExpirationService.init(
+            PaymentExpiration(paymentId.toLong(), context.request.amount.toBigDecimal())
+        ).runCatching {
             saleServiceSdk.getSaleInformation(buildRequest(context.request, paymentId)).toCreatePaymentResponse()
         }.onSuccess {
             logger.trace("Payment created: $it")
@@ -85,8 +88,7 @@ class CreatePaymentService(
 
     private fun CreatePaymentRequest.toStartPaymentRequestDto() = StartPaymentRequestDto(
         supplierOrderId = supplierOrderId,
-        paidAmount = amount.toBigDecimal(),
-        paymentType = PaymentType.DIGITAL_PAYMENT
+        amount = amount.toBigDecimal()
     )
 
     private fun retrievePaymentId(context: CreatePaymentContext): Mono<String> {

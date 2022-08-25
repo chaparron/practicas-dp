@@ -3,7 +3,7 @@ package domain.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-class UpdatePaymentResponse (
+data class UpdatePaymentResponse (
     val paymentId: String?,
     val supplierOrderId: String,
     val amount: String,

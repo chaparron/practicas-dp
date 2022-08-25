@@ -84,7 +84,8 @@ object MainConfiguration : Configuration {
             sqsClient = sqsClient(),
             delaySeconds = PAYMENT_EXPIRATION_DELAY_IN_SECONDS.get().toInt(),
             queueUrl = PAYMENT_EXPIRATION_QUEUE_URL.get(),
-            wabiPaymentAsyncNotificationSdk = wabiPaymentAsyncNotificationSdk
+            wabiPaymentAsyncNotificationSdk = wabiPaymentAsyncNotificationSdk,
+            mapper = jsonMapper
         )
     }
 

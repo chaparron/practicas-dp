@@ -1,7 +1,11 @@
 package domain.services
 
 
+import anyPaymentExpiration
+import configuration.MainConfiguration
 import kotlin.test.assertEquals
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
@@ -10,7 +14,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import randomString
 import software.amazon.awssdk.http.SdkHttpResponse
 import software.amazon.awssdk.services.sqs.SqsClient
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest
@@ -25,6 +28,7 @@ class PaymentExpirationServiceTest {
 
     private val sqsClient: SqsClient = mock()
     private val wabiPaymentAsyncNotificationSdk: WabiPaymentAsyncNotificationSdk = mock()
+    private val mapper: Json = MainConfiguration.jsonMapper
     companion object {
         private const val PAYMENT_EXPIRATION_DELAY_IN_SECONDS = 15
         private const val PAYMENT_EXPIRATION_QUEUE_URL = "some.url"
@@ -34,14 +38,15 @@ class PaymentExpirationServiceTest {
         sqsClient = sqsClient,
         delaySeconds = PAYMENT_EXPIRATION_DELAY_IN_SECONDS,
         queueUrl = PAYMENT_EXPIRATION_QUEUE_URL,
-        wabiPaymentAsyncNotificationSdk = wabiPaymentAsyncNotificationSdk
+        wabiPaymentAsyncNotificationSdk = wabiPaymentAsyncNotificationSdk,
+        mapper = mapper
     )
 
     @Test
     fun `Push paymentId to expiration queue`() {
-        val somePaymentId = randomString()
+        val somePaymentExpiration = anyPaymentExpiration()
         val request = SendMessageRequest.builder()
-            .messageBody(somePaymentId)
+            .messageBody(mapper.encodeToString(somePaymentExpiration))
             .delaySeconds(PAYMENT_EXPIRATION_DELAY_IN_SECONDS)
             .queueUrl(PAYMENT_EXPIRATION_QUEUE_URL)
             .build()
@@ -53,15 +58,15 @@ class PaymentExpirationServiceTest {
 
         whenever(sqsClient.sendMessage(request)).thenReturn(sendMessageResponse)
 
-        assertEquals(somePaymentId, sut.init(somePaymentId))
+        assertEquals(somePaymentExpiration, sut.init(somePaymentExpiration))
         verify(sqsClient, times(1)).sendMessage(request)
     }
 
     @Test
     fun `Throw AddToExpirationQueueException when sendMessage is not successful`() {
-        val somePaymentId = randomString()
+        val somePaymentExpiration = anyPaymentExpiration()
         val request = SendMessageRequest.builder()
-            .messageBody(somePaymentId)
+            .messageBody(mapper.encodeToString(somePaymentExpiration))
             .delaySeconds(PAYMENT_EXPIRATION_DELAY_IN_SECONDS)
             .queueUrl(PAYMENT_EXPIRATION_QUEUE_URL)
             .build()
@@ -74,41 +79,45 @@ class PaymentExpirationServiceTest {
         whenever(sqsClient.sendMessage(request)).thenReturn(sendMessageResponse)
 
         assertThrows<AddToExpirationQueueException> {
-            sut.init(somePaymentId)
+            sut.init(somePaymentExpiration)
         }
     }
 
     @Test
     fun `Should expire a paymentId`() {
-        val somePaymentId = 400L
+        val somePaymentExpiration = anyPaymentExpiration()
         val paymentUpdate = PaymentUpdated(
             supplierOrderId = null,
-            paymentId = somePaymentId,
+            paymentId = somePaymentExpiration.paymentId,
             paymentType = PaymentType.DIGITAL_PAYMENT,
-            resultType = PaymentResult.EXPIRED
+            resultType = PaymentResult.EXPIRED,
+            amount = somePaymentExpiration.amount,
+            paymentMethod = null
         )
 
-        val result = sut.expire(somePaymentId.toString())
+        val result = sut.expire(somePaymentExpiration)
 
         assertEquals(true, result)
-        verify(wabiPaymentAsyncNotificationSdk, times(1)).notify(paymentUpdate)
+        verify(wabiPaymentAsyncNotificationSdk).notify(paymentUpdate)
     }
 
     @Test
     fun `Throw PaymentExpireException when expire fails`() {
-        val somePaymentId = 400L
+        val somePaymentExpiration = anyPaymentExpiration()
         val paymentUpdate = PaymentUpdated(
             supplierOrderId = null,
-            paymentId = somePaymentId,
+            paymentId = somePaymentExpiration.paymentId,
             paymentType = PaymentType.DIGITAL_PAYMENT,
-            resultType = PaymentResult.EXPIRED
+            resultType = PaymentResult.EXPIRED,
+            amount = somePaymentExpiration.amount,
+            paymentMethod = null
         )
 
         whenever(wabiPaymentAsyncNotificationSdk.notify(paymentUpdate)).thenThrow(java.lang.RuntimeException())
 
         assertThrows<PaymentExpireException> {
-            sut.expire(somePaymentId.toString())
+            sut.expire(somePaymentExpiration)
         }
-        verify(wabiPaymentAsyncNotificationSdk, times(1)).notify(paymentUpdate)
+        verify(wabiPaymentAsyncNotificationSdk).notify(paymentUpdate)
     }
 }

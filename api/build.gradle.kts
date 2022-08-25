@@ -31,13 +31,9 @@ java {
 dependencies {
 
     val wabiAuthorizerVersion: String by project
-//    val wabipaySupermoneySdkVersion: String by project
-    val wabi2bJpmcSdkVersion: String by project
     val wabiAuthSdkVersion: String by project
     val wabiSerializersVersion: String by project
-    val wabi2bPaymentsSdkVersion: String by project
     val wabiApiSdkVersion: String by project
-    val wabiPaymentAsyncNotificationSdk: String by project
 
     val kotlinxSerializationVersion: String by project
 
@@ -74,8 +70,7 @@ dependencies {
     implementation("com.wabi2b:serializers:$wabiSerializersVersion")
 
     // wabi2b jpmc Sdk
-//    implementation("wabipay:supermoney-sdk:$wabipaySupermoneySdkVersion")
-    implementation("wabi2b:jpmc-sdk:$wabi2bJpmcSdkVersion")
+    implementation("wabi2b:jpmc-sdk:1009-497b8d35ec80a09dcb9bc8155846b0a6bf332d32")
 
 
     // Auth0
@@ -83,9 +78,9 @@ dependencies {
     implementation("yopdev.sdk:auth:$wabiAuthSdkVersion")
 
     //wabi2b services
-    implementation("wabi2b:payments-sdk:$wabi2bPaymentsSdkVersion")
+    implementation("wabi2b:payments-sdk:1345-5c74c8df417efa2121873da45fada6823fa72060")
     implementation("wabi2b.sdk:wabi2b-api-sdk:$wabiApiSdkVersion")
-    implementation("wabi2b:payment-async-notification-sdk:$wabiPaymentAsyncNotificationSdk") {
+    implementation("wabi2b:payment-async-notification-sdk:1345-5c74c8df417efa2121873da45fada6823fa72060") {
         exclude("wabi2b.payments.common", "common")
     }
 

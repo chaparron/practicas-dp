@@ -15,6 +15,8 @@ import wabi2b.payments.common.model.dto.PaymentType
 import wabi2b.payments.common.model.dto.PaymentUpdated
 import wabi2b.payments.common.model.dto.type.PaymentResult
 import java.time.Instant
+import toPaymentMethod
+import wabi2b.payments.common.model.dto.type.PaymentMethod
 
 class UpdatePaymentService(
     private val decrypter: AesDecrypterService,
@@ -61,7 +63,12 @@ class UpdatePaymentService(
     private fun EncData.toPaymentUpdated() = PaymentUpdated(
         supplierOrderId = supplierOrderId!!.toLong(),
         paymentType = PaymentType.DIGITAL_PAYMENT,
+        amount = amount.toBigDecimal(),
         paymentId = txnRefNo.toLong(),
+        paymentMethod = paymentOption.toPaymentMethod(),
         resultType = if (responseCode == SUCCESS_RESPONSE_CODE) PaymentResult.SUCCESS else PaymentResult.FAILED
     )
 }
+
+data class InvalidPaymentMethodException(val paymentMethod: String) : RuntimeException("Invalid payment method: $paymentMethod")
+

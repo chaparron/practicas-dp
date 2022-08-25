@@ -7,6 +7,7 @@ import com.wabi2b.jpmc.sdk.usecase.sale.SaleService
 import configuration.EnvironmentVariable
 import domain.model.CreatePaymentRequest
 import domain.model.Payment
+import domain.model.PaymentExpiration
 import domain.model.PaymentStatus
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
@@ -59,10 +60,11 @@ class CreatePaymentServiceTest {
         val request = anyCreatePaymentRequest()
         val paymentSdkRequest = request.toStartPaymentRequestDto()
         val accessToken = randomString()
+        val paymentExpiration = PaymentExpiration(anyPaymentId.value, request.amount.toBigDecimal())
 
         whenever(tokenProvider.getClientToken()).thenReturn(accessToken)
         whenever(paymentSdk.startPayment(paymentSdkRequest, accessToken)).thenReturn(Mono.just(anyPaymentId))
-        whenever(expirationService.init(anyPaymentId.value.toString())).thenReturn(anyPaymentId.value.toString())
+        whenever(expirationService.init(paymentExpiration)).thenReturn(paymentExpiration)
         whenever(saleServiceSdk.getSaleInformation(any())).thenReturn(saleInformation)
         whenever(jpmcRepository.save(any())).thenReturn(anyPayment())
         wheneverForConfigurations()
@@ -77,11 +79,11 @@ class CreatePaymentServiceTest {
             { assertEquals(saleInformation.encData, response.encData) },
         )
 
-        verify(saleServiceSdk, times(1)).getSaleInformation(any())
-        verify(jpmcRepository, times(1)).save(any())
-        verify(tokenProvider, times(1)).getClientToken()
-        verify(paymentSdk, times(1)).startPayment(paymentSdkRequest, accessToken)
-        verify(expirationService, times(1)).init(anyPaymentId.value.toString())
+        verify(saleServiceSdk).getSaleInformation(any())
+        verify(jpmcRepository).save(any())
+        verify(tokenProvider).getClientToken()
+        verify(paymentSdk).startPayment(paymentSdkRequest, accessToken)
+        verify(expirationService).init(paymentExpiration)
         verifyForConfigurations()
     }
 
@@ -91,10 +93,12 @@ class CreatePaymentServiceTest {
         val request = anyCreatePaymentRequest()
         val paymentSdkRequest = request.toStartPaymentRequestDto()
         val accessToken = randomString()
+        val paymentExpiration = PaymentExpiration(anyPaymentId.value, request.amount.toBigDecimal())
+
 
         whenever(tokenProvider.getClientToken()).thenReturn(accessToken)
         whenever(paymentSdk.startPayment(paymentSdkRequest, accessToken)).thenReturn(Mono.just(anyPaymentId))
-        whenever(expirationService.init(anyPaymentId.value.toString())).thenThrow(AddToExpirationQueueException(anyPaymentId.value.toString()))
+        whenever(expirationService.init(paymentExpiration)).thenThrow(AddToExpirationQueueException(anyPaymentId.value.toString()))
 
         assertThrows<AddToExpirationQueueException> {
             sut.createPayment(request)
@@ -102,7 +106,7 @@ class CreatePaymentServiceTest {
 
         verify(tokenProvider, times(1)).getClientToken()
         verify(paymentSdk, times(1)).startPayment(paymentSdkRequest, accessToken)
-        verify(expirationService, times(1)).init(anyPaymentId.value.toString())
+        verify(expirationService, times(1)).init(paymentExpiration)
         verifyNoInteractions(saleServiceSdk)
         verifyNoInteractions(jpmcRepository)
 
@@ -162,7 +166,6 @@ class CreatePaymentServiceTest {
 
     private fun CreatePaymentRequest.toStartPaymentRequestDto() = StartPaymentRequestDto(
         supplierOrderId = supplierOrderId,
-        paidAmount = amount.toBigDecimal(),
-        paymentType = PaymentType.DIGITAL_PAYMENT
+        amount = amount.toBigDecimal()
     )
 }
