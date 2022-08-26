@@ -43,7 +43,8 @@ class DigitalPaymentsApiGateway(
             path = PROCESS_INFORMATION_PATH,
             handler = JpmcUpdatePaymentHandler(
                 service = configuration.updatePaymentService,
-                jsonMapper = configuration.jsonMapper
+                jsonMapper = configuration.jsonMapper,
+                updatePaymentDummyEnabled = EnvironmentVariable.jpmcUpdatePaymentDummyEnabled().toBoolean()
             )
         )
 

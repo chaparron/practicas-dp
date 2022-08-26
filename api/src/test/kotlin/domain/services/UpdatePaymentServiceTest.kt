@@ -3,13 +3,16 @@ package domain.services
 import adapters.repositories.jpmc.JpmcPaymentRepository
 import com.wabi2b.jpmc.sdk.security.cipher.aes.decrypt.AesDecrypterService
 import com.wabi2b.jpmc.sdk.usecase.sale.EncData
+import com.wabi2b.serializers.BigDecimalSerializer
+import com.wabi2b.serializers.InstantSerializer
+import com.wabi2b.serializers.URISerializer
+import com.wabi2b.serializers.UUIDStringSerializer
 import domain.model.JpmcPaymentInformation
 import domain.model.Payment
 import domain.model.PaymentStatus
 import domain.model.UpdatePaymentResponse
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.*
 import org.mockito.junit.jupiter.MockitoExtension
@@ -23,10 +26,11 @@ import kotlin.random.Random
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.contextual
 import randomBigDecimal
 import randomLong
 import toPaymentMethod
-import wabi2b.payments.common.model.dto.type.PaymentMethod
 
 @ExtendWith(MockitoExtension::class)
 class UpdatePaymentServiceTest {
@@ -35,7 +39,16 @@ class UpdatePaymentServiceTest {
     private lateinit var decrypter: AesDecrypterService
 
     @Mock
-    private lateinit var jsonMapper: Json
+    private var jsonMapper: Json = Json {
+        encodeDefaults = true
+        ignoreUnknownKeys = true
+        serializersModule = SerializersModule {
+            contextual(InstantSerializer)
+            contextual(UUIDStringSerializer)
+            contextual(URISerializer)
+            contextual(BigDecimalSerializer)
+        }
+    }
 
     @Mock
     private lateinit var repository: JpmcPaymentRepository
@@ -67,9 +80,9 @@ class UpdatePaymentServiceTest {
         )
 
         val expectedResponse = UpdatePaymentResponse(
-            paymentId = encData.txnRefNo,
-            supplierOrderId = encData.supplierOrderId!!,
-            amount = encData.amount,
+            paymentId = encData.txnRefNo.toLong(),
+            supplierOrderId = encData.supplierOrderId!!.toLong(),
+            amount = encData.amount.toBigDecimal(),
             responseCode = encData.responseCode,
             message = encData.message
         )

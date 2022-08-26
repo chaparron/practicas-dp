@@ -42,9 +42,9 @@ class UpdatePaymentService(
         }.getOrThrow().toUpdatePaymentResponse()
 
     private fun EncData.toUpdatePaymentResponse() = UpdatePaymentResponse(
-        paymentId = txnRefNo,
-        supplierOrderId = supplierOrderId!!,
-        amount = amount,
+        paymentId = txnRefNo.toLong(),
+        supplierOrderId = supplierOrderId!!.toLong(),
+        amount = amount.toBigDecimal(),
         responseCode = responseCode,
         message = message
     )
@@ -57,7 +57,7 @@ class UpdatePaymentService(
         responseCode = responseCode,
         message = message,
         encData = encData,
-        status = if (responseCode == "00") PaymentStatus.PAID else PaymentStatus.ERROR
+        status = if (responseCode == SUCCESS_RESPONSE_CODE) PaymentStatus.PAID else PaymentStatus.ERROR
     ).updated(Instant.now())
 
     private fun EncData.toPaymentUpdated() = PaymentUpdated(

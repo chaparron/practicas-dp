@@ -9,7 +9,7 @@ import domain.model.UpdatePaymentResponse
 import domain.model.errors.DpErrorReason
 import domain.model.errors.DpException
 import domain.services.UpdatePaymentService
-import domain.services.Wabi2bTokenProvider
+import java.math.BigDecimal
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -21,6 +21,7 @@ import java.util.*
 class JpmcUpdatePaymentHandler(
     private val service: UpdatePaymentService,
     private val jsonMapper: Json,
+    private val updatePaymentDummyEnabled: Boolean
 ) : RestHandler {
 
     companion object {
@@ -32,11 +33,11 @@ class JpmcUpdatePaymentHandler(
     override fun handleRequest(request: APIGatewayProxyRequestEvent, context: Context): APIGatewayProxyResponseEvent {
         logger.trace("Received request: [${request.body}]")
 
-        return if (EnvironmentVariable.jpmcUpdatePaymentDummyEnabled().toBoolean()) {
+        return if (updatePaymentDummyEnabled) {
             ok(UpdatePaymentResponse(
-                paymentId = UUID.randomUUID().toString(),
-                supplierOrderId = "666",
-                amount = "100",
+                paymentId = Random().nextLong(),
+                supplierOrderId = Random().nextLong(),
+                amount = BigDecimal("100"),
                 responseCode = "00",
                 message = "Transaction Successful"
             ).also {
