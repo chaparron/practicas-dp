@@ -23,7 +23,7 @@ Mappings:
       JpmcReturnUrl: "https://webhook.site/537c1b38-f705-4886-8b51-d49ef04b1c76"
       JpmcVersion: "1"
       JpmcAvailableFor: "IN-MH"
-      JpmcStateValidationEnabled: true
+      JpmcStateValidationEnabled: false
       JpmcProvidersDummyEnabled: false
       JpmcCreatePaymentDummyEnabled: false
       JpmcUpdatePaymentDummyEnabled: false
@@ -76,7 +76,7 @@ Globals:
         NEW_RELIC_EXTENSION_SEND_FUNCTION_LOGS: true
         NEW_RELIC_DEBUG: true
         NEW_RELIC_LAMBDA_EXTENSION_ENABLED: !FindInMap [ Config, !Ref EnvironmentStackName, NewRelicLambdaExtensionEnabled ]
-        FORCE_UPDATE: 3
+        FORCE_UPDATE: 4
         SUPPLIER_TABLE: !Ref SupplierTable
 
     DeploymentPreference:
