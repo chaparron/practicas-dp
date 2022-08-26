@@ -3,14 +3,12 @@ package domain.services.providers
 class PaymentProviderService(
     private val jpmProviderService: ProviderService
 ) {
+    companion object {
+        private val defaultProvider = Provider.JP_MORGAN
+    }
     fun availableProviders(state: String, supplierId: String): List<Provider> {
-
-        val providers: ArrayList<Provider> = ArrayList()
-
-        if (jpmProviderService.isAccepted(state, supplierId)) {
-            providers.add(Provider.JP_MORGAN)
+        return buildList {
+            if(jpmProviderService.isAccepted(state, supplierId)) add(defaultProvider)
         }
-
-        return providers
     }
 }
