@@ -15,6 +15,7 @@ import com.wabi2b.serializers.InstantSerializer
 import com.wabi2b.serializers.URISerializer
 import com.wabi2b.serializers.UUIDStringSerializer
 import configuration.EnvironmentVariable.*
+import domain.functions.PaymentExpirationListener
 import domain.functions.SupplierListenerFunction
 import domain.services.*
 import domain.services.state.StateValidatorService
@@ -107,6 +108,13 @@ object MainConfiguration : Configuration {
         SupplierListenerFunction(
             jsonMapper = jsonMapper,
             supplierService = supplierService
+        )
+    }
+
+    override val paymentExpirationListener: PaymentExpirationListener by lazy {
+        PaymentExpirationListener(
+            mapper = jsonMapper,
+            paymentExpirationService = paymentExpirationService
         )
     }
 

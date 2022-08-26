@@ -1,6 +1,7 @@
 package configuration
 
 import adapters.rest.validations.Security
+import domain.functions.PaymentExpirationListener
 import domain.functions.SupplierListenerFunction
 import domain.services.CreatePaymentService
 import domain.services.UpdatePaymentService
@@ -19,6 +20,7 @@ class TestConfiguration(
     override val createPaymentService: CreatePaymentService = mock(),
     override val jpmcStateValidationConfig: EnvironmentVariable.JpmcStateValidationConfig = mock(),
     override val supplierListenerFunction: SupplierListenerFunction = SupplierListenerFunction(jsonMapper, mock()),
+    override val paymentExpirationListener: PaymentExpirationListener = PaymentExpirationListener(mock(), jsonMapper),
     override val stateValidatorService: StateValidatorService = mock(),
     override val paymentProviderService: PaymentProviderService = mock(),
     override val updatePaymentService: UpdatePaymentService = mock(),

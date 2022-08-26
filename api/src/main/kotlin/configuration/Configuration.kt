@@ -1,5 +1,6 @@
 package configuration
 
+import domain.functions.PaymentExpirationListener
 import domain.functions.SupplierListenerFunction
 import domain.services.CreatePaymentService
 import domain.services.UpdatePaymentService
@@ -24,4 +25,5 @@ interface Configuration {
     val wabi2bSdk: Wabi2bSdk
     val clock: Clock
     val paymentExpirationService: PaymentExpirationService
+    val paymentExpirationListener: PaymentExpirationListener
 }
