@@ -70,7 +70,7 @@ dependencies {
     implementation("com.wabi2b:serializers:$wabiSerializersVersion")
 
     // wabi2b jpmc Sdk
-    implementation("wabi2b:jpmc-sdk:1009-497b8d35ec80a09dcb9bc8155846b0a6bf332d32")
+    implementation("wabi2b:jpmc-sdk:1011-2a0d28df3b29381ebc3d4ae22f015553b229180f")
 
 
     // Auth0

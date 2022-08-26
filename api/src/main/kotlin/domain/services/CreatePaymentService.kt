@@ -70,13 +70,13 @@ class CreatePaymentService(
 
     private fun buildRequest(request: CreatePaymentRequest, paymentId: String) = SaleRequest(
         version = configuration.version,
-        txnRefNo = paymentId,
+        paymentId = paymentId,
         amount = request.amount.toString(),
         passCode = configuration.passCode, //TODO this passCode must be in a Secret
         bankId = configuration.bankId,
         terminalId = configuration.terminalId,
         merchantId = configuration.merchantId,
-        mCC = configuration.mcc,
+        mcc = configuration.mcc,
         currency = configuration.currency,
         txnType = TRANSACTION_TYPE,
         returnUrl = configuration.returnUrl,
