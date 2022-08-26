@@ -126,7 +126,7 @@ class DigitalPaymentsApiGatewayTest {
             logger.trace("Stubbing response $statusCode-$supplierId-$state")
             when (statusCode) {
                 200 -> doReturn(listOf(Provider.JP_MORGAN)).whenever(paymentProviderService)
-                    .availableProviders(state, supplierId)
+                    .availableProviders(supplierId)
             }
         }
     }

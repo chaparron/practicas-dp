@@ -42,9 +42,8 @@ class PaymentProvidersHandler(
             val supplierId = input.queryStringParameters[SUPPLIER_ID_PARAM]
                 .required(DpErrorReason.MISSING_SUPPLIER_ID)
 
-            val state = stateValidatorService.getState(input)
-
-            ok(service.availableProviders(state, supplierId)
+            stateValidatorService.validate(input)
+            ok(service.availableProviders(supplierId)
                 .also {
                     logger.trace("Payment Providers retrieved: $it")
                 }

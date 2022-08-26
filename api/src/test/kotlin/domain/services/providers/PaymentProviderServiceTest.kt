@@ -36,20 +36,19 @@ class PaymentProviderServiceTest {
 
     private fun assertFor(serviceResponse: Boolean, expected: () -> List<Provider>) {
         //Given
-        val (state, supplierId) = anyStateSupplierIdPair()
+        val supplierId = randomString()
 
         //When
-        whenever(jpmProviderService.isAccepted(any(), any()))
+        whenever(jpmProviderService.isAccepted(any()))
             .thenReturn(serviceResponse)
 
         //Then
-        assertEquals(expected(), sut.availableProviders(state, supplierId))
+        assertEquals(expected(), sut.availableProviders(supplierId))
 
         //Verify
-        verify(jpmProviderService).isAccepted(state, supplierId)
+        verify(jpmProviderService).isAccepted(supplierId)
     }
 
     private fun defaultProviders() = listOf(defaultProvider)
 
-    private fun anyStateSupplierIdPair() = randomString() to randomString()
 }

@@ -23,10 +23,10 @@ fun randomBigDecimal(): BigDecimal = BigDecimal(Random.nextDouble()).setScale(2,
 
 fun randomLong() = Random.nextLong()
 
-fun anySupplier() = Supplier(
-    supplierId = randomString(),
+fun anySupplier(supplierId: String = randomString(), bankAccountNumber: String = randomString()) = Supplier(
+    supplierId = supplierId,
     state = randomString(),
-    bankAccountNumber = randomString(),
+    bankAccountNumber = bankAccountNumber,
     indianFinancialSystemCode = randomString()
 )
 fun apiGatewayEventRequest(

@@ -10,7 +10,6 @@ import com.wabi2b.jpmc.sdk.security.cipher.aes.encrypt.AesEncrypterService
 import com.wabi2b.jpmc.sdk.security.hash.sha256.DigestHashCalculator
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleService
 import com.wabi2b.serializers.BigDecimalSerializer
-import com.wabi2b.serializers.BigDecimalToFloatSerializer
 import com.wabi2b.serializers.InstantSerializer
 import com.wabi2b.serializers.URISerializer
 import com.wabi2b.serializers.UUIDStringSerializer
@@ -20,7 +19,7 @@ import domain.functions.SupplierListenerFunction
 import domain.services.*
 import domain.services.state.StateValidatorService
 import domain.services.providers.PaymentProviderService
-import domain.services.providers.jpmc.JpmProviderService
+import domain.services.providers.jpmc.DefaultProviderService
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
@@ -128,9 +127,8 @@ object MainConfiguration : Configuration {
 
     override val paymentProviderService: PaymentProviderService by lazy {
         PaymentProviderService(
-            JpmProviderService(
-                supplierService = supplierService,
-                stateValidator = stateValidatorService
+            DefaultProviderService(
+                supplierService = supplierService
             )
         )
     }
