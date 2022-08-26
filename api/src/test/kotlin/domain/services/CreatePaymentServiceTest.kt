@@ -167,7 +167,7 @@ class CreatePaymentServiceTest {
     }
 
     private fun CreatePaymentRequest.toStartPaymentRequestDto() = StartPaymentRequestDto(
-        supplierOrderId = supplierOrderId.toString(),
+        supplierOrderId = supplierOrderId,
         amount = amount
     )
 }

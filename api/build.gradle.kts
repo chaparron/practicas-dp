@@ -78,9 +78,9 @@ dependencies {
     implementation("yopdev.sdk:auth:$wabiAuthSdkVersion")
 
     //wabi2b services
-    implementation("wabi2b:payments-sdk:1348-b8f730edebd6dd957c1dd8c83f95164c673b1005")
+    implementation("wabi2b:payments-sdk:1353-0605e53441739eae14b575fd9b049576de205f03")
     implementation("wabi2b.sdk:wabi2b-api-sdk:$wabiApiSdkVersion")
-    implementation("wabi2b:payment-async-notification-sdk:1348-b8f730edebd6dd957c1dd8c83f95164c673b1005") {
+    implementation("wabi2b:payment-async-notification-sdk:1353-0605e53441739eae14b575fd9b049576de205f03") {
         exclude("wabi2b.payments.common", "common")
     }
 

@@ -91,7 +91,7 @@ class CreatePaymentService(
     )
 
     private fun CreatePaymentRequest.toStartPaymentRequestDto() = StartPaymentRequestDto(
-        supplierOrderId = supplierOrderId.toString(),
+        supplierOrderId = supplierOrderId,
         amount = amount
     )
 
