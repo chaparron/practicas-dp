@@ -6,12 +6,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UpdatePaymentResponse(
-    val paymentId: String?,
+    val paymentId: Long,
     val supplierOrderId: Long,
     @Contextual
     val amount: BigDecimal,
-    val totalAmount: String,
     val responseCode: String,
     val message: String
 )
-

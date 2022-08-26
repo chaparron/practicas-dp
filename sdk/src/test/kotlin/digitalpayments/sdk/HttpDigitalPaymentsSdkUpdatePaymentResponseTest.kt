@@ -102,10 +102,9 @@ class HttpDigitalPaymentsSdkUpdatePaymentResponseTest : AbstractSdkTest() {
     fun `given valid request when updatePayment then return success updatePaymentResponse`() {
 
         val response = UpdatePaymentResponse(
-            paymentId = "",
+            paymentId = randomLong(),
             supplierOrderId = randomLong(),
             amount = randomBigDecimal(),
-            totalAmount = "",
             responseCode = "",
             message = ""
         )
