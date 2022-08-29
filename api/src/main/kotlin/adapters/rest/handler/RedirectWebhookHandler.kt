@@ -32,7 +32,7 @@ class RedirectWebhookHandler(
         }.onSuccess {
             logger.debug("response=[$it]")
         }.onFailure {
-            logger.debug("thrown=[$it]")
+            logger.error("thrown=[$it]", it)
         }.getOrThrow()
     }
 }
