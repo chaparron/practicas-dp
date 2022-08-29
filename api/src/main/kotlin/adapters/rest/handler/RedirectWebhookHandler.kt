@@ -30,7 +30,7 @@ class RedirectWebhookHandler(
                 """.trimIndent()
             )
         }.onSuccess {
-            logger.debug("response=[$it]")
+            logger.debug("response onSuccess=[$it]")
         }.onFailure {
             logger.error("thrown=[$it]", it)
         }.getOrThrow()
