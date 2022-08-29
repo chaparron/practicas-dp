@@ -224,15 +224,15 @@ Resources:
       DeadLetterQueue:
         Type: "SQS"
         TargetArn: !GetAtt SupplierListenerFunctionDLQ.Arn
-  #      Events:
-  #        PayoutEvent:
-  #          Type: SNS
-  #          Properties:
-  #            Topic:
-  #              Fn::ImportValue: !Sub "${EnvironmentStackName}-*****"
-  #            FilterPolicy:
-  #              TYPE:
-  #                - "***"
+      Events:
+        SupplierEvent:
+          Type: SNS
+          Properties:
+            Topic:
+              Fn::ImportValue: !Sub "${EnvironmentStackName}-SupplierTopic"
+            FilterPolicy:
+              Action:
+                - supplierCreated
 
   SupplierListenerFunctionDLQ:
     Type: AWS::SQS::Queue

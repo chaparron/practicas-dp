@@ -15,7 +15,6 @@ data class SupplierEvent(
     @SerialName("id")
     val supplierId: String,
     val state: String,
-    @SerialName("bankAccountDataEvent")
     val bankAccount: BankAccountEvent
 
 ) {
