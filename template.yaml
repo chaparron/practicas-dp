@@ -20,7 +20,7 @@ Mappings:
       JpmcMerchantId: "100000000010588"
       JpmcMcc: "5999"
       JpmcCurrency: "356"
-      JpmcReturnUrl: "https://webhook.site/537c1b38-f705-4886-8b51-d49ef04b1c76"
+      JpmcReturnUrl: !Sub "https://${ApiGatewayNotificationApi}.execute-api.${AWS::Region}.amazonaws.com/${EnvironmentStackName}/dp/jpmc/notification"
       JpmcVersion: "1"
       JpmcAvailableFor: "IN-MH"
       JpmcStateValidationEnabled: false
@@ -30,6 +30,7 @@ Mappings:
       ClientSecret: "qa/digital-payments"
       DelayInSeconds: 15
       RetentionPeriod: 3600
+      NotificationReservedExecutions: 4
     prod:
       SubnetsStr: "subnet-02892d9b9c9f13256,subnet-0d2c43077cc4fb646,subnet-0a31d7dcc515f14cb"
       ProvisionedExecutionsApiGatewayMinCapacity: 2
@@ -44,7 +45,7 @@ Mappings:
       JpmcMerchantId: "100000000010588"
       JpmcMcc: "5999"
       JpmcCurrency: "356"
-      JpmcReturnUrl: "https://webhook.site/537c1b38-f705-4886-8b51-d49ef04b1c76"
+      JpmcReturnUrl: !Sub "https://${ApiGatewayNotificationApi}.execute-api.${AWS::Region}.amazonaws.com/${EnvironmentStackName}/dp/jpmc/notification"
       JpmcVersion: "1"
       JpmcAvailableFor: "IN-MH"
       JpmcStateValidationEnabled: true
@@ -54,6 +55,7 @@ Mappings:
       ClientSecret: "prod/digital-payments"
       DelayInSeconds: 15
       RetentionPeriod: 345600
+      NotificationReservedExecutions: 10
 Globals:
   Function:
     Runtime: "java11"
@@ -303,6 +305,28 @@ Resources:
           Type: SQS
           Properties:
             Queue: !GetAtt PaymentExpirationQueue.Arn
+
+  NotificationApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: "api"
+      Handler: "adapters.rest.DigitalPaymentsApiGateway"
+      Role: !GetAtt LambdaExecutionRole.Arn
+      ProvisionedConcurrencyConfig:
+      ReservedConcurrentExecutions: !FindInMap [ Config, !Ref EnvironmentStackName, NotificationReservedExecutions ]
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Method: post
+            Path: /dp/jpmc/notification
+            RestApiId:
+              Ref: ApiGatewayNotificationApi
+
+  ApiGatewayNotificationApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref EnvironmentStackName
 
 Outputs:
   ApiRootURL:
