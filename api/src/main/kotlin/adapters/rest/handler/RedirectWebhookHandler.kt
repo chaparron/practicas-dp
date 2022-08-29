@@ -22,13 +22,15 @@ class RedirectWebhookHandler(
         private val logger = LoggerFactory.getLogger(RedirectWebhookHandler::class.java)
     }
 
+    @Suppress("unused")
     constructor(): this(
         jpmcNotificationConfiguration()
     )
 
     override fun handleRequest(input: APIGatewayProxyRequestEvent?, context: Context?): APIGatewayProxyResponseEvent {
         return runCatching {
-            logger.info("input=[$input]")
+            logger.info("body=[${input?.body}]")
+            logger.info("headers=[${input?.headers}]")
             ok(
                 """
                     {"MerchantId":"${configuration.merchantId}","TerminalId":"${configuration.terminalId}", "BankId":"${configuration.bankId}", "Acknowledgement":"Received"}
