@@ -318,8 +318,8 @@ Resources:
         ApiEvent:
           Type: Api
           Properties:
-            Method: post
-            Path: /dp/jpmc/notification
+            Method: any
+            Path: /{proxy+}
             RestApiId:
               Ref: ApiGatewayNotificationApi
       Policies:
