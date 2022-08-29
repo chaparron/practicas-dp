@@ -4,10 +4,8 @@ import adapters.rest.handler.*
 import adapters.rest.handler.JpmcUpdatePaymentHandler.Companion.PROCESS_INFORMATION_PATH
 import adapters.rest.handler.CreatePaymentHandler.Companion.CREATE_PAYMENT_PATH
 import adapters.rest.handler.PaymentProvidersHandler.Companion.PAYMENT_PROVIDERS_PATH
-import adapters.rest.handler.RedirectWebhookHandler.Companion.REDIRECT_PATH
 import configuration.Configuration
 import configuration.EnvironmentVariable
-import configuration.EnvironmentVariable.Companion.jpmcNotificationConfiguration
 import configuration.MainConfiguration
 import wabi.rest2lambda.ApiGatewayProxy
 import wabi.rest2lambda.ErrorHandler
@@ -44,12 +42,6 @@ class DigitalPaymentsApiGateway(
                 service = configuration.updatePaymentService,
                 jsonMapper = configuration.jsonMapper,
                 updatePaymentDummyEnabled = EnvironmentVariable.jpmcUpdatePaymentDummyEnabled().toBoolean()
-            )
-        )
-        .post(
-            path = REDIRECT_PATH,
-            handler = RedirectWebhookHandler(
-                configuration = jpmcNotificationConfiguration()
             )
         )
 

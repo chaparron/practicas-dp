@@ -20,6 +20,9 @@ enum class EnvironmentVariable {
     JPMC_PROVIDERS_DUMMY_ENABLED,
     JPMC_CREATE_PAYMENT_DUMMY_ENABLED,
     JPMC_UPDATE_PAYMENT_DUMMY_ENABLED,
+    JPMC_B_ID,
+    JPMC_T_ID,
+    JPMC_M_ID,
     CLIENT_ID,
     CLIENT_PASSWORD,
     API_ROOT,
@@ -56,9 +59,9 @@ enum class EnvironmentVariable {
 
         fun jpmcNotificationConfiguration(): JpmcNotificationConfiguration =
             JpmcNotificationConfiguration(
-                bankId = JPMC_BANK_ID.get(),
-                terminalId = JPMC_TERMINAL_ID.get(),
-                merchantId = JPMC_MERCHANT_ID.get(),
+                bankId = JPMC_B_ID.get(),
+                terminalId = JPMC_T_ID.get(),
+                merchantId = JPMC_M_ID.get(),
                 mcc = JPMC_MCC.get()
             )
 

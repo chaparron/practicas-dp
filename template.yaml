@@ -314,27 +314,14 @@ Resources:
       Environment:
         Variables:
           #It is required to find a better way to set these environments variables
-          JPMC_AES_ENCRYPTION_KEY: 'noop'
-          JPMC_SHAE256_HASH_KEY: 'noop'
-          JPMC_PASS_CODE: 'noop'
-          JPMC_BANK_ID: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcBankId ]
-          JPMC_TERMINAL_ID: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcTerminalId ]
-          JPMC_MERCHANT_ID: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcMerchantId ]
+          #BankId
+          JPMC_B_ID: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcBankId ]
+          #TerminalID
+          JPMC_T_ID: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcTerminalId ]
+          #MerchantId
+          JPMC_M_ID: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcMerchantId ]
+          #Mcc
           JPMC_MCC: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcMcc ]
-          JPMC_CURRENCY: 'noop'
-          JPMC_RETURN_URL: 'noop'
-          JPMC_VERSION: 'noop'
-          JPMC_AVAILABLE_FOR: 'noop'
-          JPMC_STATE_VALIDATION_ENABLED: 'noop'
-          JPMC_PROVIDERS_DUMMY_ENABLED: 'noop'
-          JPMC_CREATE_PAYMENT_DUMMY_ENABLED: 'noop'
-          JPMC_UPDATE_PAYMENT_DUMMY_ENABLED: 'noop'
-          JPMC_PAYMENT_TABLE: 'noop'
-          CLIENT_ID: 'noop'
-          CLIENT_PASSWORD: 'noop'
-          PAYMENT_EXPIRATION_QUEUE_URL: 'noop'
-          PAYMENT_EXPIRATION_DELAY_IN_SECONDS: 'noop'
-          PAYMENT_UPDATED_TOPIC_ARN: 'noop'
       Events:
         ApiEvent:
           Type: Api
