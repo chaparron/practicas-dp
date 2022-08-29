@@ -158,8 +158,8 @@ Resources:
           JPMC_CREATE_PAYMENT_DUMMY_ENABLED: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcCreatePaymentDummyEnabled ]
           JPMC_UPDATE_PAYMENT_DUMMY_ENABLED: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcUpdatePaymentDummyEnabled ]
           JPMC_PAYMENT_TABLE: !Ref JpmcPaymentTable
-          CLIENT_ID: "digital_payments"
-          CLIENT_PASSWORD: "WWyAh1D47U2Myeahs"
+          CLIENT_ID: !Sub "{{resolve:secretsmanager:${EnvironmentStackName}/digital-payments:SecretString:client}}"
+          CLIENT_PASSWORD: !Sub "{{resolve:secretsmanager:${EnvironmentStackName}/digital-payments:SecretString:password}}"
           PAYMENT_EXPIRATION_QUEUE_URL: !Ref PaymentExpirationQueue
           PAYMENT_EXPIRATION_DELAY_IN_SECONDS: !FindInMap [ Config, !Ref EnvironmentStackName, DelayInSeconds ]
           PAYMENT_UPDATED_TOPIC_ARN:
