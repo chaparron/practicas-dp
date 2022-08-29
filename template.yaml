@@ -20,7 +20,6 @@ Mappings:
       JpmcMerchantId: "100000000010588"
       JpmcMcc: "5999"
       JpmcCurrency: "356"
-      JpmcReturnUrl: !Sub "https://${ApiGatewayNotificationApi}.execute-api.${AWS::Region}.amazonaws.com/${EnvironmentStackName}/dp/jpmc/notification"
       JpmcVersion: "1"
       JpmcAvailableFor: "IN-MH"
       JpmcStateValidationEnabled: false
@@ -45,7 +44,6 @@ Mappings:
       JpmcMerchantId: "100000000010588"
       JpmcMcc: "5999"
       JpmcCurrency: "356"
-      JpmcReturnUrl: !Sub "https://${ApiGatewayNotificationApi}.execute-api.${AWS::Region}.amazonaws.com/${EnvironmentStackName}/dp/jpmc/notification"
       JpmcVersion: "1"
       JpmcAvailableFor: "IN-MH"
       JpmcStateValidationEnabled: true
@@ -152,7 +150,7 @@ Resources:
           JPMC_MERCHANT_ID: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcMerchantId ]
           JPMC_MCC: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcMcc ]
           JPMC_CURRENCY: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcCurrency ]
-          JPMC_RETURN_URL: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcReturnUrl ]
+          JPMC_RETURN_URL: !Sub "https://${ApiGatewayNotificationApi}.execute-api.${AWS::Region}.amazonaws.com/${EnvironmentStackName}/dp/jpmc/notification"
           JPMC_VERSION: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcVersion ]
           JPMC_AVAILABLE_FOR: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcAvailableFor ]
           JPMC_STATE_VALIDATION_ENABLED: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcStateValidationEnabled ]
