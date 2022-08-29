@@ -30,6 +30,7 @@ class DefaultPaymentExpirationService(
         private val logger = LoggerFactory.getLogger(DefaultPaymentExpirationService::class.java)
     }
     override fun init(paymentExpiration: PaymentExpiration): PaymentExpiration {
+        logger.info("About to init expiration paymentId $this")
         SendMessageRequest.builder()
                 .messageBody(mapper.encodeToString(paymentExpiration))
             .delaySeconds(delaySeconds)
