@@ -54,6 +54,14 @@ enum class EnvironmentVariable {
                 enabled = JPMC_STATE_VALIDATION_ENABLED.get().toBoolean()
             )
 
+        fun jpmcNotificationConfiguration(): JpmcNotificationConfiguration =
+            JpmcNotificationConfiguration(
+                bankId = JPMC_BANK_ID.get(),
+                terminalId = JPMC_TERMINAL_ID.get(),
+                merchantId = JPMC_MERCHANT_ID.get(),
+                mcc = JPMC_MCC.get()
+            )
+
         fun jpmcProvidersDummyEnabled() = JPMC_PROVIDERS_DUMMY_ENABLED.get()
         fun jpmcCreatePaymentDummyEnabled() = JPMC_CREATE_PAYMENT_DUMMY_ENABLED.get()
         fun jpmcUpdatePaymentDummyEnabled() = JPMC_UPDATE_PAYMENT_DUMMY_ENABLED.get()
