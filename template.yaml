@@ -311,6 +311,18 @@ Resources:
       Handler: "adapters.rest.DigitalPaymentsApiGateway"
       Role: !GetAtt LambdaExecutionRole.Arn
       ReservedConcurrentExecutions: !FindInMap [ Config, !Ref EnvironmentStackName, NotificationReservedExecutions ]
+      Environment:
+        Variables:
+          JPMC_AES_ENCRYPTION_KEY: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcAesEncryptionKey ]
+          JPMC_SHAE256_HASH_KEY: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcSha256HashKey ]
+          JPMC_PASS_CODE: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcPassCode ]
+          JPMC_BANK_ID: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcBankId ]
+          JPMC_TERMINAL_ID: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcTerminalId ]
+          JPMC_MERCHANT_ID: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcMerchantId ]
+          JPMC_MCC: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcMcc ]
+          JPMC_CURRENCY: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcCurrency ]
+          JPMC_RETURN_URL: !Sub "https://${ApiGatewayNotificationApi}.execute-api.${AWS::Region}.amazonaws.com/${EnvironmentStackName}/dp/jpmc/notification"
+          JPMC_VERSION: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcVersion ]
       Events:
         ApiEvent:
           Type: Api
