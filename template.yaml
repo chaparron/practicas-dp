@@ -308,7 +308,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: "api"
-      Handler: "adapters.rest.DigitalPaymentsApiGateway"
+      Handler: "adapters.rest.handler.RedirectWebhookHandler"
       Role: !GetAtt LambdaExecutionRole.Arn
       ReservedConcurrentExecutions: !FindInMap [ Config, !Ref EnvironmentStackName, NotificationReservedExecutions ]
       Environment:
