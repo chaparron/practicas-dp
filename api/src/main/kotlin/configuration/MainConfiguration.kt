@@ -10,6 +10,7 @@ import com.wabi2b.jpmc.sdk.security.cipher.aes.encrypt.AesEncrypterService
 import com.wabi2b.jpmc.sdk.security.hash.sha256.DigestHashCalculator
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleService
 import com.wabi2b.serializers.BigDecimalSerializer
+import com.wabi2b.serializers.BigDecimalToFloatSerializer
 import com.wabi2b.serializers.InstantSerializer
 import com.wabi2b.serializers.URISerializer
 import com.wabi2b.serializers.UUIDStringSerializer
@@ -59,7 +60,7 @@ object MainConfiguration : Configuration {
                 contextual(InstantSerializer)
                 contextual(UUIDStringSerializer)
                 contextual(URISerializer)
-                contextual(BigDecimalSerializer)
+                contextual(BigDecimalToFloatSerializer)
             }
         }
     }
@@ -68,8 +69,8 @@ object MainConfiguration : Configuration {
         with(EnvironmentVariable.jpmcConfiguration()) {
             CreatePaymentService(
                 saleServiceSdk = SaleService(
-                    hashCalculator = DigestHashCalculator(this.sha256HashKey), //TODO this key must be in a Secret
-                    encrypter = AesEncrypterService(this.aesEncryptionKey) //TODO this key must be in a Secret
+                    hashCalculator = DigestHashCalculator(this.sha256HashKey),
+                    encrypter = AesEncrypterService(this.aesEncryptionKey)
                 ),
                 configuration = this,
                 jpmcRepository = jpmcPaymentRepository,

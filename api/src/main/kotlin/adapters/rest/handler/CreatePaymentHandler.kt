@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory
 import wabi.rest2lambda.RestHandler
 import wabi.rest2lambda.ok
 
-class JpmcCreatePaymentHandler(
+class CreatePaymentHandler(
     private val service: CreatePaymentService,
     private val jsonMapper: Json,
     private val stateValidatorService: StateValidatorService,
@@ -27,7 +27,7 @@ class JpmcCreatePaymentHandler(
 ) : RestHandler {
 
     companion object {
-        private val logger = LoggerFactory.getLogger(JpmcCreatePaymentHandler::class.java)
+        private val logger = LoggerFactory.getLogger(CreatePaymentHandler::class.java)
         const val CREATE_PAYMENT_PATH = "/dp/jpmc/createPayment"
     }
 

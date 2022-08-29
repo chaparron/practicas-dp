@@ -2,7 +2,7 @@ package adapters.rest
 
 import adapters.rest.handler.*
 import adapters.rest.handler.JpmcUpdatePaymentHandler.Companion.PROCESS_INFORMATION_PATH
-import adapters.rest.handler.JpmcCreatePaymentHandler.Companion.CREATE_PAYMENT_PATH
+import adapters.rest.handler.CreatePaymentHandler.Companion.CREATE_PAYMENT_PATH
 import adapters.rest.handler.PaymentProvidersHandler.Companion.PAYMENT_PROVIDERS_PATH
 import adapters.rest.handler.RedirectWebhookHandler.Companion.REDIRECT_PATH
 import configuration.Configuration
@@ -23,7 +23,7 @@ class DigitalPaymentsApiGateway(
     override fun setupMappings(builder: RestMappings.Builder): RestMappings.Builder = builder
         .post(
             path = CREATE_PAYMENT_PATH,
-            handler = JpmcCreatePaymentHandler(
+            handler = CreatePaymentHandler(
                 service = configuration.createPaymentService,
                 jsonMapper = configuration.jsonMapper,
                 stateValidatorService = configuration.stateValidatorService,

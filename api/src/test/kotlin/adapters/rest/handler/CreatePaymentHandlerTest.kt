@@ -5,6 +5,7 @@ import apiGatewayEventRequest
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.wabi2b.serializers.BigDecimalSerializer
+import com.wabi2b.serializers.BigDecimalToFloatSerializer
 import com.wabi2b.serializers.InstantSerializer
 import com.wabi2b.serializers.URISerializer
 import com.wabi2b.serializers.UUIDStringSerializer
@@ -29,7 +30,7 @@ import kotlinx.serialization.modules.contextual
 
 @ExtendWith(MockitoExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class JpmcCreatePaymentHandlerTest {
+class CreatePaymentHandlerTest {
 
     private var context: Context = mock()
     private var service: CreatePaymentService = mock()
@@ -40,13 +41,13 @@ class JpmcCreatePaymentHandlerTest {
             contextual(InstantSerializer)
             contextual(UUIDStringSerializer)
             contextual(URISerializer)
-            contextual(BigDecimalSerializer)
+            contextual(BigDecimalToFloatSerializer)
         }
     }
     private var stateValidatorService: StateValidatorService = mock()
     private var createPaymentDummyEnabled = false
 
-    private lateinit var sut: JpmcCreatePaymentHandler
+    private lateinit var sut: CreatePaymentHandler
 
     companion object {
         private const val PATH = "/dp/jpmc/createPayment"
@@ -64,7 +65,7 @@ class JpmcCreatePaymentHandlerTest {
     @BeforeEach
     fun setUp() {
         Mockito.reset(service, stateValidatorService)
-        sut = JpmcCreatePaymentHandler(service, jsonMapper, stateValidatorService, createPaymentDummyEnabled)
+        sut = CreatePaymentHandler(service, jsonMapper, stateValidatorService, createPaymentDummyEnabled)
     }
 
     @Test
@@ -98,7 +99,7 @@ class JpmcCreatePaymentHandlerTest {
         path = PATH,
         authorization = ACCESS_TOKEN,
         body = """
-            {"supplierOrderId":"${request.supplierOrderId}","amount":"${request.amount}","invoiceId":"${request.invoiceId}"}
+            {"supplierOrderId":"${request.supplierOrderId}","amount":${request.amount},"invoiceId":"${request.invoiceId}"}
         """.trimIndent()
     )
 
