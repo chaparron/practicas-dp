@@ -11,19 +11,11 @@ import kotlin.test.assertEquals
 class RedirectWebhookHandlerTest {
 
     companion object {
-        private const val PATH = "/dp/jpmc/notification"
-
-        private val config = EnvironmentVariable.JpmcConfiguration(
-            aesEncryptionKey = randomString(),
-            sha256HashKey = randomString(),
-            passCode = randomString(),
+        private val config = EnvironmentVariable.JpmcNotificationConfiguration(
             bankId = randomString(),
             terminalId = randomString(),
             merchantId = randomString(),
-            mcc = randomString(),
-            currency = randomString(),
-            returnUrl = randomString(),
-            version = randomString()
+            mcc = randomString()
         )
 
         private val expectedBody = """

@@ -12,7 +12,7 @@ import wabi.rest2lambda.ok
  * Test webhook.
  */
 class RedirectWebhookHandler(
-    private val configuration: EnvironmentVariable.JpmcConfiguration
+    private val configuration: EnvironmentVariable.JpmcNotificationConfiguration
 ): RestHandler {
 
     companion object {

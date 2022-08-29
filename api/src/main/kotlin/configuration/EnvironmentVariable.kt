@@ -93,4 +93,11 @@ enum class EnvironmentVariable {
         val availableFor: List<String>,
         val enabled: Boolean
     )
+
+    data class JpmcNotificationConfiguration(
+        val bankId: String,
+        val terminalId: String,
+        val merchantId: String,
+        val mcc: String
+    )
 }
