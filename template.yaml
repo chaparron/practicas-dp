@@ -312,7 +312,6 @@ Resources:
       CodeUri: "api"
       Handler: "adapters.rest.DigitalPaymentsApiGateway"
       Role: !GetAtt LambdaExecutionRole.Arn
-      ProvisionedConcurrencyConfig:
       ReservedConcurrentExecutions: !FindInMap [ Config, !Ref EnvironmentStackName, NotificationReservedExecutions ]
       Events:
         ApiEvent:
