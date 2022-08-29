@@ -17,8 +17,8 @@ data class Payment(
     val encData: String? = null,
     val status: PaymentStatus,
     val createdAt: String,
-    val lastUpdatedAt: String
-) {
+    val lastUpdatedAt: String,
+    val invoiceId: String? = null) {
     constructor(
         supplierOrderId: Long,
         paymentId: Long,
@@ -28,9 +28,10 @@ data class Payment(
         message: String? = null,
         encData: String? = null,
         status: PaymentStatus,
-        created: Instant = Instant.now()
+        created: Instant = Instant.now(),
+        invoiceId: String? = null
     ): this(
-        supplierOrderId, paymentId, amount, paymentOption, responseCode, message, encData, status, created.toString(), created.toString()
+        supplierOrderId, paymentId, amount, paymentOption, responseCode, message, encData, status, created.toString(), created.toString(), invoiceId
     )
 
     fun updated(at: Instant): Payment {

@@ -41,7 +41,8 @@ class DynamoDbJpmcPaymentRepository(
                 encData = it[DynamoDBJpmcAttribute.ED],
                 status = enumValueOf(it[DynamoDBJpmcAttribute.ST]!!),
                 createdAt = it[DynamoDBJpmcAttribute.C]!!,
-                lastUpdatedAt = it[DynamoDBJpmcAttribute.LU]!!
+                lastUpdatedAt = it[DynamoDBJpmcAttribute.LU]!!,
+                invoiceId = it[DynamoDBJpmcAttribute.INV]
             )
         } ?: throw PaymentNotFound(paymentId)
     }
@@ -66,7 +67,8 @@ class DynamoDbJpmcPaymentRepository(
         DynamoDBJpmcAttribute.ED.param to this.encData?.toAttributeValue(),
         DynamoDBJpmcAttribute.ST.param to this.status.name.toAttributeValue(),
         DynamoDBJpmcAttribute.C.param to this.createdAt.toAttributeValue(),
-        DynamoDBJpmcAttribute.LU.param to this.lastUpdatedAt.toAttributeValue()
+        DynamoDBJpmcAttribute.LU.param to this.lastUpdatedAt.toAttributeValue(),
+        DynamoDBJpmcAttribute.INV.param to this.invoiceId?.toAttributeValue()
     )
 
     private val pk: pkValue = {

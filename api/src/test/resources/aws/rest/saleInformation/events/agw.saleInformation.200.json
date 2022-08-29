@@ -1,5 +1,5 @@
 {
-  "body": "{\"supplierOrderId\":\"616\",\"amount\":\"161\",\"totalAmount\":\"400\"}",
+  "body": "{\"supplierOrderId\":\"616\",\"amount\":\"161\",\"invoiceId\":\"1-ABC\"}",
   "resource": "/{proxy+}",
   "path": "/dp/jpmc/createPayment",
   "httpMethod": "POST",

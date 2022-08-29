@@ -68,6 +68,7 @@ class JpmcCreatePaymentHandler(
     private fun CreatePaymentHandlerRequest.toCreatePaymentRequest() = CreatePaymentRequest(
         supplierOrderId = supplierOrderId.required(DpErrorReason.MISSING_SUPPLIER_ID),
         amount = amount.required(DpErrorReason.MISSING_AMOUNT),
+        invoiceId = invoiceId.required(DpErrorReason.MISSING_INVOICE_ID)
     )
 
 }
@@ -75,5 +76,6 @@ class JpmcCreatePaymentHandler(
 data class CreatePaymentHandlerRequest(
     val supplierOrderId: Long,
     @Contextual
-    val amount: BigDecimal
+    val amount: BigDecimal,
+    val invoiceId: String
 )

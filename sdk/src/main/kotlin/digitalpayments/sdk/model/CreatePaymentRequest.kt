@@ -8,5 +8,6 @@ import kotlinx.serialization.Serializable
 data class CreatePaymentRequest(
     val supplierOrderId: Long,
     @Contextual
-    val amount: BigDecimal
+    val amount: BigDecimal,
+    val invoiceId: String
 )

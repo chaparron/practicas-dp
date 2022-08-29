@@ -61,8 +61,12 @@ enum class DynamoDBJpmcAttribute {
     /**
      * status
      */
-    ST
-    ;
+    ST,
+
+    /**
+     * Invoice
+     */
+    INV;
 
     val param: String by lazy { this.name }
 }

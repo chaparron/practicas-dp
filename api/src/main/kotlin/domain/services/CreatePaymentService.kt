@@ -60,7 +60,8 @@ class CreatePaymentService(
                     supplierOrderId = context.request.supplierOrderId,
                     paymentId = paymentId,
                     amount = context.request.amount,
-                    status = PaymentStatus.IN_PROGRESS
+                    status = PaymentStatus.IN_PROGRESS,
+                    invoiceId = context.request.invoiceId
                 )
             )
         }.onFailure {
