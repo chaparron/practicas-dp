@@ -9,7 +9,6 @@ import com.wabi2b.jpmc.sdk.security.cipher.aes.decrypt.AesDecrypterService
 import com.wabi2b.jpmc.sdk.security.cipher.aes.encrypt.AesEncrypterService
 import com.wabi2b.jpmc.sdk.security.hash.sha256.DigestHashCalculator
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleService
-import com.wabi2b.serializers.BigDecimalSerializer
 import com.wabi2b.serializers.BigDecimalToFloatSerializer
 import com.wabi2b.serializers.InstantSerializer
 import com.wabi2b.serializers.URISerializer
@@ -145,7 +144,7 @@ object MainConfiguration : Configuration {
         }
     }
 
-    private val supplierService: SupplierService by lazy {
+    val supplierService: SupplierService by lazy {
         DefaultSupplierService(
             supplierRepository = supplierRepository
         )

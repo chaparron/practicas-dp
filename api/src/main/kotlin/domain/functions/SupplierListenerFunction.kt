@@ -3,6 +3,7 @@ package domain.functions
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestHandler
 import com.amazonaws.services.lambda.runtime.events.SNSEvent
+import configuration.MainConfiguration
 import domain.model.Supplier
 import domain.model.SupplierEvent
 import domain.services.SupplierService
@@ -18,6 +19,12 @@ class SupplierListenerFunction(
     companion object {
         private val logger = LoggerFactory.getLogger(SupplierListenerFunction::class.java)
     }
+
+    @Suppress("unused")
+    constructor() : this(
+        supplierService = MainConfiguration.supplierService,
+        jsonMapper = MainConfiguration.jsonMapper
+    )
 
     override fun handleRequest(event: SNSEvent, context: Context) {
         event.records.forEach { record ->
