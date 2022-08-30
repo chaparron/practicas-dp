@@ -50,6 +50,7 @@ class CreatePaymentHandler(
             )
 
         } else {
+            logger.info("About to process the following input body: ${input.body}")
             stateValidatorService.validate(input)
             val request = jsonMapper.decodeFromString<CreatePaymentHandlerRequest>(input.body)
             ok(service.createPayment(request.toCreatePaymentRequest())
