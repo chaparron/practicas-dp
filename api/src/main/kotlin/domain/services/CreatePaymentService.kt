@@ -52,7 +52,8 @@ class CreatePaymentService(
                 supplierOrderId = context.request.supplierOrderId
             )
         ).runCatching {
-            saleServiceSdk.getSaleInformation(buildRequest(context.request, paymentId.toString())).toCreatePaymentResponse()
+            saleServiceSdk.getSaleInformation(buildRequest(context.request, paymentId.toString()))
+                .toCreatePaymentResponse()
         }.onSuccess {
             logger.trace("Payment created: $it")
             jpmcRepository.save(
@@ -96,11 +97,15 @@ class CreatePaymentService(
         amount = amount
     )
 
-    private fun retrievePaymentId(context: CreatePaymentContext): Mono<Long> {
-        return paymentSdk.startPayment(context.request.toStartPaymentRequestDto(), context.accessToken).map {
+    private fun retrievePaymentId(context: CreatePaymentContext): Mono<Long> = runCatching {
+        paymentSdk.startPayment(context.request.toStartPaymentRequestDto(), context.accessToken).map {
             it.value
         }
-    }
+    }.onSuccess {
+        logger.info("Payment was successfully initiated with Payment ID ${it.block()}")
+    }.onFailure {
+        logger.error("An error has occurred initiating the payment. $it")
+    }.getOrThrow()
 
     private fun String.obfuscate() = "${take(4)}..${takeLast(4)}"
 
