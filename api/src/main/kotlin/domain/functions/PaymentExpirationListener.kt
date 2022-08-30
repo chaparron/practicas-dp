@@ -3,6 +3,7 @@ package domain.functions
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestHandler
 import com.amazonaws.services.lambda.runtime.events.SQSEvent
+import configuration.MainConfiguration
 import domain.model.PaymentExpiration
 import domain.services.PaymentExpirationService
 import kotlinx.serialization.decodeFromString
@@ -17,6 +18,12 @@ class PaymentExpirationListener(
     companion object {
         private val logger = LoggerFactory.getLogger(PaymentExpirationListener::class.java)
     }
+
+    @Suppress("unused")
+    constructor() : this(
+        paymentExpirationService = MainConfiguration.paymentExpirationService,
+        mapper = MainConfiguration.jsonMapper
+    )
 
     override fun handleRequest(input: SQSEvent, context: Context?) {
         logger.info("PaymentId expired event received: $input")
