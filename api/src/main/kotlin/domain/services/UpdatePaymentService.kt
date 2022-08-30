@@ -6,6 +6,7 @@ import com.wabi2b.jpmc.sdk.security.formatter.PayloadFormatter
 import com.wabi2b.jpmc.sdk.usecase.sale.EncData
 import domain.model.Payment
 import domain.model.JpmcPaymentInformation
+import domain.model.PaymentForUpdate
 import domain.model.PaymentStatus
 import domain.model.UpdatePaymentResponse
 import kotlinx.serialization.json.Json
@@ -36,7 +37,7 @@ class UpdatePaymentService(
         }.onSuccess {
             logger.info("Payment provider return the following response: $it")
             wabiPaymentAsyncNotificationSdk.notify(it.toPaymentUpdated())
-            repository.save(it.toPayment(information.encData))
+            repository.update(it.toPaymentForUpdate(information.encData))
         }.onFailure {
             logger.error("There was an error decrypting provider response: $it")
         }.getOrThrow().toUpdatePaymentResponse()
@@ -49,16 +50,15 @@ class UpdatePaymentService(
         message = message
     )
 
-    private fun EncData.toPayment(encData: String) = Payment(
+    private fun EncData.toPaymentForUpdate(encData: String) = PaymentForUpdate(
         paymentId = txnRefNo.toLong(),
-        supplierOrderId = supplierOrderId!!.toLong(),
-        amount = amount.toBigDecimal(),
         paymentOption = paymentOption,
         responseCode = responseCode,
         message = message,
         encData = encData,
-        status = if (responseCode == SUCCESS_RESPONSE_CODE) PaymentStatus.PAID else PaymentStatus.ERROR
-    ).updated(Instant.now())
+        status = if (responseCode == SUCCESS_RESPONSE_CODE) PaymentStatus.PAID else PaymentStatus.ERROR,
+        lastUpdatedAt = Instant.now().toString()
+    )
 
     private fun EncData.toPaymentUpdated() = PaymentUpdated(
         supplierOrderId = supplierOrderId!!.toLong(),

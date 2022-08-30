@@ -10,7 +10,9 @@ import adapters.repositories.jpmc.JpmcPaymentRepository
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleInformation
 import domain.model.Payment
 import domain.model.PaymentExpiration
+import domain.model.PaymentForSave
 import domain.model.PaymentStatus
+import org.joda.time.Instant
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.Mono
 import wabi2b.payments.common.model.dto.PaymentType
@@ -57,12 +59,14 @@ class CreatePaymentService(
         }.onSuccess {
             logger.trace("Payment created: $it")
             jpmcRepository.save(
-                Payment(
+                PaymentForSave(
                     supplierOrderId = context.request.supplierOrderId,
                     paymentId = paymentId,
                     amount = context.request.amount,
                     status = PaymentStatus.IN_PROGRESS,
-                    invoiceId = context.request.invoiceId
+                    invoiceId = context.request.invoiceId,
+                    createdAt = Instant.now().toString(),
+                    lastUpdatedAt = Instant.now().toString()
                 )
             )
         }.onFailure {

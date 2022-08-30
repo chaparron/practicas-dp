@@ -5,11 +5,15 @@ import org.slf4j.LoggerFactory
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue
 import toAttributeValue
+import domain.model.PaymentForSave
+import domain.model.PaymentForUpdate
 
 interface JpmcPaymentRepository {
 
     fun findBy(paymentId: String): Payment
-    fun save(payment: Payment): Payment
+    fun save(payment: PaymentForSave): PaymentForSave
+
+    fun update(payment: PaymentForUpdate)
 }
 
 class DynamoDbJpmcPaymentRepository(
@@ -22,7 +26,7 @@ class DynamoDbJpmcPaymentRepository(
         private const val pkValuePrefix = "jpmc#"
 
         private val findByProjectionExpression: String = setOf(
-            DynamoDBJpmcAttribute.SOI, DynamoDBJpmcAttribute.SK, DynamoDBJpmcAttribute.A, DynamoDBJpmcAttribute.PO, DynamoDBJpmcAttribute.RC, DynamoDBJpmcAttribute.M, DynamoDBJpmcAttribute.ED, DynamoDBJpmcAttribute.ST, DynamoDBJpmcAttribute.C, DynamoDBJpmcAttribute.LU
+            DynamoDBJpmcAttribute.SOI, DynamoDBJpmcAttribute.SK, DynamoDBJpmcAttribute.A, DynamoDBJpmcAttribute.PO, DynamoDBJpmcAttribute.RC, DynamoDBJpmcAttribute.M, DynamoDBJpmcAttribute.ED, DynamoDBJpmcAttribute.ST, DynamoDBJpmcAttribute.C, DynamoDBJpmcAttribute.LU, DynamoDBJpmcAttribute.INV
         ).joinToString(",") { it.param }
     }
 
@@ -47,7 +51,7 @@ class DynamoDbJpmcPaymentRepository(
         } ?: throw PaymentNotFound(paymentId)
     }
 
-    override fun save(payment: Payment): Payment {
+    override fun save(payment: PaymentForSave): PaymentForSave {
         return dynamoDbClient.putItem {
             logger.trace("Saving Jpmc payment $payment")
             it.tableName(tableName).item(payment.asDynamoItem())
@@ -57,18 +61,46 @@ class DynamoDbJpmcPaymentRepository(
         }
     }
 
-    private fun Payment.asDynamoItem() = this.paymentId.toString().keys() + mapOf(
+    override fun update(payment: PaymentForUpdate) {
+        runCatching {
+            dynamoDbClient.updateItem {it
+                .tableName(tableName)
+                .key(payment.paymentId.toString().keys())
+                .updateExpression(
+                    "SET " +
+                            "${DynamoDBJpmcAttribute.PO} = :paymentOption," +
+                            "${DynamoDBJpmcAttribute.RC} = :responseCode," +
+                            "${DynamoDBJpmcAttribute.M} = :message," +
+                            "${DynamoDBJpmcAttribute.ED} = :encData," +
+                            "${DynamoDBJpmcAttribute.ST} = :status," +
+                            "${DynamoDBJpmcAttribute.LU} = :lastUpdated"
+                )
+                .expressionAttributeValues(mapOf(
+                    ":paymentOption" to payment.paymentOption.toAttributeValue(),
+                    ":responseCode" to payment.responseCode.toAttributeValue(),
+                    ":message" to payment.message.toAttributeValue(),
+                    ":encData" to payment.encData.toAttributeValue(),
+                    ":status" to payment.status.name.toAttributeValue(),
+                    ":lastUpdated" to payment.lastUpdatedAt.toAttributeValue()
+                ))
+                .conditionExpression("attribute_exists(${DynamoDBJpmcAttribute.PK})")
+            }
+        }.onFailure {
+            logger.error("There was a problem updating the following payment: $payment.")
+            throw UpdatePaymentException(payment)
+        }.onSuccess {
+            logger.info("Payment ${payment.paymentId} was successfully updated with ${payment.status} status.")
+        }.getOrThrow()
+    }
+
+    private fun PaymentForSave.asDynamoItem() = this.paymentId.toString().keys() + mapOf(
         DynamoDBJpmcAttribute.SOI.param to this.supplierOrderId.toString().toAttributeValue(),
         DynamoDBJpmcAttribute.TX.param to this.paymentId.toString().toAttributeValue(),
         DynamoDBJpmcAttribute.A.param to this.amount.toString().toAttributeValue(),
-        DynamoDBJpmcAttribute.PO.param to this.paymentOption?.toAttributeValue(),
-        DynamoDBJpmcAttribute.RC.param to this.responseCode?.toAttributeValue(),
-        DynamoDBJpmcAttribute.M.param to this.message?.toAttributeValue(),
-        DynamoDBJpmcAttribute.ED.param to this.encData?.toAttributeValue(),
         DynamoDBJpmcAttribute.ST.param to this.status.name.toAttributeValue(),
         DynamoDBJpmcAttribute.C.param to this.createdAt.toAttributeValue(),
         DynamoDBJpmcAttribute.LU.param to this.lastUpdatedAt.toAttributeValue(),
-        DynamoDBJpmcAttribute.INV.param to this.invoiceId?.toAttributeValue()
+        DynamoDBJpmcAttribute.INV.param to this.invoiceId.toAttributeValue()
     )
 
     private val pk: pkValue = {
@@ -87,3 +119,4 @@ private typealias keyValue = String.() -> Map<String, AttributeValue>
 private typealias pkValue = String.() -> AttributeValue
 
 data class PaymentNotFound(val jpmcId: String) : RuntimeException("Cannot find any jpmc information for $jpmcId")
+data class UpdatePaymentException(val payment: PaymentForUpdate) : RuntimeException("There was an error updating the following payment: $payment")

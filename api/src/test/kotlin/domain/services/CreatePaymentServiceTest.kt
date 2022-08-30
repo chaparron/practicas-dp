@@ -8,7 +8,9 @@ import configuration.EnvironmentVariable
 import domain.model.CreatePaymentRequest
 import domain.model.Payment
 import domain.model.PaymentExpiration
+import domain.model.PaymentForSave
 import domain.model.PaymentStatus
+import java.time.Instant
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.extension.ExtendWith
@@ -68,7 +70,7 @@ class CreatePaymentServiceTest {
         whenever(paymentSdk.startPayment(paymentSdkRequest, accessToken)).thenReturn(Mono.just(anyPaymentId))
         whenever(expirationService.init(paymentExpiration)).thenReturn(paymentExpiration)
         whenever(saleServiceSdk.getSaleInformation(any())).thenReturn(saleInformation)
-        whenever(jpmcRepository.save(any())).thenReturn(anyPayment())
+        whenever(jpmcRepository.save(any())).thenReturn(anyPaymentForSave())
         wheneverForConfigurations()
 
         val response = sut.createPayment(request)
@@ -134,6 +136,16 @@ class CreatePaymentServiceTest {
         paymentId = randomLong(),
         amount = randomBigDecimal(),
         status = PaymentStatus.IN_PROGRESS
+    )
+
+    private fun anyPaymentForSave() = PaymentForSave(
+        paymentId = randomLong(),
+        supplierOrderId = randomLong(),
+        amount = randomBigDecimal(),
+        status = PaymentStatus.IN_PROGRESS,
+        invoiceId = randomString(),
+        createdAt = Instant.now().toString(),
+        lastUpdatedAt = Instant.now().toString()
     )
 
 

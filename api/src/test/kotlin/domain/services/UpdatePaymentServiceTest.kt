@@ -9,6 +9,7 @@ import com.wabi2b.serializers.URISerializer
 import com.wabi2b.serializers.UUIDStringSerializer
 import domain.model.JpmcPaymentInformation
 import domain.model.Payment
+import domain.model.PaymentForUpdate
 import domain.model.PaymentStatus
 import domain.model.UpdatePaymentResponse
 import kotlinx.serialization.json.Json
@@ -57,7 +58,7 @@ class UpdatePaymentServiceTest {
     private lateinit var wabiPaymentAsyncNotificationSdk: WabiPaymentAsyncNotificationSdk
 
     @Captor
-    lateinit var paymentCaptor: ArgumentCaptor<Payment>
+    lateinit var paymentCaptor: ArgumentCaptor<PaymentForUpdate>
 
 
     @InjectMocks
@@ -88,7 +89,6 @@ class UpdatePaymentServiceTest {
         )
 
         whenever(decrypter.decrypt<EncData>(any(), any())).thenReturn(encData)
-        whenever(repository.save(any())).thenReturn(anyPayment())
 
         val response = sut.update(anyPaymentInformation())
 
@@ -96,7 +96,7 @@ class UpdatePaymentServiceTest {
         assertEquals(expectedResponse, response)
 
         // Check some fields with captor
-        verify(repository).save(capture(paymentCaptor))
+        verify(repository).update(capture(paymentCaptor))
         val payment = paymentCaptor.value
         assertNotNull(paymentUpdated)
         assertEquals(PaymentStatus.PAID, payment.status)
