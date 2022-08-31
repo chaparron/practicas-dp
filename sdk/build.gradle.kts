@@ -32,13 +32,12 @@ dependencies {
     val springBootVersion: String by project
     val slf4jVersion: String by project
     val logbackVersion: String by project
-    val wabiSdkVersion: String by project
 
     implementation(kotlin("stdlib-jdk8"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationVersion")
     implementation("com.wabi2b:serializers:$wabiSerializersVersion")
     implementation("org.springframework:spring-webflux:$springWebFluxVersion")
-    api("yopdev.wabi:sdk:$wabiSdkVersion") {
+    api("yopdev.wabi:sdk:1013-631cc453cb9faf12fd7ed240d0dbba209ac02276") {
         exclude("org.jetbrains.kotlin:kotlin-reflect")
     }
 
