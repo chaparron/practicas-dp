@@ -192,7 +192,7 @@ object MainConfiguration : Configuration {
     }
 
     private val wabiPaymentAsyncNotificationSdk: WabiPaymentAsyncNotificationSdk by lazy {
-        PAYMENT_UPDATED_TOPIC_ARN.get()
+        U_T_ARN.get()
             .let { topicArn ->
                 WabiPaymentAsyncNotificationSdk(
                     paymentUpdatedTopicArn = topicArn

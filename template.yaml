@@ -164,7 +164,8 @@ Resources:
           EX_Q_URL: !Ref PaymentExpirationQueue
           #PAYMENT_EXPIRATION_DELAY_IN_SECONDS
           EX_D_SECONDS: !FindInMap [ Config, !Ref EnvironmentStackName, DelayInSeconds ]
-          PAYMENT_UPDATED_TOPIC_ARN:
+          #PAYMENT_UPDATED_TOPIC_ARN
+          U_T_ARN:
             Fn::ImportValue:
               !Sub "${EnvironmentStackName}-PaymentUpdatedTopic"
       Policies:
@@ -303,6 +304,10 @@ Resources:
           EX_D_SECONDS: !FindInMap [ Config, !Ref EnvironmentStackName, DelayInSeconds ]
           #PAYMENT_EXPIRATION_QUEUE_URL
           EX_Q_URL: !Ref PaymentExpirationQueue
+          #PAYMENT_UPDATED_TOPIC_ARN
+          U_T_ARN:
+            Fn::ImportValue:
+              !Sub "${EnvironmentStackName}-PaymentUpdatedTopic"
       DeadLetterQueue:
         Type: "SQS"
         TargetArn: !GetAtt PaymentExpirationListenerDLQ.Arn

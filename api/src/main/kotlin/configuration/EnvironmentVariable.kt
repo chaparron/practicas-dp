@@ -2,6 +2,12 @@ package configuration
 
 private const val LIST_DELIMITER = ","
 
+/**
+ * Represents environment variables.
+ * - [EX_D_SECONDS]: Payment Expired delay in seconds.
+ * - [EX_Q_URL]: Payment Expired Queue url.
+ * - [U_T_ARN]: Payment updated topic arn.
+ */
 enum class EnvironmentVariable {
     SUPPLIER_TABLE,
     JPMC_PAYMENT_TABLE,
@@ -31,7 +37,7 @@ enum class EnvironmentVariable {
     REGION,
     EX_Q_URL,
     EX_D_SECONDS,
-    PAYMENT_UPDATED_TOPIC_ARN;
+    U_T_ARN;
 
     companion object {
         fun jpmcConfiguration(): JpmcConfiguration =
