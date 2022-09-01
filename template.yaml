@@ -27,7 +27,7 @@ Mappings:
       JpmcCreatePaymentDummyEnabled: false
       JpmcUpdatePaymentDummyEnabled: false
       ClientSecret: "qa/digital-payments"
-      DelayInSeconds: 15
+      DelayInSeconds: 3600
       RetentionPeriod: 3600
       NotificationReservedExecutions: 4
     prod:
@@ -51,7 +51,7 @@ Mappings:
       JpmcCreatePaymentDummyEnabled: true
       JpmcUpdatePaymentDummyEnabled: true
       ClientSecret: "prod/digital-payments"
-      DelayInSeconds: 15
+      DelayInSeconds: 3600
       RetentionPeriod: 345600
       NotificationReservedExecutions: 10
 Globals:
