@@ -37,7 +37,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationVersion")
     implementation("com.wabi2b:serializers:$wabiSerializersVersion")
     implementation("org.springframework:spring-webflux:$springWebFluxVersion")
-    implementation("yopdev.wabi:sdk:1012-6fd962f54addb379fd5ee0e497a1b39ce67fe00a")
+    implementation("yopdev.wabi:sdk:1014-1c81da2cc47e27e789a8829421b38b1520957872")
 
     // logging
     implementation("org.slf4j:slf4j-api:$slf4jVersion")
