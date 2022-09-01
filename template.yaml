@@ -160,8 +160,10 @@ Resources:
           JPMC_PAYMENT_TABLE: !Ref JpmcPaymentTable
           CLIENT_ID: !Sub "{{resolve:secretsmanager:${EnvironmentStackName}/digital-payments:SecretString:client}}"
           CLIENT_PASSWORD: !Sub "{{resolve:secretsmanager:${EnvironmentStackName}/digital-payments:SecretString:password}}"
-          PAYMENT_EXPIRATION_QUEUE_URL: !Ref PaymentExpirationQueue
-          PAYMENT_EXPIRATION_DELAY_IN_SECONDS: !FindInMap [ Config, !Ref EnvironmentStackName, DelayInSeconds ]
+          #PAYMENT_EXPIRATION_QUEUE_URL
+          EX_Q_URL: !Ref PaymentExpirationQueue
+          #PAYMENT_EXPIRATION_DELAY_IN_SECONDS
+          EX_D_SECONDS: !FindInMap [ Config, !Ref EnvironmentStackName, DelayInSeconds ]
           PAYMENT_UPDATED_TOPIC_ARN:
             Fn::ImportValue:
               !Sub "${EnvironmentStackName}-PaymentUpdatedTopic"
@@ -295,6 +297,12 @@ Resources:
       CodeUri: "api"
       Handler: "domain.functions.PaymentExpirationListener"
       Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          #PAYMENT_EXPIRATION_DELAY_IN_SECONDS
+          EX_D_SECONDS: !FindInMap [ Config, !Ref EnvironmentStackName, DelayInSeconds ]
+          #PAYMENT_EXPIRATION_QUEUE_URL
+          EX_Q_URL: !Ref PaymentExpirationQueue
       DeadLetterQueue:
         Type: "SQS"
         TargetArn: !GetAtt PaymentExpirationListenerDLQ.Arn

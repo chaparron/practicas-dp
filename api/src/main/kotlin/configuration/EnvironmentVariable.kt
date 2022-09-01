@@ -29,8 +29,8 @@ enum class EnvironmentVariable {
     PAYMENTS_ROOT,
     CUSTOMERS_ROOT,
     REGION,
-    PAYMENT_EXPIRATION_QUEUE_URL,
-    PAYMENT_EXPIRATION_DELAY_IN_SECONDS,
+    EX_Q_URL,
+    EX_D_SECONDS,
     PAYMENT_UPDATED_TOPIC_ARN;
 
     companion object {

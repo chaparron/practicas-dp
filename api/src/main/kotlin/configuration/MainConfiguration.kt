@@ -83,8 +83,8 @@ object MainConfiguration : Configuration {
     override val paymentExpirationService: PaymentExpirationService by lazy {
         DefaultPaymentExpirationService(
             sqsClient = sqsClient(),
-            delaySeconds = PAYMENT_EXPIRATION_DELAY_IN_SECONDS.get().toInt(),
-            queueUrl = PAYMENT_EXPIRATION_QUEUE_URL.get(),
+            delaySeconds = EX_D_SECONDS.get().toInt(),
+            queueUrl = EX_Q_URL.get(),
             wabiPaymentAsyncNotificationSdk = wabiPaymentAsyncNotificationSdk,
             mapper = jsonMapper
         )
