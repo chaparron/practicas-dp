@@ -11,7 +11,6 @@ import domain.services.providers.PaymentProviderService
 import kotlinx.serialization.json.Json
 import wabi2b.sdk.api.Wabi2bSdk
 import java.time.Clock
-import wabi2b.sdk.customers.customer.CustomersSdk
 
 interface Configuration {
     val jsonMapper: Json

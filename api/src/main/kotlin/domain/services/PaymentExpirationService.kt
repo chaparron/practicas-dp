@@ -1,7 +1,6 @@
 package domain.services
 
 import domain.model.PaymentExpiration
-import java.math.BigDecimal
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
@@ -10,7 +9,6 @@ import software.amazon.awssdk.services.sqs.model.SendMessageRequest
 import wabi2b.payment.async.notification.sdk.WabiPaymentAsyncNotificationSdk
 import wabi2b.payments.common.model.dto.PaymentType
 import wabi2b.payments.common.model.dto.PaymentUpdated
-import wabi2b.payments.common.model.dto.type.PaymentMethod
 import wabi2b.payments.common.model.dto.type.PaymentResult
 
 interface PaymentExpirationService {

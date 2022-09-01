@@ -4,7 +4,6 @@ import adapters.repositories.jpmc.JpmcPaymentRepository
 import com.wabi2b.jpmc.sdk.security.cipher.aes.decrypt.AesDecrypterService
 import com.wabi2b.jpmc.sdk.security.formatter.PayloadFormatter
 import com.wabi2b.jpmc.sdk.usecase.sale.EncData
-import domain.model.Payment
 import domain.model.JpmcPaymentInformation
 import domain.model.PaymentForUpdate
 import domain.model.PaymentStatus
@@ -17,7 +16,6 @@ import wabi2b.payments.common.model.dto.PaymentUpdated
 import wabi2b.payments.common.model.dto.type.PaymentResult
 import java.time.Instant
 import toPaymentMethod
-import wabi2b.payments.common.model.dto.type.PaymentMethod
 
 class UpdatePaymentService(
     private val decrypter: AesDecrypterService,
