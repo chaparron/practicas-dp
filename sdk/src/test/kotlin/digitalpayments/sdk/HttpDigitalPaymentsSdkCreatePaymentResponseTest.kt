@@ -5,7 +5,6 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.matching.EqualToPattern
 import digitalpayments.sdk.builders.apiResponse.ErrorResponseBuilder.buildApiRequestErrorResponse
 import digitalpayments.sdk.configuration.SdkConfiguration
-import digitalpayments.sdk.model.CreatePaymentRequest
 import digitalpayments.sdk.model.CreatePaymentResponse
 import domain.model.errors.DpErrorReason
 import junit.framework.TestCase.assertEquals
@@ -21,9 +20,6 @@ import wabi.sdk.AccessDenied
 import wabi.sdk.Forbidden
 import wabi.sdk.GenericSdkError
 import java.net.URI
-import kotlin.random.Random
-import randomBigDecimal
-import randomLong
 
 class HttpDigitalPaymentsSdkCreatePaymentResponseTest : AbstractSdkTest() {
     companion object {
