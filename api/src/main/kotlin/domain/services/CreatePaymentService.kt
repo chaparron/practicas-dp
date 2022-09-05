@@ -1,21 +1,15 @@
 package domain.services
 
+import adapters.repositories.jpmc.JpmcPaymentRepository
+import com.wabi2b.jpmc.sdk.usecase.sale.SaleInformation
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleRequest
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleService
 import configuration.EnvironmentVariable.JpmcConfiguration
-import domain.model.CreatePaymentRequest
-import domain.model.CreatePaymentResponse
+import domain.model.*
 import domain.model.errors.FunctionalityNotAvailable
-import adapters.repositories.jpmc.JpmcPaymentRepository
-import com.wabi2b.jpmc.sdk.usecase.sale.SaleInformation
-import domain.model.Payment
-import domain.model.PaymentExpiration
-import domain.model.PaymentForSave
-import domain.model.PaymentStatus
 import org.joda.time.Instant
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.Mono
-import wabi2b.payments.common.model.dto.PaymentType
 import wabi2b.payments.common.model.dto.StartPaymentRequestDto
 import wabi2b.payments.sdk.client.impl.WabiPaymentSdk
 
@@ -101,15 +95,14 @@ class CreatePaymentService(
         amount = amount
     )
 
-    private fun retrievePaymentId(context: CreatePaymentContext): Mono<Long> = runCatching {
+    private fun retrievePaymentId(context: CreatePaymentContext): Mono<Long> =
         paymentSdk.startPayment(context.request.toStartPaymentRequestDto(), context.accessToken).map {
             it.value
+        }.doOnSuccess {
+            logger.info("Payment was successfully initiated with Payment ID $it")
+        }.doOnError {
+            logger.error("An error has occurred initiating the payment. $it")
         }
-    }.onSuccess {
-        logger.info("Payment was successfully initiated with Payment ID ${it.block()}")
-    }.onFailure {
-        logger.error("An error has occurred initiating the payment. $it")
-    }.getOrThrow()
 
     private fun String.obfuscate() = "${take(4)}..${takeLast(4)}"
 
