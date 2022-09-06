@@ -72,7 +72,7 @@ class CreatePaymentService(
         version = configuration.version,
         paymentId = paymentId,
         amount = request.amount.toString(),
-        passCode = configuration.passCode, //TODO this passCode must be in a Secret
+        passCode = configuration.passCode,
         bankId = configuration.bankId,
         terminalId = configuration.terminalId,
         merchantId = configuration.merchantId,

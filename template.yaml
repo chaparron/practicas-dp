@@ -12,9 +12,6 @@ Mappings:
       ProvisionedExecutionsApiGatewayMaxCapacity: 10
       ReservedExecutionsApiGateway: 15
       NewRelicLambdaExtensionEnabled: false
-      JpmcAesEncryptionKey: "5EC4A697141C8CE45509EF485EE7D4B1"
-      JpmcSha256HashKey: "E59CD2BF6F4D86B5FB3897A680E0DD3E"
-      JpmcPassCode: "ETKT4295"
       JpmcBankId: "001002"
       JpmcTerminalId: "10010186"
       JpmcMerchantId: "100000000010588"
@@ -36,9 +33,6 @@ Mappings:
       ProvisionedExecutionsApiGatewayMaxCapacity: 10
       ReservedExecutionsApiGateway: 15
       NewRelicLambdaExtensionEnabled: true
-      JpmcAesEncryptionKey: "5EC4A697141C8CE45509EF485EE7D4B1"
-      JpmcSha256HashKey: "E59CD2BF6F4D86B5FB3897A680E0DD3E"
-      JpmcPassCode: "ETKT4295"
       JpmcBankId: "001002"
       JpmcTerminalId: "10010186"
       JpmcMerchantId: "100000000010588"
@@ -76,7 +70,7 @@ Globals:
         NEW_RELIC_EXTENSION_SEND_FUNCTION_LOGS: true
         NEW_RELIC_DEBUG: true
         NEW_RELIC_LAMBDA_EXTENSION_ENABLED: !FindInMap [ Config, !Ref EnvironmentStackName, NewRelicLambdaExtensionEnabled ]
-        FORCE_UPDATE: 5
+        FORCE_UPDATE: 6
         SUPPLIER_TABLE: !Ref SupplierTable
 
     DeploymentPreference:
@@ -142,9 +136,9 @@ Resources:
           CUSTOMERS_ROOT:
             Fn::ImportValue:
               !Sub "${EnvironmentStackName}-customers-ApiRootURL"
-          JPMC_AES_ENCRYPTION_KEY: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcAesEncryptionKey ]
-          JPMC_SHAE256_HASH_KEY: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcSha256HashKey ]
-          JPMC_PASS_CODE: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcPassCode ]
+          JPMC_AES_ENCRYPTION_KEY: !Sub "{{resolve:secretsmanager:${EnvironmentStackName}/digital-payments:SecretString:jpmcAesEncryptionKey}}"
+          JPMC_SHAE256_HASH_KEY: !Sub "{{resolve:secretsmanager:${EnvironmentStackName}/digital-payments:SecretString:jpmcShae256HashKey}}"
+          JPMC_PASS_CODE: !Sub "{{resolve:secretsmanager:${EnvironmentStackName}/digital-payments:SecretString:jpmcPassCode}}"
           JPMC_BANK_ID: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcBankId ]
           JPMC_TERMINAL_ID: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcTerminalId ]
           JPMC_MERCHANT_ID: !FindInMap [ Config, !Ref EnvironmentStackName, JpmcMerchantId ]
