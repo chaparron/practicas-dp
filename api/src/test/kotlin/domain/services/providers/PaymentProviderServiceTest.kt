@@ -8,7 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import randomString
+import randomLong
 import kotlin.test.assertEquals
 
 @ExtendWith(MockitoExtension::class)
@@ -36,7 +36,7 @@ class PaymentProviderServiceTest {
 
     private fun assertFor(serviceResponse: Boolean, expected: () -> List<Provider>) {
         //Given
-        val supplierId = randomString()
+        val supplierId = randomLong()
 
         //When
         whenever(jpmProviderService.isAccepted(any()))

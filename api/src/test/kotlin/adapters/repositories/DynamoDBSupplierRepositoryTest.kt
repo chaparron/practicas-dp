@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import randomString
+import randomLong
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 
 @Testcontainers
@@ -58,7 +58,7 @@ internal class DynamoDBSupplierRepositoryTest {
 
     @Test
     fun `throws SupplierNotFound when bank account does not exist`() {
-        val supplierId = randomString()
+        val supplierId = randomLong()
 
         assertFailsWith<SupplierNotFound> {
             sut.get(supplierId)

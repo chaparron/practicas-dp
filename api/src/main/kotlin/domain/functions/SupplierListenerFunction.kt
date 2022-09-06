@@ -4,8 +4,8 @@ import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestHandler
 import com.amazonaws.services.lambda.runtime.events.SNSEvent
 import configuration.MainConfiguration
-import domain.model.Supplier
 import domain.model.SupplierEvent
+import domain.model.SupplierEventValidator
 import domain.services.SupplierService
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -18,6 +18,7 @@ class SupplierListenerFunction(
 
     companion object {
         private val logger = LoggerFactory.getLogger(SupplierListenerFunction::class.java)
+        private val validator = SupplierEventValidator()
     }
 
     @Suppress("unused")
@@ -33,14 +34,16 @@ class SupplierListenerFunction(
             }.let {
                 deserialize(it.sns.message)
             }.let {
-                supplierService.save(it).also { response ->
-                    logger.info("Supplier saved {}", response)
+                it.doHandle(validator) { event ->
+                    supplierService.save(event).also { response ->
+                        logger.info("Supplier saved {}", response)
+                    }
                 }
             }
         }
     }
 
-    private fun deserialize(message: String): Supplier {
-        return jsonMapper.decodeFromString<SupplierEvent>(message).toSupplier()
+    private fun deserialize(message: String): SupplierEvent {
+        return jsonMapper.decodeFromString(message)
     }
 }

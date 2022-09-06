@@ -6,7 +6,7 @@ import kotlin.test.assertFalse
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import randomString
+import randomLong
 
 class DefaultProviderServiceTest {
 
@@ -16,7 +16,7 @@ class DefaultProviderServiceTest {
 
     @Test
     fun `Should return true if supplier has bank account`() {
-        val someSupplierId = randomString()
+        val someSupplierId = randomLong()
         val someSupplier = anySupplier(someSupplierId)
 
         whenever(supplierService.get(someSupplierId)).thenReturn(someSupplier)
@@ -26,7 +26,7 @@ class DefaultProviderServiceTest {
 
     @Test
     fun `Should return false if supplier has not bank account`() {
-        val someSupplierId = randomString()
+        val someSupplierId = randomLong()
         val someSupplier = anySupplier(someSupplierId, "")
 
         whenever(supplierService.get(someSupplierId)).thenReturn(someSupplier)
@@ -36,7 +36,7 @@ class DefaultProviderServiceTest {
 
     @Test
     fun `Should return false if supplierService fail`() {
-        val someSupplierId = randomString()
+        val someSupplierId = randomLong()
 
         whenever(supplierService.get(someSupplierId)).thenThrow(RuntimeException())
 

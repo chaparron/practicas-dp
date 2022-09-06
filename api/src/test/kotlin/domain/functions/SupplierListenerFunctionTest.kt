@@ -23,6 +23,10 @@ import kotlin.test.assertFailsWith
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SupplierListenerFunctionTest {
 
+    companion object {
+        private const val country = "in"
+    }
+
     private lateinit var configuration: Configuration
     private lateinit var json: Json
     private lateinit var supplierService: SupplierService
@@ -72,16 +76,42 @@ class SupplierListenerFunctionTest {
         verifyNoInteractions(supplierService)
     }
 
-    private fun buildSnsEvent(): SNSEvent = json.encodeToString(anySupplier().toSupplierEvent()).let {
-        SNSEvent().withRecords(listOf(
-            SNSEvent.SNSRecord().withSns(SNSEvent.SNS().withMessage((it)))
+    @Test
+    fun `handle a supplier payload with bank account`() {
+        //Given
+        val payload = fullPayload("""{"number":"123","ifsc":"616"}""")
+        val event = buildSnsEvent(payload)
+
+        //When
+        sut.handleRequest(event, context)
+
+        //Verify
+        verifyServiceInvocation(event)
+    }
+
+    @Test
+    fun `ignores a supplier payload with null bank account`() {
+        //Given
+        val payload = fullPayload(null)
+        val event = buildSnsEvent(payload)
+
+        //When
+        sut.handleRequest(event, context)
+
+        //Verify
+        verifyNoInteractions(supplierService)
+    }
+
+    private fun buildSnsEvent(payload: String = json.encodeToString(anySupplier().toSupplierEvent())): SNSEvent {
+        return SNSEvent().withRecords(listOf(
+            SNSEvent.SNSRecord().withSns(SNSEvent.SNS().withMessage((payload)))
         ))
     }
 
     private fun Supplier.toSupplierEvent(): SupplierEvent {
         return SupplierEvent(
             supplierId = supplierId,
-            state = state,
+            country = "in",
             bankAccount = BankAccountEvent(
                 number = bankAccountNumber,
                 indianFinancialSystemCode = indianFinancialSystemCode
@@ -92,5 +122,9 @@ class SupplierListenerFunctionTest {
     private fun verifyServiceInvocation(event: SNSEvent) {
         verify(supplierService).save(json.decodeFromString<SupplierEvent>(event.records.first().sns.message).toSupplier())
     }
+
+    private fun fullPayload(bankAccount: String? = null) = """
+        {"id":1258,"name":"Coastal","legalName":"Supplier test Integration Coastal","legalId":"1234567","enabled":true,"phone":"34 610929464","avatar":"258d1e79-d96c-4717-a66a-44f5830e46fb.png","country":"$country","timezone":"Africa/Nairobi","users":[],"state":null,"wabipayUsername":null,"rating":null,"bankAccount":${if(bankAccount != null) "$bankAccount" else "null"},"averageRating":null}
+    """.trimIndent()
 
 }

@@ -6,7 +6,7 @@ class PaymentProviderService(
     companion object {
         private val defaultProvider = Provider.JP_MORGAN
     }
-    fun availableProviders(supplierId: String): List<Provider> {
+    fun availableProviders(supplierId: Long): List<Provider> {
         return buildList {
             if(jpmProviderService.isAccepted(supplierId)) add(defaultProvider)
         }

@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory
 
 interface SupplierService {
     fun save(supplier: Supplier): Supplier
-    fun get(supplierId: String): Supplier
+    fun get(supplierId: Long): Supplier
 }
 
 class DefaultSupplierService(
@@ -22,7 +22,7 @@ class DefaultSupplierService(
         return supplierRepository.save(supplier)
     }
 
-    override fun get(supplierId: String): Supplier {
+    override fun get(supplierId: Long): Supplier {
         logger.info("About to get supplier for $supplierId")
         return supplierRepository.get(supplierId)
     }

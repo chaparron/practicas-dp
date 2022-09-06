@@ -5,6 +5,7 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValue
 import wabi2b.payments.common.model.dto.type.PaymentMethod
 
 fun String.toAttributeValue(): AttributeValue = AttributeValue.builder().s(this).build()
+fun Long.toAttributeValue(): AttributeValue = AttributeValue.builder().s(this.toString()).build()
 
 inline fun <reified T> T.asJsonString(): String = MainConfiguration.jsonMapper.encodeToString(this)
 

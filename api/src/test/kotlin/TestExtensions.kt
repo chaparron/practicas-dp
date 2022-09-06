@@ -23,9 +23,8 @@ fun randomBigDecimal(): BigDecimal = BigDecimal(Random.nextDouble()).setScale(2,
 
 fun randomLong() = Random.nextLong()
 
-fun anySupplier(supplierId: String = randomString(), bankAccountNumber: String = randomString()) = Supplier(
+fun anySupplier(supplierId: Long = randomLong(), bankAccountNumber: String = randomString()) = Supplier(
     supplierId = supplierId,
-    state = randomString(),
     bankAccountNumber = bankAccountNumber,
     indianFinancialSystemCode = randomString()
 )

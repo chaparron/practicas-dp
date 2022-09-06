@@ -17,7 +17,7 @@ class DefaultProviderService(
      *
      * Validation: Check associate bank account
      */
-    override fun isAccepted(supplierId: String): Boolean {
+    override fun isAccepted(supplierId: Long): Boolean {
         return supplierId.runCatching {
             supplierService.get(this).bankAccountNumber.isNotEmpty()
         }.onSuccess {
