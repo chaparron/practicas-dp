@@ -1,9 +1,7 @@
 package adapters.repositories.jpmc
 
-import adapters.infrastructure.CreateTableRequest
 import adapters.infrastructure.DynamoDbContainer
-import adapters.infrastructure.DynamoTestSupport
-import adapters.repositories.supplier.DynamoDBSupplierAttribute
+import adapters.infrastructure.DynamoDbContainer.digitalPaymentTableSchema
 import domain.model.Payment
 import domain.model.PaymentForSave
 import domain.model.PaymentForUpdate
@@ -11,45 +9,40 @@ import domain.model.PaymentStatus
 import domain.model.errors.PaymentNotFound
 import domain.model.errors.UpdatePaymentException
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.testcontainers.junit.jupiter.Container
-import org.testcontainers.junit.jupiter.Testcontainers
+import org.testcontainers.containers.localstack.LocalStackContainer
+import randomBigDecimal
+import randomLong
 import randomString
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
+import wabipay.commons.dynamodb.testing.DynamoDbTestUtils
+import java.net.URI
 import java.time.Instant
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import randomBigDecimal
-import randomLong
 
-@Testcontainers
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class DynamoDbJpmcPaymentRepositoryTest {
-
-    companion object {
-        @JvmStatic
-        @Container
-        val container: DynamoDbContainer = DynamoDbContainer()
-    }
-
-    private lateinit var dynamoDbClient: DynamoDbClient
+    private val dynamoDbTestUtils = DynamoDbTestUtils(
+        DynamoDbContainer.localStack.getEndpointConfiguration(LocalStackContainer.Service.DYNAMODB).serviceEndpoint
+            .let { URI.create(it) }
+    )
+    private var dynamoDbClient: DynamoDbClient = dynamoDbTestUtils.dynamoDb
 
     private lateinit var sut: DynamoDbJpmcPaymentRepository
 
     @BeforeAll
-    fun setUp() {
-        dynamoDbClient = DynamoTestSupport.dynamoDbClient(container.endpoint())
-        sut = DynamoDbJpmcPaymentRepository(dynamoDbClient, DynamoTestSupport.supplierTable)
+    fun init() {
+        sut = DynamoDbJpmcPaymentRepository(dynamoDbClient, DynamoDbTestUtils.tableName)
+        dynamoDbTestUtils.createSingleTable(digitalPaymentTableSchema())
+    }
 
-        CreateTableRequest(
-            tableName = DynamoTestSupport.supplierTable,
-            attributes = listOf(
-                CreateTableRequest.Param(DynamoDBSupplierAttribute.PK.param),
-                CreateTableRequest.Param(DynamoDBSupplierAttribute.SK.param)),
-            pk = DynamoDBSupplierAttribute.PK.param,
-            sk = DynamoDBSupplierAttribute.SK.param
-        ).doExecuteWith(dynamoDbClient, DynamoTestSupport::createTable)
+    @BeforeEach
+    fun setup(){
+        dynamoDbTestUtils.removeAll()
     }
 
     @Test
@@ -131,6 +124,7 @@ internal class DynamoDbJpmcPaymentRepositoryTest {
             sut.update(payment)
         }
     }
+
 
     private fun anySavedPayment(): PaymentForSave {
         return sut.save(anyPaymentForSave())

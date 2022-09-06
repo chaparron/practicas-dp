@@ -46,6 +46,7 @@ dependencies {
     implementation("wabi2b:payment-async-notification-sdk:1360-241624d163a197bcd1d89fc0fe93c9ca1d4e5216") {
         exclude("wabi2b.payments.common", "common")
     }
+    implementation("wabipay:commons-dynamodb:1013-4161990480b12968bfbd3eae7022b7f9cf47d1de")
 
     // security
     implementation("wabi2b:wabi2b-authorizer:1021-4ce0fd69f4ccb17ac12a9778c18dd2488257dfe3")
@@ -55,11 +56,6 @@ dependencies {
     implementation("com.amazonaws:aws-lambda-java-core:1.2.1")
     implementation("software.amazon.awssdk:url-connection-client")
     implementation("com.amazonaws:aws-java-sdk-stepfunctions:1.12.125")
-
-    implementation("software.amazon.awssdk:dynamodb") {
-        exclude("software.amazon.awssdk", "apache-client")
-        exclude("software.amazon.awssdk", "netty-nio-client")
-    }
     implementation("software.amazon.awssdk:sns") {
         exclude("software.amazon.awssdk", "apache-client")
         exclude("software.amazon.awssdk", "netty-nio-client")
@@ -86,6 +82,7 @@ dependencies {
     implementation("org.junit.jupiter:junit-jupiter:5.8.1")
 
     // test
+    testImplementation("wabipay:commons-localstack:1001-aa6f4aed23785c7f6e39cb249dc3919c17663e12")
     testImplementation(kotlin("test-junit"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
@@ -93,10 +90,7 @@ dependencies {
     testImplementation("com.squareup.okhttp3:mockwebserver:4.9.2")
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
     testImplementation("org.mockito:mockito-junit-jupiter:4.0.0")
-    testImplementation("org.testcontainers:localstack:1.16.2")
-    testImplementation("org.testcontainers:junit-jupiter:1.16.2")
     testImplementation("org.assertj:assertj-core:3.22.0")
-    testRuntimeOnly("com.amazonaws:aws-java-sdk-dynamodb:1.11.689")
     testImplementation("com.github.tomakehurst:wiremock:2.24.1")
     testImplementation("io.projectreactor:reactor-core:3.4.14")
     testImplementation("io.projectreactor.netty:reactor-netty:1.0.15")

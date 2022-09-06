@@ -1,50 +1,42 @@
 package adapters.repositories
 
-import anySupplier
-import adapters.infrastructure.CreateTableRequest
 import adapters.infrastructure.DynamoDbContainer
-import adapters.infrastructure.DynamoTestSupport
-import adapters.infrastructure.DynamoTestSupport.supplierTable
-import adapters.repositories.supplier.DynamoDBSupplierAttribute
+import adapters.infrastructure.DynamoDbContainer.digitalPaymentTableSchema
 import adapters.repositories.supplier.DynamoDBSupplierRepository
 import adapters.repositories.supplier.SupplierNotFound
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
+import anySupplier
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.testcontainers.junit.jupiter.Container
-import org.testcontainers.junit.jupiter.Testcontainers
+import org.testcontainers.containers.localstack.LocalStackContainer.Service.DYNAMODB
 import randomLong
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
+import wabipay.commons.dynamodb.testing.DynamoDbTestUtils
+import java.net.URI
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
-@Testcontainers
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class DynamoDBSupplierRepositoryTest {
-
-    companion object {
-        @JvmStatic
-        @Container
-        val container: DynamoDbContainer = DynamoDbContainer()
-    }
-
-    private lateinit var dynamoDbClient: DynamoDbClient
+    private val dynamoDbTestUtils = DynamoDbTestUtils(
+        DynamoDbContainer.localStack.getEndpointConfiguration(DYNAMODB).serviceEndpoint
+            .let { URI.create(it) }
+    )
+    private var dynamoDbClient: DynamoDbClient = dynamoDbTestUtils.dynamoDb
 
     private lateinit var sut: DynamoDBSupplierRepository
 
     @BeforeAll
-    fun setUp() {
-        dynamoDbClient = DynamoTestSupport.dynamoDbClient(container.endpoint())
-        sut = DynamoDBSupplierRepository(dynamoDbClient, supplierTable)
+    fun init() {
+        sut = DynamoDBSupplierRepository(dynamoDbClient, DynamoDbTestUtils.tableName)
+        dynamoDbTestUtils.createSingleTable(digitalPaymentTableSchema())
+    }
 
-        CreateTableRequest(
-            tableName = supplierTable,
-            attributes = listOf(
-                CreateTableRequest.Param(DynamoDBSupplierAttribute.PK.param),
-                CreateTableRequest.Param(DynamoDBSupplierAttribute.SK.param)),
-            pk = DynamoDBSupplierAttribute.PK.param,
-            sk = DynamoDBSupplierAttribute.SK.param
-        ).doExecuteWith(dynamoDbClient, DynamoTestSupport::createTable)
+    @BeforeEach
+    fun setup(){
+        dynamoDbTestUtils.removeAll()
     }
 
     @Test
