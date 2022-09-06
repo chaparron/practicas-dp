@@ -1,15 +1,12 @@
 package adapters.rest.handler
 
-import adapters.rest.validations.RequestValidations.required
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import domain.model.CreatePaymentRequest
 import domain.model.CreatePaymentResponse
-import domain.model.errors.DpErrorReason
 import domain.services.CreatePaymentService
 import domain.services.state.StateValidatorService
-import java.math.BigDecimal
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -18,6 +15,7 @@ import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import wabi.rest2lambda.RestHandler
 import wabi.rest2lambda.ok
+import java.math.BigDecimal
 
 class CreatePaymentHandler(
     private val service: CreatePaymentService,
@@ -67,9 +65,9 @@ class CreatePaymentHandler(
     }
 
     private fun CreatePaymentHandlerRequest.toCreatePaymentRequest() = CreatePaymentRequest(
-        supplierOrderId = supplierOrderId.required(DpErrorReason.MISSING_SUPPLIER_ID),
-        amount = amount.required(DpErrorReason.MISSING_AMOUNT),
-        invoiceId = invoiceId.required(DpErrorReason.MISSING_INVOICE_ID)
+        supplierOrderId = supplierOrderId,
+        amount = amount,
+        invoiceId = invoiceId
     )
 
 }

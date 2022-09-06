@@ -1,8 +1,10 @@
-package domain.model.errors
+package domain.model.exceptions
 
 enum class ErrorType {
-    BAD_REQUEST,
+
     NOT_FOUND,
+    BAD_REQUEST,
     CONFLICT,
     UNKNOWN
+
 }

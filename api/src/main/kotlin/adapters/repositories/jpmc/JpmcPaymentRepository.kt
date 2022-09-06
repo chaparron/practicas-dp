@@ -1,12 +1,14 @@
 package adapters.repositories.jpmc
 
 import domain.model.Payment
+import domain.model.PaymentForSave
+import domain.model.PaymentForUpdate
+import domain.model.errors.PaymentNotFound
+import domain.model.errors.UpdatePaymentException
 import org.slf4j.LoggerFactory
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue
 import toAttributeValue
-import domain.model.PaymentForSave
-import domain.model.PaymentForUpdate
 
 interface JpmcPaymentRepository {
 
@@ -118,5 +120,3 @@ class DynamoDbJpmcPaymentRepository(
 private typealias keyValue = String.() -> Map<String, AttributeValue>
 private typealias pkValue = String.() -> AttributeValue
 
-data class PaymentNotFound(val jpmcId: String) : RuntimeException("Cannot find any jpmc information for $jpmcId")
-data class UpdatePaymentException(val payment: PaymentForUpdate) : RuntimeException("There was an error updating the following payment: $payment")

@@ -4,7 +4,6 @@ import anyCreatePaymentRequest
 import apiGatewayEventRequest
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
-import com.wabi2b.serializers.BigDecimalSerializer
 import com.wabi2b.serializers.BigDecimalToFloatSerializer
 import com.wabi2b.serializers.InstantSerializer
 import com.wabi2b.serializers.URISerializer
@@ -27,6 +26,7 @@ import org.springframework.http.HttpMethod
 import kotlin.test.assertEquals
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
+import randomString
 
 @ExtendWith(MockitoExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -85,7 +85,8 @@ class CreatePaymentHandlerTest {
 
     @Test
     fun `given state validation ko when createPayment then throw custom exception FunctionalityNotAvailable`() {
-        whenever(stateValidatorService.validate(any<APIGatewayProxyRequestEvent>())).thenThrow(FunctionalityNotAvailable())
+        whenever(stateValidatorService.validate(any<APIGatewayProxyRequestEvent>()))
+            .thenThrow(FunctionalityNotAvailable(randomString()))
 
         assertThrows<FunctionalityNotAvailable> { sut.handleRequest(anyApiGatewayProxyRequestEvent(), context) }
 

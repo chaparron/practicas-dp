@@ -2,12 +2,11 @@ package domain.model
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
-import randomString
+import randomBigDecimal
+import randomLong
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import kotlin.test.assertEquals
-import randomBigDecimal
-import randomLong
 
 class PaymentTest {
 

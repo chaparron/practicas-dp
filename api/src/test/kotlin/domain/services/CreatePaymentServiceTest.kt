@@ -6,32 +6,26 @@ import com.wabi2b.jpmc.sdk.usecase.sale.SaleInformation
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleService
 import configuration.EnvironmentVariable
 import domain.model.CreatePaymentRequest
-import domain.model.Payment
 import domain.model.PaymentExpiration
 import domain.model.PaymentForSave
 import domain.model.PaymentStatus
-import java.time.Instant
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.any
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
-import randomString
-import kotlin.test.assertEquals
-import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.*
 import randomBigDecimal
 import randomLong
+import randomString
 import reactor.core.publisher.Mono
 import wabi2b.payments.common.model.dto.PaymentId
-import wabi2b.payments.common.model.dto.PaymentType
 import wabi2b.payments.common.model.dto.StartPaymentRequestDto
 import wabi2b.payments.sdk.client.impl.WabiPaymentSdk
+import java.time.Instant
+import kotlin.test.assertEquals
 
 @ExtendWith(MockitoExtension::class)
 class CreatePaymentServiceTest {
@@ -130,13 +124,6 @@ class CreatePaymentServiceTest {
             sut.createPayment(request)
         }
     }
-
-    private fun anyPayment() = Payment(
-        supplierOrderId = randomLong(),
-        paymentId = randomLong(),
-        amount = randomBigDecimal(),
-        status = PaymentStatus.IN_PROGRESS
-    )
 
     private fun anyPaymentForSave() = PaymentForSave(
         paymentId = randomLong(),

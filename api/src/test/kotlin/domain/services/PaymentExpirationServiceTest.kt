@@ -3,7 +3,6 @@ package domain.services
 
 import anyPaymentExpiration
 import configuration.MainConfiguration
-import kotlin.test.assertEquals
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
@@ -14,7 +13,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import randomLong
 import software.amazon.awssdk.http.SdkHttpResponse
 import software.amazon.awssdk.services.sqs.SqsClient
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest
@@ -23,6 +21,7 @@ import wabi2b.payment.async.notification.sdk.WabiPaymentAsyncNotificationSdk
 import wabi2b.payments.common.model.dto.PaymentType
 import wabi2b.payments.common.model.dto.PaymentUpdated
 import wabi2b.payments.common.model.dto.type.PaymentResult
+import kotlin.test.assertEquals
 
 @ExtendWith(MockitoExtension::class)
 class PaymentExpirationServiceTest {

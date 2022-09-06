@@ -4,9 +4,8 @@ import adapters.rest.validations.RequestValidations.required
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
-import domain.model.errors.DpErrorReason
-import domain.services.state.StateValidatorService
 import domain.services.providers.PaymentProviderService
+import domain.services.state.StateValidatorService
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
@@ -28,7 +27,7 @@ class PaymentProvidersHandler(
 
     override fun handleRequest(input: APIGatewayProxyRequestEvent, context: Context): APIGatewayProxyResponseEvent {
         val supplierId = input.queryStringParameters[SUPPLIER_ID_PARAM]
-            .required(DpErrorReason.MISSING_SUPPLIER_ID)
+            .required(SUPPLIER_ID_PARAM)
         stateValidatorService.validate(input)
         return ok(service.availableProviders(supplierId)
             .also {

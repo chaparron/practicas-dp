@@ -23,7 +23,7 @@ class DefaultProviderService(
         }.onSuccess {
             logger.info("Supplier retrieved: $it")
         }.onFailure {
-            logger.error("There was an error retrieving supplier id: $supplierId")
+            logger.error("There was an error retrieving supplier for id: $supplierId")
         }.getOrElse { false }
     }
 }

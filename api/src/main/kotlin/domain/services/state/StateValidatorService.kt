@@ -40,8 +40,9 @@ class StateValidatorService(
     }
     data class CustomerWithoutStateException(val customer: CustomerDto): RuntimeException("The following customer doesn't have state: $customer")
     fun validate(input: APIGatewayProxyRequestEvent) {
-        if (!validate(getState(input)))
-            throw FunctionalityNotAvailable()
+        val state = getState(input)
+        if (!validate(state))
+            throw FunctionalityNotAvailable(state)
     }
 
     fun validate(state: String): Boolean =

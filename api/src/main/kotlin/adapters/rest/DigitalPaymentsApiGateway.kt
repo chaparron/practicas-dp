@@ -1,7 +1,7 @@
 package adapters.rest
 
 import adapters.rest.handler.*
-import adapters.rest.handler.JpmcUpdatePaymentHandler.Companion.PROCESS_INFORMATION_PATH
+import adapters.rest.handler.JpmcUpdatePaymentHandler.Companion.UPDATE_PAYMENT_PATH
 import adapters.rest.handler.CreatePaymentHandler.Companion.CREATE_PAYMENT_PATH
 import adapters.rest.handler.PaymentProvidersHandler.Companion.PAYMENT_PROVIDERS_PATH
 import configuration.Configuration
@@ -37,7 +37,7 @@ class DigitalPaymentsApiGateway(
             )
         )
         .post(
-            path = PROCESS_INFORMATION_PATH,
+            path = UPDATE_PAYMENT_PATH,
             handler = JpmcUpdatePaymentHandler(
                 service = configuration.updatePaymentService,
                 jsonMapper = configuration.jsonMapper,
@@ -46,6 +46,6 @@ class DigitalPaymentsApiGateway(
         )
 
     override fun getErrorHandler(): ErrorHandler {
-        return RestErrorHandler(configuration.jsonMapper)
+        return ErrorHandler(configuration.jsonMapper)
     }
 }

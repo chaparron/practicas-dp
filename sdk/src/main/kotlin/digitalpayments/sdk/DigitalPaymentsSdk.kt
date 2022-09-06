@@ -12,9 +12,9 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.util.DefaultUriBuilderFactory
 import reactor.core.publisher.Mono
 import wabi.sdk.UnexpectedResponse
+import wabi.sdk.impl.CustomHttpErrorHandler
 import java.net.URI
 import java.util.*
-import wabi.sdk.HttpErrorHandler
 
 interface DigitalPaymentsSdk {
     fun createPayment(createPaymentRequest: CreatePaymentRequest, accessToken: String): Mono<CreatePaymentResponse>
@@ -32,6 +32,8 @@ class HttpDigitalPaymentsSdk(root: URI) : DigitalPaymentsSdk {
         .baseUrl(Objects.requireNonNull(root.toString()))
         .build()
 
+    private val detailedHttpErrorHandler = CustomHttpErrorHandler()
+
     override fun createPayment(
         createPaymentRequest: CreatePaymentRequest,
         accessToken: String
@@ -43,7 +45,7 @@ class HttpDigitalPaymentsSdk(root: URI) : DigitalPaymentsSdk {
             .body(BodyInserters.fromObject(createPaymentRequest))
             .retrieve()
             .onStatus(HttpStatus::isError) {
-                HttpErrorHandler.defaultHandling(it)
+                detailedHttpErrorHandler.handle(it)
             }
             .bodyToMono(String::class.java)
             .map { responseBody ->
@@ -62,7 +64,7 @@ class HttpDigitalPaymentsSdk(root: URI) : DigitalPaymentsSdk {
             .body(BodyInserters.fromObject(updatePaymentRequest))
             .retrieve()
             .onStatus(HttpStatus::isError) {
-                HttpErrorHandler.defaultHandling(it)
+                detailedHttpErrorHandler.handle(it)
             }
             .bodyToMono(String::class.java)
             .map { responseBody ->
@@ -82,7 +84,7 @@ class HttpDigitalPaymentsSdk(root: URI) : DigitalPaymentsSdk {
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .retrieve()
             .onStatus(HttpStatus::isError) {
-                HttpErrorHandler.defaultHandling(it)
+                detailedHttpErrorHandler.handle(it)
             }
             .bodyToMono(String::class.java)
             .map { responseBody ->

@@ -8,6 +8,8 @@ import domain.model.Payment
 import domain.model.PaymentForSave
 import domain.model.PaymentForUpdate
 import domain.model.PaymentStatus
+import domain.model.errors.PaymentNotFound
+import domain.model.errors.UpdatePaymentException
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance

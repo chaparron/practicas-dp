@@ -60,7 +60,6 @@ class UpdatePaymentServiceTest {
     @Captor
     lateinit var paymentCaptor: ArgumentCaptor<PaymentForUpdate>
 
-
     @InjectMocks
     private lateinit var sut: UpdatePaymentService
 
@@ -120,17 +119,6 @@ class UpdatePaymentServiceTest {
         verifyNoInteractions(repository)
 
     }
-
-    private fun anyPayment() = Payment(
-        paymentId = randomLong(),
-        amount = randomBigDecimal(),
-        paymentOption = randomString(),
-        responseCode = randomString(),
-        message = randomString(),
-        encData = randomString(),
-        status = PaymentStatus.PAID,
-        supplierOrderId = randomLong()
-    )
 
     private fun anyPaymentInformation() = JpmcPaymentInformation(
         encData = randomString()

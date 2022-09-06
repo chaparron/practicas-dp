@@ -3,11 +3,7 @@ package adapters.rest.handler
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
-import configuration.EnvironmentVariable
-import domain.model.JpmcPaymentInformation
 import domain.model.UpdatePaymentResponse
-import domain.model.errors.DpErrorReason
-import domain.model.errors.DpException
 import domain.services.UpdatePaymentService
 import java.math.BigDecimal
 import kotlinx.serialization.decodeFromString
@@ -26,7 +22,7 @@ class JpmcUpdatePaymentHandler(
 
     companion object {
         private val logger = LoggerFactory.getLogger(JpmcUpdatePaymentHandler::class.java)
-        const val PROCESS_INFORMATION_PATH = "/dp/jpmc/updatePayment"
+        const val UPDATE_PAYMENT_PATH = "/dp/jpmc/updatePayment"
     }
 
 
@@ -48,7 +44,7 @@ class JpmcUpdatePaymentHandler(
                 })
 
         } else {
-            ok(service.update(map(request))
+            ok(service.update(jsonMapper.decodeFromString(request.body))
                 .also {
                     logger.trace("Payment Updated: $it")
                 }
@@ -57,17 +53,5 @@ class JpmcUpdatePaymentHandler(
                 }
             )
         }
-
-
     }
-
-    private fun map(request: APIGatewayProxyRequestEvent): JpmcPaymentInformation =
-        runCatching {
-            jsonMapper.decodeFromString<JpmcPaymentInformation>(request.body)
-        }.getOrElse { exception ->
-            when (exception) {
-                is DpException -> throw exception
-                else -> throw DpException.from(reason = DpErrorReason.UNKNOWN, rootCause = exception)
-            }
-        }
 }

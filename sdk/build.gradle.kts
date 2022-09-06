@@ -19,42 +19,27 @@ repositories {
 }
 
 dependencies {
-
-    val wiremockVersion: String by project
-    val kotlinxSerializationVersion: String by project
-    val wabiSerializersVersion: String by project
-    val mockitoCoreVersion: String by project
-    val junit5Version: String by project
-    val testReactorCoreVersion: String by project
-    val testReactorNettyVersion: String by project
-    val testReactorTestVersion: String by project
-    val springWebFluxVersion: String by project
-    val springBootVersion: String by project
-    val slf4jVersion: String by project
-    val logbackVersion: String by project
-
     implementation(kotlin("stdlib-jdk8"))
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationVersion")
-    implementation("com.wabi2b:serializers:$wabiSerializersVersion")
-    implementation("org.springframework:spring-webflux:$springWebFluxVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+    implementation("com.wabi2b:serializers:1007-8ea7571732f9dbdcca033fa025fe06e3f5179fa8")
+    implementation("org.springframework:spring-webflux:5.1.9.RELEASE")
     implementation("yopdev.wabi:sdk:1014-1c81da2cc47e27e789a8829421b38b1520957872")
 
     // logging
-    implementation("org.slf4j:slf4j-api:$slf4jVersion")
-    implementation("ch.qos.logback:logback-core:$logbackVersion")
-    implementation("ch.qos.logback:logback-classic:$logbackVersion")
+    implementation("org.slf4j:slf4j-api:1.7.30")
+    implementation("ch.qos.logback:logback-core:1.2.9")
+    implementation("ch.qos.logback:logback-classic:1.2.9")
 
     testImplementation(project(":api")) {
         exclude("wabi2b", "wabi2b-authorizer")
     }
     testImplementation(kotlin("test-junit"))
-    testImplementation("org.junit.jupiter:junit-jupiter:$junit5Version")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:$junit5Version")
-    testImplementation("com.github.tomakehurst:wiremock:$wiremockVersion")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:$mockitoCoreVersion")
-    testImplementation("org.mockito:mockito-junit-jupiter:$mockitoCoreVersion")
-    testImplementation("io.projectreactor:reactor-core:$testReactorCoreVersion")
-    testImplementation("io.projectreactor.netty:reactor-netty:$testReactorNettyVersion")
-    testImplementation("io.projectreactor:reactor-test:$testReactorTestVersion")
-    testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
+    testImplementation("com.github.tomakehurst:wiremock:2.24.1")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:4.0.0")
+    testImplementation("io.projectreactor:reactor-core:3.4.14")
+    testImplementation("io.projectreactor.netty:reactor-netty:1.0.15")
+    testImplementation("io.projectreactor:reactor-test:3.2.11.RELEASE")
 }

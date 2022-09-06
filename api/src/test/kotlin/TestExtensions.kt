@@ -68,6 +68,3 @@ fun anyCustomer(addresses: List<AddressDto>) = CustomerDto(
 )
 
 fun anyPaymentExpiration() = PaymentExpiration(Random.nextLong(), randomBigDecimal(), randomLong())
-
-@Suppress("UNCHECKED_CAST")
-private fun <T> capture(captor: ArgumentCaptor<T>): T = captor.capture()

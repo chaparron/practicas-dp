@@ -7,17 +7,15 @@ import configuration.MainConfiguration
 import domain.model.PaymentExpiration
 import domain.services.PaymentExpirationService
 import domain.services.PaymentExpireException
-import kotlin.test.assertFailsWith
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mockito.times
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import randomString
+import kotlin.test.assertFailsWith
 
 @ExtendWith(MockitoExtension::class)
 class PaymentExpirationListenerTest {
