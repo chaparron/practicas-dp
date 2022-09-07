@@ -141,7 +141,7 @@ class DigitalPaymentsApiGatewayTest {
 
         private fun whenExpectedProvidersResponseContext(statusCode: Int, supplierId: Long?, state: String) {
             whenever(stateValidatorService.getState(any())).thenReturn(STATE)
-
+            whenever(stateValidatorService.validate(STATE)).thenReturn(true)
             logger.trace("Stubbing response $statusCode-$supplierId-$state")
             when (statusCode) {
                 200 -> doReturn(listOf(Provider.JP_MORGAN)).whenever(paymentProviderService)
