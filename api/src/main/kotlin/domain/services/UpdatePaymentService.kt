@@ -4,10 +4,8 @@ import adapters.repositories.jpmc.JpmcPaymentRepository
 import com.wabi2b.jpmc.sdk.usecase.sale.PaymentData
 import com.wabi2b.jpmc.sdk.usecase.sale.PaymentService
 import com.wabi2b.jpmc.sdk.usecase.sale.PaymentStatus
-import com.wabi2b.jpmc.sdk.usecase.sale.EncData
 import domain.model.JpmcPaymentInformation
 import domain.model.PaymentForUpdate
-import kotlinx.serialization.json.Json
 import domain.model.UpdatePaymentResponse
 import org.slf4j.LoggerFactory
 import wabi2b.payment.async.notification.sdk.WabiPaymentAsyncNotificationSdk
@@ -22,7 +20,6 @@ class UpdatePaymentService(
 
     companion object {
         private val logger = LoggerFactory.getLogger(UpdatePaymentService::class.java)
-        private const val SUCCESS_RESPONSE_CODE = "00"
     }
 
     fun update(information: JpmcPaymentInformation): UpdatePaymentResponse = information.encData

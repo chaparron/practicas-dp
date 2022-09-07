@@ -1,8 +1,13 @@
 package domain.services
 
 
+import adapters.repositories.jpmc.JpmcPaymentRepository
 import anyPaymentExpiration
+import com.wabi2b.jpmc.sdk.usecase.sale.PaymentStatus
 import configuration.MainConfiguration
+import domain.model.PaymentForStatusUpdate
+import java.time.Clock
+import java.time.Instant
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
@@ -22,12 +27,15 @@ import wabi2b.payments.common.model.dto.PaymentType
 import wabi2b.payments.common.model.dto.PaymentUpdated
 import wabi2b.payments.common.model.dto.type.PaymentResult
 import kotlin.test.assertEquals
+import org.mockito.kotlin.verifyNoInteractions
 
 @ExtendWith(MockitoExtension::class)
 class PaymentExpirationServiceTest {
 
     private val sqsClient: SqsClient = mock()
     private val wabiPaymentAsyncNotificationSdk: WabiPaymentAsyncNotificationSdk = mock()
+    private val repository: JpmcPaymentRepository = mock()
+    private val clock: Clock = mock()
     private val mapper: Json = MainConfiguration.jsonMapper
     companion object {
         private const val PAYMENT_EXPIRATION_DELAY_IN_SECONDS = 15
@@ -39,6 +47,8 @@ class PaymentExpirationServiceTest {
         delaySeconds = PAYMENT_EXPIRATION_DELAY_IN_SECONDS,
         queueUrl = PAYMENT_EXPIRATION_QUEUE_URL,
         wabiPaymentAsyncNotificationSdk = wabiPaymentAsyncNotificationSdk,
+        jpmcPaymentRepository = repository,
+        clock = clock,
         mapper = mapper
     )
 
@@ -94,11 +104,20 @@ class PaymentExpirationServiceTest {
             amount = somePaymentExpiration.amount,
             paymentMethod = null
         )
+        val now = Instant.now()
+        val paymentForStatusUpdate = PaymentForStatusUpdate(
+            paymentUpdate.paymentId,
+            PaymentStatus.EXPIRED,
+            now.toString()
+        )
+
+        whenever(clock.instant()).thenReturn(now)
 
         val result = sut.expire(somePaymentExpiration)
 
         assertEquals(true, result)
         verify(wabiPaymentAsyncNotificationSdk).notify(paymentUpdate)
+        verify(repository).update(paymentForStatusUpdate)
     }
 
     @Test
@@ -119,5 +138,6 @@ class PaymentExpirationServiceTest {
             sut.expire(somePaymentExpiration)
         }
         verify(wabiPaymentAsyncNotificationSdk).notify(paymentUpdate)
+        verifyNoInteractions(repository)
     }
 }

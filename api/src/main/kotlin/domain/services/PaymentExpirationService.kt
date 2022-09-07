@@ -1,6 +1,11 @@
 package domain.services
 
+import adapters.repositories.jpmc.JpmcPaymentRepository
+import com.wabi2b.jpmc.sdk.usecase.sale.PaymentStatus
 import domain.model.PaymentExpiration
+import domain.model.PaymentForStatusUpdate
+import java.time.Clock
+import java.time.Instant
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
@@ -21,6 +26,8 @@ class DefaultPaymentExpirationService(
     private val delaySeconds: Int,
     private val queueUrl: String,
     private val wabiPaymentAsyncNotificationSdk: WabiPaymentAsyncNotificationSdk,
+    private val jpmcPaymentRepository: JpmcPaymentRepository,
+    private val clock: Clock,
     private val mapper: Json
 ) : PaymentExpirationService {
 
@@ -48,6 +55,11 @@ class DefaultPaymentExpirationService(
             wabiPaymentAsyncNotificationSdk.notify(this.toPaymentUpdate())
         }.onSuccess {
             logger.info("PaymentId ${paymentExpiration.paymentId} expired")
+            jpmcPaymentRepository.update(PaymentForStatusUpdate(
+                paymentExpiration.paymentId,
+                PaymentStatus.EXPIRED,
+                clock.instant().toString()
+            ))
         }.onFailure {
             logger.error("There was an error expiring paymentId ${paymentExpiration.paymentId}")
             throw PaymentExpireException(paymentExpiration.paymentId.toString(), it)

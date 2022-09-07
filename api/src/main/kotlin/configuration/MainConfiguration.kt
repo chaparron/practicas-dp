@@ -86,6 +86,8 @@ object MainConfiguration : Configuration {
             delaySeconds = EX_D_SECONDS.get().toInt(),
             queueUrl = EX_Q_URL.get(),
             wabiPaymentAsyncNotificationSdk = wabiPaymentAsyncNotificationSdk,
+            jpmcPaymentRepository = jpmcPaymentRepository,
+            clock = clock,
             mapper = jsonMapper
         )
     }

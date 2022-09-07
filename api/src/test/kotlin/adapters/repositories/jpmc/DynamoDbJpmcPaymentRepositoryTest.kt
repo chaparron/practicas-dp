@@ -6,8 +6,10 @@ import domain.model.Payment
 import domain.model.PaymentForSave
 import domain.model.PaymentForUpdate
 import com.wabi2b.jpmc.sdk.usecase.sale.PaymentStatus
+import domain.model.PaymentForStatusUpdate
 import domain.model.errors.PaymentNotFound
 import domain.model.errors.UpdatePaymentException
+import domain.model.errors.UpdatePaymentStatusException
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -121,6 +123,45 @@ internal class DynamoDbJpmcPaymentRepositoryTest {
         val payment = anyPaymentForUpdate()
 
         assertFailsWith<UpdatePaymentException> {
+            sut.update(payment)
+        }
+    }
+
+    @Test
+    fun `can update an status by id`() {
+        val anySavedPayment = anySavedPayment()
+        val paymentForStatusUpdate = PaymentForStatusUpdate(
+            paymentId = anySavedPayment.paymentId,
+            status = PaymentStatus.EXPIRED,
+            lastUpdatedAt = Instant.now().toString()
+        )
+        val expected = Payment(
+            supplierOrderId = anySavedPayment.supplierOrderId,
+            paymentId = anySavedPayment.paymentId,
+            amount = anySavedPayment.amount,
+            status = paymentForStatusUpdate.status,
+            invoiceId = anySavedPayment.invoiceId,
+            createdAt = anySavedPayment.createdAt,
+            lastUpdatedAt = paymentForStatusUpdate.lastUpdatedAt
+        )
+
+
+        sut.update(paymentForStatusUpdate)
+
+        val actual = sut.findBy(anySavedPayment.paymentId.toString())
+
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `fails with UpdatePaymentStatusException on error at status update`() {
+        val payment = PaymentForStatusUpdate(
+            paymentId = randomLong(),
+            status = PaymentStatus.EXPIRED,
+            lastUpdatedAt = Instant.now().toString()
+        )
+
+        assertFailsWith<UpdatePaymentStatusException> {
             sut.update(payment)
         }
     }

@@ -26,6 +26,7 @@ open class ErrorHandler(val json: Json) : wabi.rest2lambda.ErrorHandler {
             is ClientTokenException -> createRequest(error.asClientTokenExceptionError(), HttpStatus.SC_BAD_REQUEST)
             is MissingFieldException -> createRequest(error.asMissingFieldException(), HttpStatus.SC_BAD_REQUEST)
             is UpdatePaymentException -> createRequest(error.asUpdatePaymentException(), HttpStatus.SC_BAD_REQUEST)
+            is UpdatePaymentStatusException -> createRequest(error.asUpdatePaymentStatusException(), HttpStatus.SC_BAD_REQUEST)
             is PaymentNotFound -> createRequest(error.asPaymentNotFoundError(), HttpStatus.SC_BAD_REQUEST)
             is CustomSdkException -> createRequest(error.toDetailedError().asJsonString(), HttpStatus.SC_BAD_REQUEST)
             else -> createRequest(defaultDetailedError(error).asJsonString(), HttpStatus.SC_INTERNAL_SERVER_ERROR)

@@ -2,9 +2,11 @@ package adapters.repositories.jpmc
 
 import domain.model.Payment
 import domain.model.PaymentForSave
+import domain.model.PaymentForStatusUpdate
 import domain.model.PaymentForUpdate
 import domain.model.errors.PaymentNotFound
 import domain.model.errors.UpdatePaymentException
+import domain.model.errors.UpdatePaymentStatusException
 import org.slf4j.LoggerFactory
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue
@@ -14,8 +16,8 @@ interface JpmcPaymentRepository {
 
     fun findBy(paymentId: String): Payment
     fun save(payment: PaymentForSave): PaymentForSave
-
     fun update(payment: PaymentForUpdate)
+    fun update(payment: PaymentForStatusUpdate)
 }
 
 class DynamoDbJpmcPaymentRepository(
@@ -90,6 +92,29 @@ class DynamoDbJpmcPaymentRepository(
         }.onFailure {
             logger.error("There was a problem updating the following payment: $payment.")
             throw UpdatePaymentException(payment)
+        }.onSuccess {
+            logger.info("Payment ${payment.paymentId} was successfully updated with ${payment.status} status.")
+        }.getOrThrow()
+    }
+
+    override fun update(payment: PaymentForStatusUpdate) {
+        runCatching {
+            dynamoDbClient.updateItem {it
+                .tableName(tableName)
+                .key(payment.paymentId.toString().keys())
+                .updateExpression(
+                    "SET ${DynamoDBJpmcAttribute.ST} = :status," +
+                            "${DynamoDBJpmcAttribute.LU} = :lastUpdated"
+                )
+                .expressionAttributeValues(mapOf(
+                    ":status" to payment.status.name.toAttributeValue(),
+                    ":lastUpdated" to payment.lastUpdatedAt.toAttributeValue()
+                ))
+                .conditionExpression("attribute_exists(${DynamoDBJpmcAttribute.PK})")
+            }
+        }.onFailure {
+            logger.error("There was a problem updating the status for the following payment: $payment.")
+            throw UpdatePaymentStatusException(payment)
         }.onSuccess {
             logger.info("Payment ${payment.paymentId} was successfully updated with ${payment.status} status.")
         }.getOrThrow()
