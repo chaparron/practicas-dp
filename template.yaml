@@ -19,7 +19,7 @@ Mappings:
       JpmcCurrency: "356"
       JpmcVersion: "1"
       JpmcAvailableFor: "IN-MH"
-      JpmcStateValidationEnabled: false
+      JpmcStateValidationEnabled: true
       JpmcProvidersDummyEnabled: false
       JpmcCreatePaymentDummyEnabled: false
       JpmcUpdatePaymentDummyEnabled: false
@@ -70,7 +70,7 @@ Globals:
         NEW_RELIC_EXTENSION_SEND_FUNCTION_LOGS: true
         NEW_RELIC_DEBUG: true
         NEW_RELIC_LAMBDA_EXTENSION_ENABLED: !FindInMap [ Config, !Ref EnvironmentStackName, NewRelicLambdaExtensionEnabled ]
-        FORCE_UPDATE: 6
+        FORCE_UPDATE: 7
         SUPPLIER_TABLE: !Ref SupplierTable
 
     DeploymentPreference:
