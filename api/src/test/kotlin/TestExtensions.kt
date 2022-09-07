@@ -32,8 +32,10 @@ fun apiGatewayEventRequest(
     method: HttpMethod = HttpMethod.POST,
     path: String? = randomString(),
     authorization: String? = randomString(),
-    body: String = randomString()
+    body: String = randomString(),
+    queryParams: Map<String, String>? = emptyMap()
 ): APIGatewayProxyRequestEvent = APIGatewayProxyRequestEvent()
+    .withQueryStringParameters(queryParams)
     .withPath(path)
     .withHeaders(mapOf("Authorization" to authorization))
     .withBody(body)

@@ -22,20 +22,25 @@ class PaymentProvidersHandler(
         private val logger = LoggerFactory.getLogger(PaymentProvidersHandler::class.java)
         const val PAYMENT_PROVIDERS_PATH = "/dp/paymentProviders"
         const val SUPPLIER_ID_PARAM = "supplierId"
+        const val EMPTY_LIST_BODY = "[]"
     }
 
 
     override fun handleRequest(input: APIGatewayProxyRequestEvent, context: Context): APIGatewayProxyResponseEvent {
         val supplierId = input.queryStringParameters[SUPPLIER_ID_PARAM]
             .required(SUPPLIER_ID_PARAM).toLong()
-        stateValidatorService.validate(input)
-        return ok(service.availableProviders(supplierId)
-            .also {
-                logger.trace("Payment Providers retrieved: $it")
-            }
-            .let {
-                jsonMapper.encodeToString(it)
-            }
-        )
+        val state = stateValidatorService.getState(input)
+        return if(stateValidatorService.validate(state)) {
+            ok(service.availableProviders(supplierId)
+                .let {
+                    jsonMapper.encodeToString(it)
+                }
+            )
+        }
+        else {
+            ok(EMPTY_LIST_BODY)
+        }.also {
+            logger.trace("Payment Providers retrieved: $it")
+        }
     }
 }
