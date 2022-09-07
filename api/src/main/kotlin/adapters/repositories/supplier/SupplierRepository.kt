@@ -39,7 +39,7 @@ class DynamoDBSupplierRepository(
         }
 
     private fun Supplier.asDynamoItem() = mapOf(
-        DynamoDBSupplierAttribute.PK.param to "$pkValuePrefix + ${this.supplierId}".toAttributeValue(),
+        DynamoDBSupplierAttribute.PK.param to "$pkValuePrefix${this.supplierId}".toAttributeValue(),
         DynamoDBSupplierAttribute.SK.param to this.supplierId.toAttributeValue(),
         DynamoDBSupplierAttribute.SI.param to this.supplierId.toAttributeValue(),
         DynamoDBSupplierAttribute.N.param to this.bankAccountNumber.toAttributeValue(),
@@ -47,7 +47,7 @@ class DynamoDBSupplierRepository(
     )
 
     private fun Long.asGetItemKey() = mapOf(
-        DynamoDBSupplierAttribute.PK.param to "$pkValuePrefix + $this".toAttributeValue(),
+        DynamoDBSupplierAttribute.PK.param to "$pkValuePrefix$this".toAttributeValue(),
         DynamoDBSupplierAttribute.SK.param to this.toAttributeValue()
     )
 
