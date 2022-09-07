@@ -8,7 +8,6 @@ import configuration.EnvironmentVariable
 import domain.model.CreatePaymentRequest
 import domain.model.PaymentExpiration
 import domain.model.PaymentForSave
-import domain.model.PaymentStatus
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.assertThrows
@@ -26,6 +25,7 @@ import wabi2b.payments.common.model.dto.StartPaymentRequestDto
 import wabi2b.payments.sdk.client.impl.WabiPaymentSdk
 import java.time.Instant
 import kotlin.test.assertEquals
+import com.wabi2b.jpmc.sdk.usecase.sale.PaymentStatus
 
 @ExtendWith(MockitoExtension::class)
 class CreatePaymentServiceTest {

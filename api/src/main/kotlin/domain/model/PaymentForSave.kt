@@ -1,5 +1,6 @@
 package domain.model
 
+import com.wabi2b.jpmc.sdk.usecase.sale.PaymentStatus
 import java.math.BigDecimal
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable

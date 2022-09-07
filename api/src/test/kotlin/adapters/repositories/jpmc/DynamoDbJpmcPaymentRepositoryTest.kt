@@ -5,7 +5,7 @@ import adapters.infrastructure.DynamoDbContainer.digitalPaymentTableSchema
 import domain.model.Payment
 import domain.model.PaymentForSave
 import domain.model.PaymentForUpdate
-import domain.model.PaymentStatus
+import com.wabi2b.jpmc.sdk.usecase.sale.PaymentStatus
 import domain.model.errors.PaymentNotFound
 import domain.model.errors.UpdatePaymentException
 import org.junit.jupiter.api.BeforeAll

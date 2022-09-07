@@ -1,6 +1,7 @@
 package domain.services
 
 import adapters.repositories.jpmc.JpmcPaymentRepository
+import com.wabi2b.jpmc.sdk.usecase.sale.PaymentStatus
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleInformation
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleRequest
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleService

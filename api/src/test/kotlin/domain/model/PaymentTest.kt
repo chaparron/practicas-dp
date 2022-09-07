@@ -1,5 +1,6 @@
 package domain.model
 
+import com.wabi2b.jpmc.sdk.usecase.sale.PaymentStatus
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import randomBigDecimal

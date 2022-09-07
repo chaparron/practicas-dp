@@ -1,24 +1,24 @@
 package domain.services
 
 import adapters.repositories.jpmc.JpmcPaymentRepository
-import com.wabi2b.jpmc.sdk.security.cipher.aes.decrypt.AesDecrypterService
 import com.wabi2b.jpmc.sdk.usecase.sale.EncData
-import com.wabi2b.serializers.BigDecimalSerializer
-import com.wabi2b.serializers.InstantSerializer
-import com.wabi2b.serializers.URISerializer
-import com.wabi2b.serializers.UUIDStringSerializer
+import com.wabi2b.jpmc.sdk.usecase.sale.PaymentData
+import com.wabi2b.jpmc.sdk.usecase.sale.PaymentService
+import com.wabi2b.jpmc.sdk.usecase.sale.PaymentStatus
 import domain.model.JpmcPaymentInformation
-import domain.model.Payment
 import domain.model.PaymentForUpdate
-import domain.model.PaymentStatus
 import domain.model.UpdatePaymentResponse
-import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.*
+import org.mockito.ArgumentCaptor
+import org.mockito.Captor
+import org.mockito.InjectMocks
+import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.*
+import randomBigDecimal
 import randomString
+import toPaymentMethod
 import wabi2b.payment.async.notification.sdk.WabiPaymentAsyncNotificationSdk
 import wabi2b.payments.common.model.dto.PaymentType
 import wabi2b.payments.common.model.dto.PaymentUpdated
@@ -27,29 +27,12 @@ import kotlin.random.Random
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.contextual
-import randomBigDecimal
-import randomLong
-import toPaymentMethod
 
 @ExtendWith(MockitoExtension::class)
 class UpdatePaymentServiceTest {
 
     @Mock
-    private lateinit var decrypter: AesDecrypterService
-
-    @Mock
-    private var jsonMapper: Json = Json {
-        encodeDefaults = true
-        ignoreUnknownKeys = true
-        serializersModule = SerializersModule {
-            contextual(InstantSerializer)
-            contextual(UUIDStringSerializer)
-            contextual(URISerializer)
-            contextual(BigDecimalSerializer)
-        }
-    }
+    private lateinit var paymentService: PaymentService
 
     @Mock
     private lateinit var repository: JpmcPaymentRepository
@@ -69,9 +52,10 @@ class UpdatePaymentServiceTest {
 
     @Test
     fun `given a valid encData when update then save information in database`() {
+        //Given
         val encData = anyEncData(SUCCESS_RESPONSE_CODE)
         val paymentUpdated = PaymentUpdated(
-            supplierOrderId = encData.supplierOrderId!!.toLong(),
+            supplierOrderId = encData.supplierOrderId.toLong(),
             paymentType = PaymentType.DIGITAL_PAYMENT,
             paymentId = encData.txnRefNo.toLong(),
             resultType = if (encData.responseCode == SUCCESS_RESPONSE_CODE) PaymentResult.SUCCESS else PaymentResult.FAILED,
@@ -81,17 +65,32 @@ class UpdatePaymentServiceTest {
 
         val expectedResponse = UpdatePaymentResponse(
             paymentId = encData.txnRefNo.toLong(),
-            supplierOrderId = encData.supplierOrderId!!.toLong(),
+            supplierOrderId = encData.supplierOrderId.toLong(),
             amount = encData.amount.toBigDecimal(),
             responseCode = encData.responseCode,
             message = encData.message
         )
 
-        whenever(decrypter.decrypt<EncData>(any(), any())).thenReturn(encData)
+        val paymentData = PaymentData(
+            paymentId = encData.txnRefNo.toLong(),
+            supplierOrderId = encData.supplierOrderId.toLong(),
+            amount = encData.amount.toBigDecimal(),
+            paymentOption = "dc",
+            responseCode = encData.responseCode,
+            message = encData.message,
+            encData = encData.toString(),
+            status = PaymentStatus.PAID,
+            paymentType = PaymentType.DIGITAL_PAYMENT,
+            paymentMethod = encData.paymentOption.toPaymentMethod(),
+            resultType = PaymentResult.SUCCESS
+        )
 
+        whenever(paymentService.createPaymentData(any())).thenReturn(paymentData)
+
+        //When
         val response = sut.update(anyPaymentInformation())
 
-
+        //Then
         assertEquals(expectedResponse, response)
 
         // Check some fields with captor
@@ -100,21 +99,23 @@ class UpdatePaymentServiceTest {
         assertNotNull(paymentUpdated)
         assertEquals(PaymentStatus.PAID, payment.status)
 
-        verify(decrypter).decrypt<EncData>(any(), any())
+        verify(paymentService).createPaymentData(any())
         verify(wabiPaymentAsyncNotificationSdk).notify(paymentUpdated)
     }
 
     @Test
     fun `Given an encData with invalid payment method should throw InvalidPaymentMethod exception`() {
+        //Given
         val encData = anyEncData(SUCCESS_RESPONSE_CODE, paymentMethod = randomString())
 
-        whenever(decrypter.decrypt<EncData>(any(), any())).thenReturn(encData)
+        whenever(paymentService.createPaymentData(any())).doThrow(InvalidPaymentMethodException(encData.paymentOption))
 
+        //When
         assertFailsWith<InvalidPaymentMethodException> {
             sut.update(anyPaymentInformation())
         }
 
-        verify(decrypter).decrypt<EncData>(any(), any())
+        //Then
         verifyNoInteractions(wabiPaymentAsyncNotificationSdk)
         verifyNoInteractions(repository)
 

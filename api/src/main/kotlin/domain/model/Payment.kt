@@ -1,9 +1,10 @@
 package domain.model
 
-import java.math.BigDecimal
-import java.time.Instant
+import com.wabi2b.jpmc.sdk.usecase.sale.PaymentStatus
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import java.math.BigDecimal
+import java.time.Instant
 
 @Serializable
 data class Payment(
@@ -37,8 +38,4 @@ data class Payment(
     fun updated(at: Instant): Payment {
         return copy(lastUpdatedAt = at.toString())
     }
-}
-
-enum class PaymentStatus {
-    IN_PROGRESS, PAID, ERROR, EXPIRED
 }

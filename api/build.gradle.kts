@@ -33,7 +33,7 @@ dependencies {
     implementation("com.wabi2b:serializers:1007-8ea7571732f9dbdcca033fa025fe06e3f5179fa8")
 
     // wabi2b jpmc Sdk
-    implementation("wabi2b:jpmc-sdk:1012-4a2029291dd1ebdc9a129c64e024cf691c0f9bf3")
+    implementation("wabi2b:jpmc-sdk:1015-9a0c8805813508cf013ca77e2bb9b4b1058d448d")
 
 
     // Auth0

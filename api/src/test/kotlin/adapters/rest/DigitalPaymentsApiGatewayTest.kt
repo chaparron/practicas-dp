@@ -6,11 +6,11 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import com.amazonaws.services.lambda.runtime.tests.annotations.Events
 import com.amazonaws.services.lambda.runtime.tests.annotations.HandlerParams
 import com.amazonaws.services.lambda.runtime.tests.annotations.Responses
+import com.wabi2b.jpmc.sdk.usecase.sale.PaymentStatus
 import configuration.MainConfiguration.jsonMapper
 import configuration.TestConfiguration
 import domain.model.CreatePaymentResponse
 import domain.model.PaymentForUpdate
-import domain.model.PaymentStatus
 import domain.model.UpdatePaymentResponse
 import domain.model.errors.FunctionalityNotAvailable
 import domain.model.errors.UpdatePaymentException

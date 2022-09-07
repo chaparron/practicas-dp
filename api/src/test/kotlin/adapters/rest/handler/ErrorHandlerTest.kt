@@ -1,11 +1,11 @@
 package adapters.rest.handler
 
+import com.wabi2b.jpmc.sdk.usecase.sale.PaymentStatus
 import com.wabi2b.serializers.BigDecimalSerializer
 import com.wabi2b.serializers.InstantSerializer
 import com.wabi2b.serializers.URISerializer
 import com.wabi2b.serializers.UUIDStringSerializer
 import domain.model.PaymentForUpdate
-import domain.model.PaymentStatus
 import domain.model.errors.*
 import domain.model.exceptions.DigitalPaymentsDetailedError
 import domain.model.exceptions.ErrorReason

@@ -1,25 +1,21 @@
 package domain.services
 
 import adapters.repositories.jpmc.JpmcPaymentRepository
-import com.wabi2b.jpmc.sdk.security.cipher.aes.decrypt.AesDecrypterService
-import com.wabi2b.jpmc.sdk.security.formatter.PayloadFormatter
+import com.wabi2b.jpmc.sdk.usecase.sale.PaymentData
+import com.wabi2b.jpmc.sdk.usecase.sale.PaymentService
+import com.wabi2b.jpmc.sdk.usecase.sale.PaymentStatus
 import com.wabi2b.jpmc.sdk.usecase.sale.EncData
 import domain.model.JpmcPaymentInformation
 import domain.model.PaymentForUpdate
-import domain.model.PaymentStatus
-import domain.model.UpdatePaymentResponse
 import kotlinx.serialization.json.Json
+import domain.model.UpdatePaymentResponse
 import org.slf4j.LoggerFactory
 import wabi2b.payment.async.notification.sdk.WabiPaymentAsyncNotificationSdk
-import wabi2b.payments.common.model.dto.PaymentType
 import wabi2b.payments.common.model.dto.PaymentUpdated
-import wabi2b.payments.common.model.dto.type.PaymentResult
 import java.time.Instant
-import toPaymentMethod
 
 class UpdatePaymentService(
-    private val decrypter: AesDecrypterService,
-    private val jsonMapper: Json,
+    private val paymentService: PaymentService,
     private val repository: JpmcPaymentRepository,
     private val wabiPaymentAsyncNotificationSdk: WabiPaymentAsyncNotificationSdk
 ) {
@@ -31,40 +27,40 @@ class UpdatePaymentService(
 
     fun update(information: JpmcPaymentInformation): UpdatePaymentResponse = information.encData
         .runCatching {
-            decrypter.decrypt<EncData>(this) { PayloadFormatter(jsonMapper).decodeFrom(it) }
+            paymentService.createPaymentData(this)
         }.onSuccess {
             logger.info("Payment provider return the following response: $it")
             wabiPaymentAsyncNotificationSdk.notify(it.toPaymentUpdated())
-            repository.update(it.toPaymentForUpdate(information.encData))
+            repository.update(it.toPaymentForUpdate())
         }.onFailure {
             logger.error("There was an error decrypting provider response: $it")
         }.getOrThrow().toUpdatePaymentResponse()
 
-    private fun EncData.toUpdatePaymentResponse() = UpdatePaymentResponse(
-        paymentId = txnRefNo.toLong(),
-        supplierOrderId = supplierOrderId!!.toLong(),
-        amount = amount.toBigDecimal(),
+    private fun PaymentData.toUpdatePaymentResponse() = UpdatePaymentResponse(
+        paymentId = paymentId,
+        supplierOrderId = supplierOrderId,
+        amount = amount,
         responseCode = responseCode,
         message = message
     )
 
-    private fun EncData.toPaymentForUpdate(encData: String) = PaymentForUpdate(
-        paymentId = txnRefNo.toLong(),
+    private fun PaymentData.toPaymentForUpdate() = PaymentForUpdate(
+        paymentId = paymentId,
         paymentOption = paymentOption,
         responseCode = responseCode,
         message = message,
         encData = encData,
-        status = if (responseCode == SUCCESS_RESPONSE_CODE) PaymentStatus.PAID else PaymentStatus.ERROR,
+        status = enumValueOf<PaymentStatus>(status.name),
         lastUpdatedAt = Instant.now().toString()
     )
 
-    private fun EncData.toPaymentUpdated() = PaymentUpdated(
-        supplierOrderId = supplierOrderId!!.toLong(),
-        paymentType = PaymentType.DIGITAL_PAYMENT,
-        amount = amount.toBigDecimal(),
-        paymentId = txnRefNo.toLong(),
-        paymentMethod = paymentOption.toPaymentMethod(),
-        resultType = if (responseCode == SUCCESS_RESPONSE_CODE) PaymentResult.SUCCESS else PaymentResult.FAILED
+    private fun PaymentData.toPaymentUpdated() = PaymentUpdated(
+        supplierOrderId = supplierOrderId,
+        paymentType = paymentType,
+        amount = amount,
+        paymentId = paymentId,
+        paymentMethod = paymentMethod,
+        resultType = resultType
     )
 }
 

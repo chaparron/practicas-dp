@@ -5,9 +5,9 @@ import adapters.repositories.jpmc.JpmcPaymentRepository
 import adapters.repositories.supplier.DynamoDBSupplierRepository
 import adapters.repositories.supplier.SupplierRepository
 import adapters.rest.validations.Security
-import com.wabi2b.jpmc.sdk.security.cipher.aes.decrypt.AesDecrypterService
 import com.wabi2b.jpmc.sdk.security.cipher.aes.encrypt.AesEncrypterService
 import com.wabi2b.jpmc.sdk.security.hash.sha256.DigestHashCalculator
+import com.wabi2b.jpmc.sdk.usecase.sale.PaymentService
 import com.wabi2b.jpmc.sdk.usecase.sale.SaleService
 import com.wabi2b.serializers.BigDecimalToFloatSerializer
 import com.wabi2b.serializers.InstantSerializer
@@ -17,27 +17,27 @@ import configuration.EnvironmentVariable.*
 import domain.functions.PaymentExpirationListener
 import domain.functions.SupplierListenerFunction
 import domain.services.*
-import domain.services.state.StateValidatorService
 import domain.services.providers.PaymentProviderService
 import domain.services.providers.jpmc.DefaultProviderService
+import domain.services.state.StateValidatorService
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
 import org.slf4j.LoggerFactory
-import software.amazon.awssdk.http.urlconnection.UrlConnectionHttpClient
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient
-import wabi2b.sdk.api.HttpWabi2bSdk
-import wabi2b.sdk.api.Wabi2bSdk
-import java.net.URI
-import java.time.Clock
 import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider
 import software.amazon.awssdk.http.SdkHttpClient
+import software.amazon.awssdk.http.urlconnection.UrlConnectionHttpClient
 import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.sqs.SqsClient
 import wabi2b.payment.async.notification.sdk.WabiPaymentAsyncNotificationSdk
 import wabi2b.payments.sdk.client.impl.WabiPaymentSdk
+import wabi2b.sdk.api.HttpWabi2bSdk
+import wabi2b.sdk.api.Wabi2bSdk
 import wabi2b.sdk.customers.customer.CustomersSdk
 import wabi2b.sdk.customers.customer.HttpCustomersSdk
+import java.net.URI
+import java.time.Clock
 
 
 object MainConfiguration : Configuration {
@@ -136,8 +136,7 @@ object MainConfiguration : Configuration {
     override val updatePaymentService: UpdatePaymentService by lazy {
         with(EnvironmentVariable.jpmcConfiguration()) {
             UpdatePaymentService(
-                decrypter = AesDecrypterService(this.aesEncryptionKey),
-                jsonMapper = jsonMapper,
+                paymentService = PaymentService(this.aesEncryptionKey),
                 repository = jpmcPaymentRepository,
                 wabiPaymentAsyncNotificationSdk = wabiPaymentAsyncNotificationSdk
             )
