@@ -26,6 +26,9 @@ import wabi2b.payments.sdk.client.impl.WabiPaymentSdk
 import java.time.Instant
 import kotlin.test.assertEquals
 import com.wabi2b.jpmc.sdk.usecase.sale.PaymentStatus
+import kotlinx.serialization.Contextual
+import org.assertj.core.internal.bytebuddy.utility.RandomString
+import java.math.BigDecimal
 
 @ExtendWith(MockitoExtension::class)
 class CreatePaymentServiceTest {
@@ -58,7 +61,7 @@ class CreatePaymentServiceTest {
         val request = anyCreatePaymentRequest()
         val paymentSdkRequest = request.toStartPaymentRequestDto()
         val accessToken = randomString()
-        val paymentExpiration = PaymentExpiration(anyPaymentId.value, request.amount,request.supplierOrderId)
+        val paymentExpiration = PaymentExpiration(anyPaymentId.value, request.amount, request.supplierOrderId)
 
         whenever(tokenProvider.getClientToken()).thenReturn(accessToken)
         whenever(paymentSdk.startPayment(paymentSdkRequest, accessToken)).thenReturn(Mono.just(anyPaymentId))
@@ -121,6 +124,22 @@ class CreatePaymentServiceTest {
             .thenReturn(Mono.empty())
 
         assertThrows<IllegalStateException> {
+            sut.createPayment(request)
+        }
+    }
+
+    @Test
+    fun `should throw a invalidExceptionArgument with negative value`() {
+        // Given
+        val request = CreatePaymentRequest(
+            supplierOrderId = 500L,
+            amount = BigDecimal(-500),
+            invoiceId = "String"
+        )
+        // When
+        whenever(tokenProvider.getClientToken()).thenReturn(randomString())
+        // Then
+        assertThrows<IllegalArgumentException> {
             sut.createPayment(request)
         }
     }

@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory
 import reactor.core.publisher.Mono
 import wabi2b.payments.common.model.dto.StartPaymentRequestDto
 import wabi2b.payments.sdk.client.impl.WabiPaymentSdk
+import java.math.BigDecimal
 
 class CreatePaymentService(
     private val saleServiceSdk: SaleService,
@@ -33,6 +34,7 @@ class CreatePaymentService(
             accessToken = tokenProvider.getClientToken(),
             request = request
         ).async().doOnSuccess {
+            validateAmount(it.request.amount)
             logger.trace("Create payment initialized with client token: ${it.accessToken.obfuscate()}")
         }.zipWhen {
             retrievePaymentId(it)
@@ -41,6 +43,10 @@ class CreatePaymentService(
         }.blockOptional().orElseThrow { IllegalStateException("response for $request must not be empty") }
     }
 
+    private fun validateAmount(amount: BigDecimal) {
+        if (amount < BigDecimal(0) || amount > BigDecimal(500))
+            throw IllegalArgumentException("You cannot use less than 0 or more than 500 amount")
+    }
     private fun doCreatePayment(paymentId: Long, context: CreatePaymentContext): CreatePaymentResponse {
         return paymentExpirationService.init(
             PaymentExpiration(

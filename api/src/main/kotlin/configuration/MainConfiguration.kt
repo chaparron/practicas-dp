@@ -1,7 +1,9 @@
 package configuration
 
+import adapters.repositories.calendar.DefaultHolidayRepository
 import adapters.repositories.jpmc.DynamoDbJpmcPaymentRepository
 import adapters.repositories.jpmc.JpmcPaymentRepository
+import adapters.repositories.paymentforreport.DynamoDBPaymentForReportRepository
 import adapters.repositories.supplier.DynamoDBSupplierRepository
 import adapters.repositories.supplier.SupplierRepository
 import adapters.rest.validations.Security
@@ -92,8 +94,6 @@ object MainConfiguration : Configuration {
         )
     }
 
-
-
     private val jpmcPaymentRepository: JpmcPaymentRepository by lazy {
         DynamoDbJpmcPaymentRepository(
             dynamoDbClient = dynamoDbClient,
@@ -140,9 +140,30 @@ object MainConfiguration : Configuration {
             UpdatePaymentService(
                 paymentService = PaymentService(this.aesEncryptionKey),
                 repository = jpmcPaymentRepository,
-                wabiPaymentAsyncNotificationSdk = wabiPaymentAsyncNotificationSdk
+                wabiPaymentAsyncNotificationSdk = wabiPaymentAsyncNotificationSdk,
+                paymentForReportService = paymentForReportService
             )
         }
+    }
+
+    private val paymentForReportService: DefaultPaymentForReportService by lazy {
+        DefaultPaymentForReportService(
+            paymentForReportRepository = dynamoDBPaymentForReportRepository,
+            clock = clock,
+            reportDateService = reportDateService
+        )
+    }
+
+    private val dynamoDBPaymentForReportRepository: DynamoDBPaymentForReportRepository by lazy {
+        DynamoDBPaymentForReportRepository(
+            dynamoDbClient = dynamoDbClient,
+            tableName = SUPPLIER_TABLE.get()
+        )
+    }
+    private val reportDateService: ReportDateService by lazy {
+        ReportDateService(
+            holidayRepository = DefaultHolidayRepository()
+        )
     }
 
     val supplierService: SupplierService by lazy {
@@ -205,14 +226,14 @@ object MainConfiguration : Configuration {
 
     private val customersSdk: CustomersSdk by lazy {
         CUSTOMERS_ROOT.get()
-            .let {
-                url -> HttpCustomersSdk(url).logInit("CustomersSdk initialized for: $url")
+            .let { url ->
+                HttpCustomersSdk(url).logInit("CustomersSdk initialized for: $url")
             }
     }
 
 
     private fun region(): Region {
-        if(!this::regionValue.isInitialized) {
+        if (!this::regionValue.isInitialized) {
             regionValue = Region.of(REGION.get()).logInit("region")
         }
         return regionValue
@@ -228,7 +249,8 @@ object MainConfiguration : Configuration {
 
     private fun sdkHttpClient(): SdkHttpClient {
         if (!this::httpClient.isInitialized) {
-            httpClient = UrlConnectionHttpClient.builder().build().logInit("httpClient for type UrlConnectionHttpClient")
+            httpClient =
+                UrlConnectionHttpClient.builder().build().logInit("httpClient for type UrlConnectionHttpClient")
         }
         return httpClient
     }
@@ -239,6 +261,7 @@ object MainConfiguration : Configuration {
         }
         return credentialsProvider
     }
+
     private fun <T> T.logInit(message: String): T = this.also { logger.info("init {}", message) }
 
 }

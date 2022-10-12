@@ -15,7 +15,8 @@ import java.time.Instant
 class UpdatePaymentService(
     private val paymentService: PaymentService,
     private val repository: JpmcPaymentRepository,
-    private val wabiPaymentAsyncNotificationSdk: WabiPaymentAsyncNotificationSdk
+    private val wabiPaymentAsyncNotificationSdk: WabiPaymentAsyncNotificationSdk,
+    private val paymentForReportService: DefaultPaymentForReportService
 ) {
 
     companion object {
@@ -29,6 +30,7 @@ class UpdatePaymentService(
             logger.info("Payment provider return the following response: $it")
             wabiPaymentAsyncNotificationSdk.notify(it.toPaymentUpdated())
             repository.update(it.toPaymentForUpdate())
+            paymentForReportService.save(it)
         }.onFailure {
             logger.error("There was an error decrypting provider response: $it")
         }.getOrThrow().toUpdatePaymentResponse()
