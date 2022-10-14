@@ -9,7 +9,8 @@ import java.util.*
 
 interface PaymentForReportService {
     fun save(paymentData: PaymentData): PaymentForReport
-    fun get(paymentId: Long): PaymentForReport
+    fun getOne(paymentId: Long): PaymentForReport
+    fun get(reportDate: String): List<PaymentForReport>
 }
 
 class DefaultPaymentForReportService(
@@ -29,9 +30,14 @@ class DefaultPaymentForReportService(
         return paymentForReportRepository.save(paymentForReport)
     }
 
-    override fun get(paymentId: Long): PaymentForReport {
+    override fun getOne(paymentId: Long): PaymentForReport {
         logger.info("About to get paymentForReport for $paymentId")
-        return paymentForReportRepository.get(paymentId)
+        return paymentForReportRepository.getOne(paymentId)
+    }
+
+    override fun get(reportDate: String): List<PaymentForReport> {
+        logger.info("About to get payment List for $reportDate")
+        return paymentForReportRepository.get(reportDate)
     }
 
     private fun PaymentData.toPaymentForReport(): PaymentForReport {

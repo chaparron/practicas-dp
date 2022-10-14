@@ -12,7 +12,8 @@ import java.util.*
 
 interface PaymentForReportRepository {
     fun save(paymentForReport: PaymentForReport): PaymentForReport
-    fun get(paymentId: Long): PaymentForReport
+    fun getOne(paymentId: Long): PaymentForReport
+    fun get(reportDate: String): List<PaymentForReport>
 }
 
 class DynamoDBPaymentForReportRepository(
@@ -35,12 +36,16 @@ class DynamoDBPaymentForReportRepository(
         }
     }
 
-    override fun get(paymentId: Long): PaymentForReport =
+    override fun getOne(paymentId: Long): PaymentForReport =
         dynamoDbClient.getItem {
             it.tableName(tableName).key(paymentId.asGetItemKey())
         }.let { response ->
             response.takeIf { it.hasItem() }?.item()?.asPaymentForReport() ?: throw PaymentForReportNotFound(paymentId)
         }
+
+    override fun get(reportDate: String): List<PaymentForReport> {
+        TODO("😡😡")
+    }
 
     private fun PaymentForReport.asDynamoItem() = mapOf(
         DynamoDBPaymentForReportAttribute.PK.param to "$pkValuePrefix${this.paymentId}".toAttributeValue(),

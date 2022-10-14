@@ -84,7 +84,7 @@ internal class DefaultPaymentForReportServiceTest {
     }
 
     @Test
-    fun `can retrieve saved supplier`() {
+    fun `can retrieve saved paymentforReport`() {
         // Given
         val paymentData = anyPaymentData
         val paymentForReport = anyPaymentForReport
@@ -94,11 +94,30 @@ internal class DefaultPaymentForReportServiceTest {
         whenever(paymentForReportRepository.save(paymentForReport)).thenReturn(paymentForReport)
         whenever(clock.instant()).thenReturn(clockedInstant)
 
-        doReturn(paymentForReport).whenever(paymentForReportRepository).get(paymentId)
+        doReturn(paymentForReport).whenever(paymentForReportRepository).getOne(paymentId)
 
         sut.save(paymentData)
 
-        val actual = sut.get(paymentId)
+        val actual = sut.getOne(paymentId)
+        // Then
+        assertEquals(paymentForReport, actual)
+    }
+    @Test
+    fun `can retrieve List of payments`() {
+        // Given
+        val paymentData = anyPaymentData
+        val paymentForReport = anyPaymentForReport
+        val paymentId = 77L
+        // When
+        whenever(reportDateService.reportDate(any())).thenReturn(Date.from(clockedInstant))
+        whenever(paymentForReportRepository.save(paymentForReport)).thenReturn(paymentForReport)
+        whenever(clock.instant()).thenReturn(clockedInstant)
+
+        doReturn(paymentForReport).whenever(paymentForReportRepository).getOne(paymentId)
+
+        sut.save(paymentData)
+
+        val actual = sut.getOne(paymentId)
         // Then
         assertEquals(paymentForReport, actual)
     }

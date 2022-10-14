@@ -6,6 +6,7 @@ import com.wabi2b.jpmc.sdk.usecase.sale.PaymentData
 import com.wabi2b.jpmc.sdk.usecase.sale.PaymentService
 import com.wabi2b.jpmc.sdk.usecase.sale.PaymentStatus
 import domain.model.JpmcPaymentInformation
+import domain.model.PaymentForReport
 import domain.model.PaymentForUpdate
 import domain.model.UpdatePaymentResponse
 import org.junit.jupiter.api.Test
@@ -23,6 +24,7 @@ import wabi2b.payment.async.notification.sdk.WabiPaymentAsyncNotificationSdk
 import wabi2b.payments.common.model.dto.PaymentType
 import wabi2b.payments.common.model.dto.PaymentUpdated
 import wabi2b.payments.common.model.dto.type.PaymentResult
+import java.util.*
 import kotlin.random.Random
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -40,6 +42,9 @@ class UpdatePaymentServiceTest {
     @Mock
     private lateinit var wabiPaymentAsyncNotificationSdk: WabiPaymentAsyncNotificationSdk
 
+    @Mock
+    private lateinit var defaultPaymentForReportService: DefaultPaymentForReportService
+
     @Captor
     lateinit var paymentCaptor: ArgumentCaptor<PaymentForUpdate>
 
@@ -53,6 +58,7 @@ class UpdatePaymentServiceTest {
     @Test
     fun `given a valid encData when update then save information in database`() {
         //Given
+        // <editor-fold desc="vals encData paymentUpdated expectedResponse paymentData paymentForReport">
         val encData = anyEncData(SUCCESS_RESPONSE_CODE)
         val paymentUpdated = PaymentUpdated(
             supplierOrderId = encData.supplierOrderId.toLong(),
@@ -85,7 +91,21 @@ class UpdatePaymentServiceTest {
             resultType = PaymentResult.SUCCESS
         )
 
+        val paymentForReport = PaymentForReport(
+            createdAt = Date(4L),
+            reportDay = Date(4L),
+            paymentId = encData.txnRefNo.toLong(),
+            supplierOrderId = encData.supplierOrderId.toLong(),
+            amount = encData.amount.toBigDecimal(),
+            paymentOption = "dc",
+            encData = encData.toString(),
+            paymentType = PaymentType.DIGITAL_PAYMENT,
+            paymentMethod = encData.paymentOption.toPaymentMethod(),
+        )
+        // </editor-fold>
+
         whenever(paymentService.createPaymentData(any())).thenReturn(paymentData)
+        whenever(defaultPaymentForReportService.save(paymentData)).thenReturn(paymentForReport)
 
         //When
         val response = sut.update(anyPaymentInformation())
@@ -101,24 +121,22 @@ class UpdatePaymentServiceTest {
 
         verify(paymentService).createPaymentData(any())
         verify(wabiPaymentAsyncNotificationSdk).notify(paymentUpdated)
+        verify(defaultPaymentForReportService).save(paymentData)
     }
 
     @Test
     fun `Given an encData with invalid payment method should throw InvalidPaymentMethod exception`() {
         //Given
         val encData = anyEncData(SUCCESS_RESPONSE_CODE, paymentMethod = randomString())
-
         whenever(paymentService.createPaymentData(any())).doThrow(InvalidPaymentMethodException(encData.paymentOption))
-
         //When
         assertFailsWith<InvalidPaymentMethodException> {
             sut.update(anyPaymentInformation())
         }
-
         //Then
         verifyNoInteractions(wabiPaymentAsyncNotificationSdk)
         verifyNoInteractions(repository)
-
+        verifyNoInteractions(defaultPaymentForReportService)
     }
 
     private fun anyPaymentInformation() = JpmcPaymentInformation(
