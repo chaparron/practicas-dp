@@ -6,6 +6,8 @@ import adapters.repositories.jpmc.JpmcPaymentRepository
 import adapters.repositories.paymentforreport.DynamoDBPaymentForReportRepository
 import adapters.repositories.supplier.DynamoDBSupplierRepository
 import adapters.repositories.supplier.SupplierRepository
+import adapters.repositories.supplierorderdelay.DynamoDBOrderDelayRepository
+import adapters.repositories.supplierorderdelay.SupplierOrderDelayRepository
 import adapters.rest.validations.Security
 import com.wabi2b.jpmc.sdk.security.cipher.aes.encrypt.AesEncrypterService
 import com.wabi2b.jpmc.sdk.security.hash.sha256.DigestHashCalculator
@@ -163,6 +165,18 @@ object MainConfiguration : Configuration {
     private val reportDateService: ReportDateService by lazy {
         ReportDateService(
             holidayRepository = DefaultHolidayRepository()
+        )
+    }
+    val supplierOrderDelayService: DefaultSupplierOrderDelayService by lazy {
+        DefaultSupplierOrderDelayService(
+            supplierOrderDelayRepository = supplierOrderDelayRepository
+        )
+    }
+
+    private val supplierOrderDelayRepository: DynamoDBOrderDelayRepository by lazy {
+        DynamoDBOrderDelayRepository(
+            dynamoDbClient = dynamoDbClient,
+            tableName = SUPPLIER_TABLE.get()
         )
     }
 

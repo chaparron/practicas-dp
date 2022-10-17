@@ -92,8 +92,8 @@ class UpdatePaymentServiceTest {
         )
 
         val paymentForReport = PaymentForReport(
-            createdAt = Date(4L),
-            reportDay = Date(4L),
+            createdAt = Date(4L).toString(),
+            reportDay = Date(4L).toString(),
             paymentId = encData.txnRefNo.toLong(),
             supplierOrderId = encData.supplierOrderId.toLong(),
             amount = encData.amount.toBigDecimal(),

@@ -43,8 +43,8 @@ class DefaultPaymentForReportService(
     private fun PaymentData.toPaymentForReport(): PaymentForReport {
         val clockedInstant = clock.instant()
         return PaymentForReport(
-            createdAt = Date.from(clockedInstant),
-            reportDay = reportDateService.reportDate(clockedInstant),
+            createdAt = Date.from(clockedInstant).toString(),
+            reportDay = reportDateService.reportDate(clockedInstant).toString(),
             paymentId = paymentId,
             supplierOrderId = supplierOrderId,
             amount = amount,

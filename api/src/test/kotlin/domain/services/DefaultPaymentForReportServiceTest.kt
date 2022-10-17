@@ -26,13 +26,10 @@ internal class DefaultPaymentForReportServiceTest {
 
     @Mock
     private lateinit var paymentForReportRepository: DynamoDBPaymentForReportRepository
-
     @Mock
     private lateinit var reportDateService: ReportDateService
-
     @Mock
     private lateinit var clock: Clock
-
     @InjectMocks
     private lateinit var sut: DefaultPaymentForReportService
 
@@ -56,8 +53,8 @@ internal class DefaultPaymentForReportServiceTest {
         resultType = PaymentResult.SUCCESS
     )
     private val anyPaymentForReport = PaymentForReport(
-        createdAt = Date.from(clockedInstant),
-        reportDay = Date.from(clockedInstant),
+        createdAt = Date.from(clockedInstant).toString(),
+        reportDay = Date.from(clockedInstant).toString(),
         paymentId = 77L,
         supplierOrderId = 77L,
         amount = BigDecimal(77),
@@ -82,7 +79,6 @@ internal class DefaultPaymentForReportServiceTest {
         // Then
         assertEquals(paymentForReport, actual)
     }
-
     @Test
     fun `can retrieve saved paymentforReport`() {
         // Given
@@ -105,20 +101,16 @@ internal class DefaultPaymentForReportServiceTest {
     @Test
     fun `can retrieve List of payments`() {
         // Given
-        val paymentData = anyPaymentData
-        val paymentForReport = anyPaymentForReport
-        val paymentId = 77L
+        val reportDate = Date(77L).toString()
+        val paymentForReportList = listOf(
+            anyPaymentForReport,
+            anyPaymentForReport,
+            anyPaymentForReport,
+        )
         // When
-        whenever(reportDateService.reportDate(any())).thenReturn(Date.from(clockedInstant))
-        whenever(paymentForReportRepository.save(paymentForReport)).thenReturn(paymentForReport)
-        whenever(clock.instant()).thenReturn(clockedInstant)
-
-        doReturn(paymentForReport).whenever(paymentForReportRepository).getOne(paymentId)
-
-        sut.save(paymentData)
-
-        val actual = sut.getOne(paymentId)
+        whenever(paymentForReportRepository.get(reportDate)).thenReturn(paymentForReportList)
+        val actual = sut.get(Date(77L).toString())
         // Then
-        assertEquals(paymentForReport, actual)
+        assertEquals(actual, paymentForReportList)
     }
 }

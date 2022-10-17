@@ -11,9 +11,9 @@ import java.util.*
 @Serializable
 data class PaymentForReport(
     @Contextual
-    val createdAt: Date,
+    val createdAt: String,
     @Contextual
-    val reportDay: Date,
+    val reportDay: String,
     // PaymentData
     val paymentId: Long,
     val supplierOrderId: Long,
