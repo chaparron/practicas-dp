@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SupplierOrderDelayEvent(
-    val supplierOrderId: String,
+    val supplierOrderId: Long,
     val delay: Boolean,
     val delayTime: Int,
 ) { // payload (payload = json) {"supplierOrderId":"2334","delay":true,"delayTime":"2 hours"}

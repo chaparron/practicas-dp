@@ -2,10 +2,7 @@ package configuration
 
 import domain.functions.PaymentExpirationListener
 import domain.functions.SupplierListenerFunction
-import domain.services.CreatePaymentService
-import domain.services.UpdatePaymentService
-import domain.services.PaymentExpirationService
-import domain.services.TokenProvider
+import domain.services.*
 import domain.services.state.StateValidatorService
 import domain.services.providers.PaymentProviderService
 import kotlinx.serialization.json.Json
@@ -19,6 +16,7 @@ interface Configuration {
     val supplierListenerFunction: SupplierListenerFunction
     val stateValidatorService: StateValidatorService
     val paymentProviderService: PaymentProviderService
+    val supplierOrderDelayService: DefaultSupplierOrderDelayService
     val updatePaymentService: UpdatePaymentService
     val wabi2bTokenProvider: TokenProvider
     val wabi2bSdk: Wabi2bSdk
