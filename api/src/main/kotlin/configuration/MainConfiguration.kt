@@ -167,7 +167,7 @@ object MainConfiguration : Configuration {
             holidayRepository = DefaultHolidayRepository()
         )
     }
-    val supplierOrderDelayService: DefaultSupplierOrderDelayService by lazy {
+    override val supplierOrderDelayService: DefaultSupplierOrderDelayService by lazy {
         DefaultSupplierOrderDelayService(
             supplierOrderDelayRepository = supplierOrderDelayRepository
         )

@@ -3,10 +3,7 @@ package configuration
 import adapters.rest.validations.Security
 import domain.functions.PaymentExpirationListener
 import domain.functions.SupplierListenerFunction
-import domain.services.CreatePaymentService
-import domain.services.UpdatePaymentService
-import domain.services.PaymentExpirationService
-import domain.services.TokenProvider
+import domain.services.*
 import domain.services.state.StateValidatorService
 import domain.services.providers.PaymentProviderService
 import kotlinx.serialization.json.Json
@@ -27,7 +24,8 @@ class TestConfiguration(
     override val wabi2bTokenProvider: TokenProvider = mock(),
     override val wabi2bSdk: Wabi2bSdk = mock(),
     override val clock: Clock = mock(),
-    override val paymentExpirationService: PaymentExpirationService = mock()
+    override val paymentExpirationService: PaymentExpirationService = mock(),
+    override val supplierOrderDelayService: DefaultSupplierOrderDelayService = mock()
 ) : Configuration {
 
     companion object {
