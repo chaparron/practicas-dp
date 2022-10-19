@@ -7,7 +7,6 @@ import adapters.repositories.paymentforreport.DynamoDBPaymentForReportRepository
 import adapters.repositories.supplier.DynamoDBSupplierRepository
 import adapters.repositories.supplier.SupplierRepository
 import adapters.repositories.supplierorderdelay.DynamoDBOrderDelayRepository
-import adapters.repositories.supplierorderdelay.SupplierOrderDelayRepository
 import adapters.rest.validations.Security
 import com.wabi2b.jpmc.sdk.security.cipher.aes.encrypt.AesEncrypterService
 import com.wabi2b.jpmc.sdk.security.hash.sha256.DigestHashCalculator

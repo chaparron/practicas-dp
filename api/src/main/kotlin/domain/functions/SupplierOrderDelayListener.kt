@@ -12,20 +12,14 @@ import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 
 class SupplierOrderDelayListener(
-    private val jsonMapper: Json,
-    private val supplierOrderDelayService: SupplierOrderDelayService
+    private val jsonMapper: Json = MainConfiguration.jsonMapper,
+    private val supplierOrderDelayService: SupplierOrderDelayService = MainConfiguration.supplierOrderDelayService
 ) : RequestHandler<SNSEvent, Unit> {
 
     companion object {
         private val logger = LoggerFactory.getLogger(SupplierOrderDelayListener::class.java)
         private val validator = SupplierOrderDelayValidator()
     }
-
-    @Suppress("unused")
-    constructor() : this(
-        jsonMapper = MainConfiguration.jsonMapper,
-        supplierOrderDelayService = MainConfiguration.supplierOrderDelayService
-    )
 
     override fun handleRequest(event: SNSEvent, context: Context) {
         event.records.forEach { record ->
