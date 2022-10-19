@@ -251,6 +251,48 @@ Resources:
           AttributeType: "S"
       BillingMode: "PAY_PER_REQUEST"
 
+  SupplierOrderDelayListener:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: "api"
+      Handler: "domain.functions.SupplierOrderDelayListener"
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SupplierOrderDelayTable
+      DeadLetterQueue:
+        Type: "SQS"
+        TargetArn: !GetAtt SupplierOrderDelayListenerDLQ.Arn
+      Events:
+        SupplierOrderDelayEvent:
+          Type: SNS
+          Properties:
+            Topic:
+              Fn::ImportValue: !Sub "${EnvironmentStackName}-SupplierOrderDelayTopic"
+            FilterPolicy:
+              Action:
+                - supplierOrderDelayCreated
+
+  SupplierOrderDelayListenerDLQ:
+    Type: AWS::SQS::Queue
+
+  SupplierOrderDelayTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      KeySchema:
+        - AttributeName: "PK"
+          KeyType: "HASH"
+        - AttributeName: "SK"
+          KeyType: "RANGE"
+      AttributeDefinitions:
+        - AttributeName: "PK"
+          AttributeType: "S"
+        - AttributeName: "SK"
+          AttributeType: "S"
+      BillingMode: "PAY_PER_REQUEST"
+
   JpmcPaymentTable:
     Type: AWS::DynamoDB::Table
     Properties:
