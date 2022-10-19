@@ -1,6 +1,6 @@
 package domain.services
 
-import adapters.repositories.paymentforreport.DynamoDBPaymentForReportRepository
+import adapters.repositories.paymentforreport.PaymentForReportRepository
 import com.wabi2b.jpmc.sdk.usecase.sale.PaymentData
 import domain.model.PaymentForReport
 import org.slf4j.LoggerFactory
@@ -14,7 +14,7 @@ interface PaymentForReportService {
 }
 
 class DefaultPaymentForReportService(
-    private val paymentForReportRepository: DynamoDBPaymentForReportRepository,
+    private val paymentForReportRepository: PaymentForReportRepository,
     private val clock: Clock,
     private val reportDateService: ReportDateService
 ) : PaymentForReportService {
