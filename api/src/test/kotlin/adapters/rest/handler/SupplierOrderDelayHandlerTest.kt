@@ -28,7 +28,7 @@ internal class SupplierOrderDelayHandlerTest {
     companion object {
         private const val PATH = "/dp/supplierOrderDelay"
         private const val ACCESS_TOKEN = "my-token"
-        private const val SUPPLIER_ORDER_ID_PARAM = "supplierOrderID"
+        private const val SUPPLIER_ORDER_ID_PARAM = "supplierOrderId"
         private const val SUPPLIER_ORDER_ID_VALUE = "666"
     }
 
@@ -39,35 +39,35 @@ internal class SupplierOrderDelayHandlerTest {
 
 
     @Test
-    fun `should return Order arrived delayed with delayed orderId`() {
+    fun `should return False delayed orderId`() {
         // Given
-        val supplierOrderID = SUPPLIER_ORDER_ID_VALUE.toLong()
+        val supplierOrderId = SUPPLIER_ORDER_ID_VALUE.toLong()
         val event = anyApiGatewayProxyRequestEvent()
-        val expected = "Order arrived delayed"
+        val expected = "true"
 
-        whenever(service.isDelayed(supplierOrderID)).thenReturn(true)
+        whenever(service.isDelayed(supplierOrderId)).thenReturn(true)
         // When
         val response = sut.handleRequest(event, context).body
         // Then
         assertEquals(expected, response)
 
-        verify(service).isDelayed(supplierOrderID)
+        verify(service).isDelayed(supplierOrderId)
 
     }
     @Test
-    fun `should return Order arrived on time with on time orderId`() {
+    fun `should return false on time orderId`() {
         // Given
-        val supplierOrderID = SUPPLIER_ORDER_ID_VALUE.toLong()
+        val supplierOrderId = SUPPLIER_ORDER_ID_VALUE.toLong()
         val event = anyApiGatewayProxyRequestEvent()
-        val expected = "Order arrived on time"
+        val expected = "false"
 
-        whenever(service.isDelayed(supplierOrderID)).thenReturn(false)
+        whenever(service.isDelayed(supplierOrderId)).thenReturn(false)
         // When
         val response = sut.handleRequest(event, context).body
         // Then
         assertEquals(expected, response)
 
-        verify(service).isDelayed(supplierOrderID)
+        verify(service).isDelayed(supplierOrderId)
 
     }
 

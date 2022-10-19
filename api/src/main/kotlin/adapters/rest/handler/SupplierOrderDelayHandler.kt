@@ -17,15 +17,15 @@ class SupplierOrderDelayHandler(
 
     companion object {
         private val logger = LoggerFactory.getLogger(SupplierOrderDelayHandler::class.java)
-        const val SUPPLIER_ORDER_ID_PARAM = "supplierOrderID"
+        const val SUPPLIER_ORDER_ID_PARAM = "supplierOrderId"
         const val SUPPLIER_ORDER_DELAY_PATH = "/dp/supplierOrderDelay"
     }
 
     override fun handleRequest(input: APIGatewayProxyRequestEvent, context: Context): APIGatewayProxyResponseEvent {
-        val supplierOrderID =
+        val supplierOrderId =
             input.queryStringParameters[SUPPLIER_ORDER_ID_PARAM].required(SUPPLIER_ORDER_ID_PARAM).toLong()
 //        val state = stateValidatorService.getState(input)
-        return (ok(if (service.isDelayed(supplierOrderID)) "Order arrived delayed" else "Order arrived on time"))
+        return ok(service.isDelayed(supplierOrderId).toString())
             .also {
                 logger.trace("Payment Providers retrieved: $it")
             }
