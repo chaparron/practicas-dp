@@ -9,12 +9,12 @@ data class SupplierOrderDelayEvent(
     val delayTime: Int,
 ) { // payload (payload = json) {"supplierOrderId":"2334","delay":true,"delayTime":"2 hours"}
 
-    fun toSupplierOrderDelayEvent(): SupplierOrderDelayEvent{
+    fun SupplierOrderDelayEvent(): SupplierOrderDelayEvent{
         return SupplierOrderDelayEvent(supplierOrderId, delay, delayTime)
     }
     fun doHandle(validator: SupplierOrderDelayValidator, block: (SupplierOrderDelayEvent) -> Unit) {
         if(validator.isValid(this))
-            block(toSupplierOrderDelayEvent())
+            block(SupplierOrderDelayEvent())
     }
 }
 

@@ -1,15 +1,14 @@
 package adapters.repositories.supplierorderdelay
 
-import adapters.repositories.supplier.DynamoDBSupplierAttribute
-import domain.model.SupplierOrderDelayEvent
+import domain.model.SupplierOrderDelay
 import org.slf4j.LoggerFactory
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue
 import toAttributeValue
 
 interface SupplierOrderDelayRepository {
-    fun save(supplierOrderDelayEvent: SupplierOrderDelayEvent): SupplierOrderDelayEvent
-    fun get(supplierId: Long): SupplierOrderDelayEvent
+    fun save(supplierOrderDelay: SupplierOrderDelay): SupplierOrderDelay
+    fun get(supplierId: Long): SupplierOrderDelay
 }
 
 class DynamoDBOrderDelayRepository(
@@ -21,44 +20,44 @@ class DynamoDBOrderDelayRepository(
         private const val pkValuePrefix = "SupplierOrderDelay#"
     }
 
-    override fun save(supplierOrderDelayEvent: SupplierOrderDelayEvent): SupplierOrderDelayEvent {
+    override fun save(supplierOrderDelay: SupplierOrderDelay): SupplierOrderDelay {
         return dynamoDbClient.putItem {
-            logger.info("Saving supplier order delay: $supplierOrderDelayEvent")
-            it.tableName(tableName).item(supplierOrderDelayEvent.asDynamoItem())
+            logger.info("Saving supplier order delay: $supplierOrderDelay")
+            it.tableName(tableName).item(supplierOrderDelay.asDynamoItem())
         }.let {
-            logger.trace("Saved supplier order delay: $supplierOrderDelayEvent")
-            supplierOrderDelayEvent
+            logger.trace("Saved supplier order delay: $supplierOrderDelay")
+            supplierOrderDelay
         }
     }
 
-    override fun get(supplierId: Long): SupplierOrderDelayEvent =
+    override fun get(supplierId: Long): SupplierOrderDelay =
         dynamoDbClient.getItem {
             it.tableName(tableName).key(supplierId.asGetItemKey())
         }.let { response ->
-            response.takeIf { it.hasItem() }?.item()?.asSupplierOrderDelayEvent()
-                ?: throw SupplierOrderDelayEventNotFound(supplierId)
+            response.takeIf { it.hasItem() }?.item()?.asSupplierOrderDelay()
+                ?: throw SupplierOrderDelayNotFound(supplierId)
         }
 
-    private fun SupplierOrderDelayEvent.asDynamoItem() = mapOf(
-        DynamoDBSupplierOrderDelayEventAttribute.PK.param to "$pkValuePrefix${this.supplierOrderId}".toAttributeValue(),
-        DynamoDBSupplierOrderDelayEventAttribute.SK.param to this.supplierOrderId.toAttributeValue(),
-        DynamoDBSupplierOrderDelayEventAttribute.OI.param to this.supplierOrderId.toAttributeValue(),
-        DynamoDBSupplierOrderDelayEventAttribute.D.param to this.delay.toString().toAttributeValue(),
-        DynamoDBSupplierOrderDelayEventAttribute.DT.param to this.delayTime.toString().toAttributeValue()
+    private fun SupplierOrderDelay.asDynamoItem() = mapOf(
+        DynamoDBSupplierOrderDelayAttribute.PK.param to "$pkValuePrefix${this.supplierOrderId}".toAttributeValue(),
+        DynamoDBSupplierOrderDelayAttribute.SK.param to this.supplierOrderId.toAttributeValue(),
+        DynamoDBSupplierOrderDelayAttribute.OI.param to this.supplierOrderId.toAttributeValue(),
+        DynamoDBSupplierOrderDelayAttribute.D.param to this.delay.toString().toAttributeValue(),
+        DynamoDBSupplierOrderDelayAttribute.DT.param to this.delayTime.toString().toAttributeValue()
     )
 
     private fun Long.asGetItemKey() = mapOf(
-        DynamoDBSupplierOrderDelayEventAttribute.PK.param to "$pkValuePrefix$this".toAttributeValue(),
-        DynamoDBSupplierOrderDelayEventAttribute.SK.param to this.toAttributeValue()
+        DynamoDBSupplierOrderDelayAttribute.PK.param to "$pkValuePrefix$this".toAttributeValue(),
+        DynamoDBSupplierOrderDelayAttribute.SK.param to this.toAttributeValue()
     )
 
-    private fun Map<String, AttributeValue>.asSupplierOrderDelayEvent() =
-        SupplierOrderDelayEvent(
-            supplierOrderId = this.getValue(DynamoDBSupplierAttribute.SI.param).s().toLong(),
-            delay = this.getValue(DynamoDBSupplierOrderDelayEventAttribute.D.param).bool(),
-            delayTime = this.getValue(DynamoDBSupplierOrderDelayEventAttribute.DT.param).hashCode(), //WTF Dynamo!!
+    private fun Map<String, AttributeValue>.asSupplierOrderDelay() =
+        SupplierOrderDelay(
+            supplierOrderId = this.getValue(DynamoDBSupplierOrderDelayAttribute.OI.param).s().toLong(),
+            delay = this.getValue(DynamoDBSupplierOrderDelayAttribute.D.param).bool(),
+            delayTime = this.getValue(DynamoDBSupplierOrderDelayAttribute.DT.param).hashCode(),
         )
 }
 
-data class SupplierOrderDelayEventNotFound(val supplierId: Long) :
+data class SupplierOrderDelayNotFound(val supplierId: Long) :
     RuntimeException("Cannot find any supplier order for $supplierId")

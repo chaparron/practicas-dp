@@ -1,6 +1,6 @@
 package adapters.repositories.supplierorderdelay
 
-enum class DynamoDBSupplierOrderDelayEventAttribute {
+enum class DynamoDBSupplierOrderDelayAttribute {
 
     /**
      * partition key

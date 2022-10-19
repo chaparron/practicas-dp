@@ -6,7 +6,6 @@ import com.amazonaws.services.lambda.runtime.events.SNSEvent
 import configuration.MainConfiguration
 import domain.model.SupplierOrderDelayEvent
 import domain.model.SupplierOrderDelayValidator
-import domain.services.DefaultSupplierOrderDelayService
 import domain.services.SupplierOrderDelayService
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -14,7 +13,7 @@ import org.slf4j.LoggerFactory
 
 class SupplierOrderDelayListener(
     private val jsonMapper: Json,
-    private val supplierOrderDelayService: DefaultSupplierOrderDelayService
+    private val supplierOrderDelayService: SupplierOrderDelayService
 ) : RequestHandler<SNSEvent, Unit> {
 
     companion object {
@@ -47,6 +46,7 @@ class SupplierOrderDelayListener(
     private fun deserialize(message: String): SupplierOrderDelayEvent {
         return jsonMapper.decodeFromString(message)
     }
+
 
 }
 
