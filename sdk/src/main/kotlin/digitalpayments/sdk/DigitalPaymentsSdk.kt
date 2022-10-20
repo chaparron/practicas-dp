@@ -20,7 +20,7 @@ interface DigitalPaymentsSdk {
     fun createPayment(createPaymentRequest: CreatePaymentRequest, accessToken: String): Mono<CreatePaymentResponse>
     fun updatePayment(updatePaymentRequest: UpdatePaymentRequest, accessToken: String): Mono<UpdatePaymentResponse>
     fun getPaymentProviders(supplierId: String, accessToken: String): Mono<List<Provider>>
-    fun isDelayedSupplierOrder(supplierOrderId: String, accessToken: String): Mono<DelayedOrderSupplier>
+    fun isDelayedSupplierOrder(supplierOrderId: String, accessToken: String): Mono<Boolean>
 }
 
 class HttpDigitalPaymentsSdk(root: URI) : DigitalPaymentsSdk {
@@ -93,7 +93,7 @@ class HttpDigitalPaymentsSdk(root: URI) : DigitalPaymentsSdk {
             }
             .switchIfEmpty(Mono.error(UnexpectedResponse("Unexpected error retrieving payment information with supplierId $supplierId")))
 
-    override fun isDelayedSupplierOrder(supplierOrderId: String, accessToken: String): Mono<DelayedOrderSupplier> =
+    override fun isDelayedSupplierOrder(supplierOrderId: String, accessToken: String): Mono<Boolean> =
         webClient.get()
             .uri { builder ->
                 builder
@@ -109,7 +109,7 @@ class HttpDigitalPaymentsSdk(root: URI) : DigitalPaymentsSdk {
             }
             .bodyToMono(String::class.java)
             .map { responseBody ->
-                mapper.decodeFromString<DelayedOrderSupplier>(responseBody)
+                responseBody.toBoolean()
             }
             .switchIfEmpty(Mono.error(UnexpectedResponse("Unexpected error retrieving payment information with supplierOrderId $supplierOrderId")))
 }
