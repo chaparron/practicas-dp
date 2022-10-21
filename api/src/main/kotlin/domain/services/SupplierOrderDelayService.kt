@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory
 interface SupplierOrderDelayService {
     fun save(supplierOrderDelayEvent: SupplierOrderDelayEvent): SupplierOrderDelay
     fun get(supplierId: Long): SupplierOrderDelay
+    fun isDelayed(supplierId: Long): Boolean
 }
 
 class DefaultSupplierOrderDelayService(
@@ -27,7 +28,7 @@ class DefaultSupplierOrderDelayService(
         return supplierOrderDelayRepository.get(supplierId)
     }
 
-    fun isDelayed(supplierId: Long): Boolean {
+    override fun isDelayed(supplierId: Long): Boolean {
         val supplierOrderDelayEvent = get(supplierId)
         return supplierOrderDelayEvent.delay
     }

@@ -18,7 +18,7 @@ interface Configuration {
     val supplierOrderDelayListener: SupplierOrderDelayListener
     val stateValidatorService: StateValidatorService
     val paymentProviderService: PaymentProviderService
-    val supplierOrderDelayService: DefaultSupplierOrderDelayService
+    val supplierOrderDelayService: SupplierOrderDelayService
     val updatePaymentService: UpdatePaymentService
     val wabi2bTokenProvider: TokenProvider
     val wabi2bSdk: Wabi2bSdk

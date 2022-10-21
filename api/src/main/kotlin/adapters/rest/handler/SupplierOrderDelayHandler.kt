@@ -4,13 +4,13 @@ import adapters.rest.validations.RequestValidations.required
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
-import domain.services.DefaultSupplierOrderDelayService
+import domain.services.SupplierOrderDelayService
 import org.slf4j.LoggerFactory
 import wabi.rest2lambda.RestHandler
 import wabi.rest2lambda.ok
 
 class SupplierOrderDelayHandler(
-    private val service: DefaultSupplierOrderDelayService,
+    private val service: SupplierOrderDelayService,
 //    private val stateValidatorService: StateValidatorService,
 //    private val jsonMapper: Json,
 ) : RestHandler {
