@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory
 
 class SupplierOrderDelayListener(
     private val jsonMapper: Json = MainConfiguration.jsonMapper,
-    val supplierOrderDelayService: SupplierOrderDelayService = MainConfiguration.supplierOrderDelayService
+    private val supplierOrderDelayService: SupplierOrderDelayService = MainConfiguration.supplierOrderDelayService
 ) : RequestHandler<SNSEvent, Unit> {
 
     companion object {

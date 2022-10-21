@@ -3,6 +3,7 @@ package domain.functions
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.SNSEvent
 import configuration.Configuration
+import configuration.MainConfiguration
 import configuration.TestConfiguration
 import domain.model.SupplierOrderDelayEvent
 import domain.services.SupplierOrderDelayService
@@ -11,25 +12,23 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.*
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(MockitoExtension::class)
 internal class SupplierOrderDelayListenerTest {
 
-    private lateinit var configuration: Configuration
-    private lateinit var json: Json
-    private lateinit var service: SupplierOrderDelayService
-    private val context: Context = mock()
-    private lateinit var sut: SupplierOrderDelayListener
 
-    @BeforeEach
-    fun setUp() {
-        json = configuration.jsonMapper
-        service = configuration.supplierOrderDelayListener.supplierOrderDelayService
-        sut = configuration.supplierOrderDelayListener
-        configuration = TestConfiguration.mockedInstance()
-    }
+    private val service: SupplierOrderDelayService = mock()
+    private val context: Context = mock()
+    private val json: Json = MainConfiguration.jsonMapper
+
+    private val sut = SupplierOrderDelayListener(
+        jsonMapper = MainConfiguration.jsonMapper,
+        supplierOrderDelayService = service
+    )
+
     private fun anySupplierOrderDelayEvent() = SupplierOrderDelayEvent(
         supplierOrderId = 77L,
         delay = false,
@@ -42,6 +41,7 @@ internal class SupplierOrderDelayListenerTest {
         sut.handleRequest(event, context)
         verifyServiceInvocation(event)
     }
+
     private fun buildSnsEvent(payload: String = json.encodeToString(anySupplierOrderDelayEvent())): SNSEvent {
         return SNSEvent().withRecords(
             listOf(
@@ -49,6 +49,7 @@ internal class SupplierOrderDelayListenerTest {
             )
         )
     }
+
     private fun verifyServiceInvocation(event: SNSEvent) {
         verify(service).save(json.decodeFromString(event.records.first().sns.message))
     }
