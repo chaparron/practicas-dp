@@ -22,6 +22,7 @@ class SupplierOrderDelayListener(
     }
 
     override fun handleRequest(event: SNSEvent, context: Context) {
+        logger.info("Event: $event")
         event.records.forEach { record ->
             record.apply {
                 logger.info("Received SNS message: {}", record)

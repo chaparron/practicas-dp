@@ -15,7 +15,6 @@ interface Configuration {
     val createPaymentService: CreatePaymentService
     val jpmcStateValidationConfig: EnvironmentVariable.JpmcStateValidationConfig
     val supplierListenerFunction: SupplierListenerFunction
-    val supplierOrderDelayListener: SupplierOrderDelayListener
     val stateValidatorService: StateValidatorService
     val paymentProviderService: PaymentProviderService
     val supplierOrderDelayService: SupplierOrderDelayService

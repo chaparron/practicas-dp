@@ -114,12 +114,6 @@ object MainConfiguration : Configuration {
             supplierService = supplierService
         )
     }
-    override val supplierOrderDelayListener: SupplierOrderDelayListener by lazy {
-        SupplierOrderDelayListener(
-            jsonMapper = jsonMapper,
-            supplierOrderDelayService = supplierOrderDelayService
-        )
-    }
 
     override val paymentExpirationListener: PaymentExpirationListener by lazy {
         PaymentExpirationListener(

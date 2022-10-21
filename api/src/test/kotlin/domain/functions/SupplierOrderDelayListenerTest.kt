@@ -28,7 +28,7 @@ internal class SupplierOrderDelayListenerTest {
         configuration = TestConfiguration.mockedInstance()
         json = configuration.jsonMapper
         service = configuration.supplierOrderDelayService
-        sut = configuration.supplierOrderDelayListener
+        sut = SupplierOrderDelayListener(json, service)
     }
     private fun anySupplierOrderDelayEvent() = SupplierOrderDelayEvent(
         supplierOrderId = 77L,
