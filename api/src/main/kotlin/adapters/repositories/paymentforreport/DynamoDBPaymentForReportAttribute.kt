@@ -13,7 +13,7 @@ enum class DynamoDBPaymentForReportAttribute {
     // encData
     ED,
     // supplierOrderId
-    SI,
+    SOI,
     // amount
     A,
     // paymentOption

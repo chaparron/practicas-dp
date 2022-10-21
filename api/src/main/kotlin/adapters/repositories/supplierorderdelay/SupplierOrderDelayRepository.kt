@@ -41,7 +41,7 @@ class DynamoDBOrderDelayRepository(
     private fun SupplierOrderDelay.asDynamoItem() = mapOf(
         DynamoDBSupplierOrderDelayAttribute.PK.param to "$pkValuePrefix${supplierOrderId}".toAttributeValue(),
         DynamoDBSupplierOrderDelayAttribute.SK.param to supplierOrderId.toAttributeValue(),
-        DynamoDBSupplierOrderDelayAttribute.OI.param to supplierOrderId.toAttributeValue(),
+        DynamoDBSupplierOrderDelayAttribute.SOI.param to supplierOrderId.toAttributeValue(),
         DynamoDBSupplierOrderDelayAttribute.D.param to delay.toString().toAttributeValue(),
         DynamoDBSupplierOrderDelayAttribute.DT.param to delayTime.toString().toAttributeValue()
     )
@@ -53,9 +53,9 @@ class DynamoDBOrderDelayRepository(
 
     private fun Map<String, AttributeValue>.asSupplierOrderDelay() =
         SupplierOrderDelay(
-            supplierOrderId = this.getValue(DynamoDBSupplierOrderDelayAttribute.OI.param).s().toLong(),
-            delay = this.getValue(DynamoDBSupplierOrderDelayAttribute.D.param).bool(),
-            delayTime = this.getValue(DynamoDBSupplierOrderDelayAttribute.DT.param).hashCode(),
+            supplierOrderId = this.getValue(DynamoDBSupplierOrderDelayAttribute.SOI.param).s().toLong(),
+            delay = this.getValue(DynamoDBSupplierOrderDelayAttribute.D.param).s().toBoolean(),
+            delayTime = this.getValue(DynamoDBSupplierOrderDelayAttribute.DT.param).s().toInt(),
         )
 }
 

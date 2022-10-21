@@ -15,7 +15,7 @@ enum class DynamoDBSupplierOrderDelayAttribute {
     /**
      * supplier order Id
      */
-    OI,
+    SOI,
 
     /**
      * delay
