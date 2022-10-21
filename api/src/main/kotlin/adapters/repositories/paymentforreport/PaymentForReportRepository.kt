@@ -24,7 +24,7 @@ class DynamoDBPaymentForReportRepository(
 
     companion object {
         private val logger = LoggerFactory.getLogger(DynamoDBPaymentForReportRepository::class.java)
-        private const val pkValuePrefix = "paymentForReport"
+        private const val pkValuePrefix = "paymentForReport#"
     }
 
     override fun save(paymentForReport: PaymentForReport): PaymentForReport {
@@ -60,16 +60,16 @@ class DynamoDBPaymentForReportRepository(
     }
 
     private fun PaymentForReport.asDynamoItem() = mapOf(
-        DynamoDBPaymentForReportAttribute.PK.param to "$pkValuePrefix${this.paymentId}".toAttributeValue(),
-        DynamoDBPaymentForReportAttribute.SK.param to this.paymentId.toString().toAttributeValue(),
-        DynamoDBPaymentForReportAttribute.CA.param to this.createdAt.toAttributeValue(),
-        DynamoDBPaymentForReportAttribute.RD.param to this.reportDay.toAttributeValue(),
-        DynamoDBPaymentForReportAttribute.ED.param to this.encData.toAttributeValue(),
-        DynamoDBPaymentForReportAttribute.SI.param to this.supplierOrderId.toString().toAttributeValue(),
-        DynamoDBPaymentForReportAttribute.A.param to this.amount.toString().toAttributeValue(),
-        DynamoDBPaymentForReportAttribute.PO.param to this.paymentOption.toAttributeValue(),
-        DynamoDBPaymentForReportAttribute.PT.param to this.paymentType.toString().toAttributeValue(),
-        DynamoDBPaymentForReportAttribute.PM.param to this.paymentMethod.toString().toAttributeValue(),
+        DynamoDBPaymentForReportAttribute.PK.param to "$pkValuePrefix$reportDay".toAttributeValue(),
+        DynamoDBPaymentForReportAttribute.SK.param to paymentId.toString().toAttributeValue(),
+        DynamoDBPaymentForReportAttribute.CA.param to createdAt.toAttributeValue(),
+        DynamoDBPaymentForReportAttribute.RD.param to reportDay.toAttributeValue(),
+        DynamoDBPaymentForReportAttribute.ED.param to encData.toAttributeValue(),
+        DynamoDBPaymentForReportAttribute.SI.param to supplierOrderId.toString().toAttributeValue(),
+        DynamoDBPaymentForReportAttribute.A.param to amount.toString().toAttributeValue(),
+        DynamoDBPaymentForReportAttribute.PO.param to paymentOption.toAttributeValue(),
+        DynamoDBPaymentForReportAttribute.PT.param to paymentType.toString().toAttributeValue(),
+        DynamoDBPaymentForReportAttribute.PM.param to paymentMethod.toString().toAttributeValue(),
     )
 
     private fun String.toAttributeValue(): AttributeValue = AttributeValue.builder().s(this).build()
@@ -83,15 +83,13 @@ class DynamoDBPaymentForReportRepository(
         PaymentForReport(
             createdAt = this.getValue(DynamoDBPaymentForReportAttribute.CA.param).s(),
             reportDay = this.getValue(DynamoDBPaymentForReportAttribute.RD.param).s(),
-            paymentId = this.getValue(DynamoDBPaymentForReportAttribute.PK.param).s().toLong(),
-            supplierOrderId = this[DynamoDBPaymentForReportAttribute.PK.param]?.s()!!.toLong(), // Paprobar
+            paymentId = this.getValue(DynamoDBPaymentForReportAttribute.SK.param).s().toLong(),
+            supplierOrderId = this.getValue(DynamoDBPaymentForReportAttribute.SI.param).s().toLong(),
             amount = BigDecimal(this.getValue(DynamoDBPaymentForReportAttribute.A.param).s()),
             paymentOption = this.getValue(DynamoDBPaymentForReportAttribute.PO.param).s(),
             encData = this.getValue(DynamoDBPaymentForReportAttribute.ED.param).s(),
-//            paymentType = this.getValue(DynamoDBPaymentForReportAttribute.PT.param),
-            paymentType = PaymentType.DIGITAL_PAYMENT,
-//            paymentMethod = this.getValue(DynamoDBPaymentForReportAttribute.PM.param),
-            paymentMethod = PaymentMethod.DIGITAL_WALLET
+            paymentType = PaymentType.valueOf(this.getValue(DynamoDBPaymentForReportAttribute.PT.param).s()),
+            paymentMethod = PaymentMethod.valueOf(this.getValue(DynamoDBPaymentForReportAttribute.PM.param).s()),
         )
 
     data class PaymentForReportNotFound(val paymentId: Long): RuntimeException("Cannot find any paymentForReport for $paymentId")
