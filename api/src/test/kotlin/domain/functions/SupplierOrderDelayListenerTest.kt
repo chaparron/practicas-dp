@@ -42,6 +42,7 @@ internal class SupplierOrderDelayListenerTest {
         sut.handleRequest(event, context)
         verifyServiceInvocation(event)
     }
+
     private fun buildSnsEvent(payload: String = json.encodeToString(anySupplierOrderDelayEvent())): SNSEvent {
         return SNSEvent().withRecords(
             listOf(
@@ -49,6 +50,7 @@ internal class SupplierOrderDelayListenerTest {
             )
         )
     }
+
     private fun verifyServiceInvocation(event: SNSEvent) {
         verify(service).save(json.decodeFromString(event.records.first().sns.message))
     }
