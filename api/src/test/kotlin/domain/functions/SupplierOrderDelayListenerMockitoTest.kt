@@ -2,34 +2,30 @@ package domain.functions
 
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.SNSEvent
-import configuration.Configuration
-import configuration.TestConfiguration
+import configuration.MainConfiguration
 import domain.model.SupplierOrderDelayEvent
 import domain.services.SupplierOrderDelayService
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.*
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class SupplierOrderDelayListenerTest {
+@ExtendWith(MockitoExtension::class)
+internal class SupplierOrderDelayListenerMockitoTest {
 
-    private lateinit var configuration: Configuration
-    private lateinit var json: Json
-    private lateinit var service: SupplierOrderDelayService
+
+    private val service: SupplierOrderDelayService = mock()
     private val context: Context = mock()
-    private lateinit var sut: SupplierOrderDelayListener
+    private val json: Json = MainConfiguration.jsonMapper
 
-    @BeforeEach
-    fun setUp() {
-        configuration = TestConfiguration.mockedInstance()
-        json = configuration.jsonMapper
-        service = configuration.supplierOrderDelayService
-        sut = SupplierOrderDelayListener(json, service)
-    }
+    private val sut = SupplierOrderDelayListener(
+        jsonMapper = MainConfiguration.jsonMapper,
+        supplierOrderDelayService = service
+    )
+
     private fun anySupplierOrderDelayEvent() = SupplierOrderDelayEvent(
         supplierOrderId = 77L,
         delay = false,

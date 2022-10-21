@@ -26,8 +26,7 @@ class TestConfiguration(
     override val wabi2bSdk: Wabi2bSdk = mock(),
     override val clock: Clock = mock(),
     override val paymentExpirationService: PaymentExpirationService = mock(),
-    override val supplierOrderDelayService: DefaultSupplierOrderDelayService = mock(),
-    override val supplierOrderDelayListener: SupplierOrderDelayListener = mock()
+    override val supplierOrderDelayService: DefaultSupplierOrderDelayService = mock()
 ) : Configuration {
 
     companion object {
