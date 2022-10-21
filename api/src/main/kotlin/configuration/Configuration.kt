@@ -2,9 +2,10 @@ package configuration
 
 import domain.functions.PaymentExpirationListener
 import domain.functions.SupplierListenerFunction
+import domain.functions.SupplierOrderDelayListener
 import domain.services.*
-import domain.services.state.StateValidatorService
 import domain.services.providers.PaymentProviderService
+import domain.services.state.StateValidatorService
 import kotlinx.serialization.json.Json
 import wabi2b.sdk.api.Wabi2bSdk
 import java.time.Clock
@@ -14,6 +15,7 @@ interface Configuration {
     val createPaymentService: CreatePaymentService
     val jpmcStateValidationConfig: EnvironmentVariable.JpmcStateValidationConfig
     val supplierListenerFunction: SupplierListenerFunction
+    val supplierOrderDelayListener: SupplierOrderDelayListener
     val stateValidatorService: StateValidatorService
     val paymentProviderService: PaymentProviderService
     val supplierOrderDelayService: DefaultSupplierOrderDelayService

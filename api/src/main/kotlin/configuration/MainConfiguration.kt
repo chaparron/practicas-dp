@@ -7,6 +7,7 @@ import adapters.repositories.paymentforreport.DynamoDBPaymentForReportRepository
 import adapters.repositories.supplier.DynamoDBSupplierRepository
 import adapters.repositories.supplier.SupplierRepository
 import adapters.repositories.supplierorderdelay.DynamoDBOrderDelayRepository
+import adapters.repositories.supplierorderdelay.SupplierOrderDelayRepository
 import adapters.rest.validations.Security
 import com.wabi2b.jpmc.sdk.security.cipher.aes.encrypt.AesEncrypterService
 import com.wabi2b.jpmc.sdk.security.hash.sha256.DigestHashCalculator
@@ -19,6 +20,7 @@ import com.wabi2b.serializers.UUIDStringSerializer
 import configuration.EnvironmentVariable.*
 import domain.functions.PaymentExpirationListener
 import domain.functions.SupplierListenerFunction
+import domain.functions.SupplierOrderDelayListener
 import domain.services.*
 import domain.services.providers.PaymentProviderService
 import domain.services.providers.jpmc.DefaultProviderService
@@ -110,6 +112,12 @@ object MainConfiguration : Configuration {
         SupplierListenerFunction(
             jsonMapper = jsonMapper,
             supplierService = supplierService
+        )
+    }
+    override val supplierOrderDelayListener: SupplierOrderDelayListener by lazy {
+        SupplierOrderDelayListener(
+            jsonMapper = jsonMapper,
+            supplierOrderDelayService = supplierOrderDelayService
         )
     }
 

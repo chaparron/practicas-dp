@@ -32,7 +32,7 @@ class DefaultSupplierOrderDelayService(
         return supplierOrderDelayEvent.delay
     }
 
-    fun SupplierOrderDelayEvent.toSupplierOrderDelay(): SupplierOrderDelay {
+    private fun SupplierOrderDelayEvent.toSupplierOrderDelay(): SupplierOrderDelay {
         return SupplierOrderDelay(
             supplierOrderId = this.supplierOrderId,
             delay = this.delay,

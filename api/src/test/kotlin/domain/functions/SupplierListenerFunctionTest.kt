@@ -35,10 +35,10 @@ class SupplierListenerFunctionTest {
 
     @BeforeEach
     fun setUp() {
-        configuration = TestConfiguration.mockedInstance()
         json = configuration.jsonMapper
         supplierService = configuration.supplierListenerFunction.supplierService
         sut = configuration.supplierListenerFunction
+        configuration = TestConfiguration.mockedInstance()
     }
 
     @Test
