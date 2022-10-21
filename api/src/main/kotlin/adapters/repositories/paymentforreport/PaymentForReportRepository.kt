@@ -9,7 +9,6 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValue
 import wabi2b.payments.common.model.dto.PaymentType
 import wabi2b.payments.common.model.dto.type.PaymentMethod
 import java.math.BigDecimal
-import java.util.*
 
 interface PaymentForReportRepository {
     fun save(paymentForReport: PaymentForReport): PaymentForReport
@@ -83,15 +82,15 @@ class DynamoDBPaymentForReportRepository(
         PaymentForReport(
             createdAt = this.getValue(DynamoDBPaymentForReportAttribute.CA.param).s(),
             reportDay = this.getValue(DynamoDBPaymentForReportAttribute.RD.param).s(),
-            paymentId = this.getValue(DynamoDBPaymentForReportAttribute.PK.param).s().toLong(),
+            paymentId = this.getValue(DynamoDBPaymentForReportAttribute.SK.param).s().toLong(),
             supplierOrderId = this.getValue(DynamoDBPaymentForReportAttribute.SOI.param).s().toLong(),
-           // supplierOrderId = this[DynamoDBPaymentForReportAttribute.PK.param]?.s()!!.toLong(), devolvería nullables
             amount = BigDecimal(this.getValue(DynamoDBPaymentForReportAttribute.A.param).s()),
             paymentOption = this.getValue(DynamoDBPaymentForReportAttribute.PO.param).s(),
             encData = this.getValue(DynamoDBPaymentForReportAttribute.ED.param).s(),
             paymentType = PaymentType.valueOf(this.getValue(DynamoDBPaymentForReportAttribute.PT.param).s()),
-            paymentMethod = PaymentMethod.valueOf(this.getValue(DynamoDBPaymentForReportAttribute.PT.param).s())
+            paymentMethod = PaymentMethod.valueOf(this.getValue(DynamoDBPaymentForReportAttribute.PM.param).s()),
         )
 
-    data class PaymentForReportNotFound(val paymentId: Long): RuntimeException("Cannot find any paymentForReport for $paymentId")
+    data class PaymentForReportNotFound(val paymentId: Long) :
+        RuntimeException("Cannot find any paymentForReport for $paymentId")
 }
