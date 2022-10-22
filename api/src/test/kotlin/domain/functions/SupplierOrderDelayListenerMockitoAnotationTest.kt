@@ -2,17 +2,12 @@ package domain.functions
 
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.SNSEvent
-import configuration.Configuration
 import configuration.MainConfiguration
-import configuration.TestConfiguration
 import domain.model.SupplierOrderDelayEvent
 import domain.services.SupplierOrderDelayService
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
@@ -39,6 +34,7 @@ internal class SupplierOrderDelayListenerMockitoAnotationTest(
         sut.handleRequest(event, context)
         verifyServiceInvocation(event)
     }
+
     private fun buildSnsEvent(payload: String = json.encodeToString(anySupplierOrderDelayEvent())): SNSEvent {
         return SNSEvent().withRecords(
             listOf(
@@ -46,6 +42,7 @@ internal class SupplierOrderDelayListenerMockitoAnotationTest(
             )
         )
     }
+
     private fun verifyServiceInvocation(event: SNSEvent) {
         verify(service).save(json.decodeFromString(event.records.first().sns.message))
     }

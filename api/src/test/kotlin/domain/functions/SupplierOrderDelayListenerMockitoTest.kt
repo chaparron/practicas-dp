@@ -21,10 +21,7 @@ internal class SupplierOrderDelayListenerMockitoTest {
     private val context: Context = mock()
     private val json: Json = MainConfiguration.jsonMapper
 
-    private val sut = SupplierOrderDelayListener(
-        jsonMapper = MainConfiguration.jsonMapper,
-        supplierOrderDelayService = service
-    )
+    private val sut = SupplierOrderDelayListener(json, service)
 
     private fun anySupplierOrderDelayEvent() = SupplierOrderDelayEvent(
         supplierOrderId = 77L,
