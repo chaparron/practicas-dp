@@ -3,6 +3,7 @@ package configuration
 import domain.functions.PaymentExpirationListener
 import domain.functions.SupplierListenerFunction
 import domain.functions.SupplierOrderDelayListener
+import domain.functions.UserListener
 import domain.services.*
 import domain.services.providers.PaymentProviderService
 import domain.services.state.StateValidatorService
@@ -24,4 +25,6 @@ interface Configuration {
     val clock: Clock
     val paymentExpirationService: PaymentExpirationService
     val paymentExpirationListener: PaymentExpirationListener
+    val userListener: UserListener
+    val userService: UserService
 }

@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory
 
 class SupplierOrderDelayListener(
     private val jsonMapper: Json = MainConfiguration.jsonMapper,
-    private val supplierOrderDelayService: SupplierOrderDelayService = MainConfiguration.supplierOrderDelayService
+    private val supplierOrderDelayService: SupplierOrderDelayService
 ) : RequestHandler<SNSEvent, Unit> {
 
     companion object {
@@ -30,7 +30,7 @@ class SupplierOrderDelayListener(
                 deserialize(it.sns.message)
             }.let {
                 it.doHandle(validator) { event ->
-                    supplierOrderDelayService.save(event).also { response ->
+                    supplierOrderDelayService.get(event.supplierOrderId).also { response ->
                         logger.info("Supplier order delay event saved {}", response)
                     }
                 }

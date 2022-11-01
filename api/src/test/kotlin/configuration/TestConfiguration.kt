@@ -3,7 +3,7 @@ package configuration
 import adapters.rest.validations.Security
 import domain.functions.PaymentExpirationListener
 import domain.functions.SupplierListenerFunction
-import domain.functions.SupplierOrderDelayListener
+import domain.functions.UserListener
 import domain.services.*
 import domain.services.state.StateValidatorService
 import domain.services.providers.PaymentProviderService
@@ -26,7 +26,9 @@ class TestConfiguration(
     override val wabi2bSdk: Wabi2bSdk = mock(),
     override val clock: Clock = mock(),
     override val paymentExpirationService: PaymentExpirationService = mock(),
-    override val supplierOrderDelayService: DefaultSupplierOrderDelayService = mock()
+    override val supplierOrderDelayService: DefaultSupplierOrderDelayService = mock(),
+    override val userListener: UserListener = mock(),
+    override val userService: UserService = mock(),
 ) : Configuration {
 
     companion object {

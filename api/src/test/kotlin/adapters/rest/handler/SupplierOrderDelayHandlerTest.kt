@@ -37,7 +37,7 @@ internal class SupplierOrderDelayHandlerTest {
 
 
     @Test
-    fun `should return False delayed orderId`() {
+    fun `should return true on delayed orderId`() {
         // Given
         val supplierOrderId = SUPPLIER_ORDER_ID_VALUE.toLong()
         val event = anyApiGatewayProxyRequestEvent()
@@ -53,7 +53,7 @@ internal class SupplierOrderDelayHandlerTest {
 
     }
     @Test
-    fun `should return false on time orderId`() {
+    fun `should return false on in time orderId`() {
         // Given
         val supplierOrderId = SUPPLIER_ORDER_ID_VALUE.toLong()
         val event = anyApiGatewayProxyRequestEvent()

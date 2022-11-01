@@ -6,6 +6,7 @@ import domain.model.PaymentForReport
 import org.slf4j.LoggerFactory
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue
+import toAttributeValue
 import wabi2b.payments.common.model.dto.PaymentType
 import wabi2b.payments.common.model.dto.type.PaymentMethod
 import java.math.BigDecimal
@@ -70,8 +71,6 @@ class DynamoDBPaymentForReportRepository(
         DynamoDBPaymentForReportAttribute.PT.param to paymentType.toString().toAttributeValue(),
         DynamoDBPaymentForReportAttribute.PM.param to paymentMethod.toString().toAttributeValue(),
     )
-
-    private fun String.toAttributeValue(): AttributeValue = AttributeValue.builder().s(this).build()
 
     private fun Long.asGetItemKey() = mapOf(
         DynamoDBSupplierAttribute.PK.param to "$pkValuePrefix$this".toAttributeValue(),

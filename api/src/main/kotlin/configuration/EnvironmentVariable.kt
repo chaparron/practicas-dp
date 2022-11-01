@@ -10,6 +10,7 @@ private const val LIST_DELIMITER = ","
  */
 enum class EnvironmentVariable {
     SUPPLIER_TABLE,
+    USER_TABLE,
     JPMC_PAYMENT_TABLE,
     JPMC_AES_ENCRYPTION_KEY,
     JPMC_SHAE256_HASH_KEY,

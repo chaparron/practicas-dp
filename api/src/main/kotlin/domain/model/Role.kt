@@ -1,4 +1,11 @@
 package domain.model
 
-class Role {
+import kotlinx.serialization.Serializable
+
+@Serializable
+enum class Role {
+    ADMIN,
+    USER,
+    SUPPLIER,
+    TEST
 }

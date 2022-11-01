@@ -5,6 +5,7 @@ import adapters.rest.handler.JpmcUpdatePaymentHandler.Companion.UPDATE_PAYMENT_P
 import adapters.rest.handler.CreatePaymentHandler.Companion.CREATE_PAYMENT_PATH
 import adapters.rest.handler.PaymentProvidersHandler.Companion.PAYMENT_PROVIDERS_PATH
 import adapters.rest.handler.SupplierOrderDelayHandler.Companion.SUPPLIER_ORDER_DELAY_PATH
+import adapters.rest.handler.UserHandler.Companion.USER_PATH
 import configuration.Configuration
 import configuration.EnvironmentVariable
 import configuration.MainConfiguration
@@ -43,6 +44,12 @@ class DigitalPaymentsApiGateway(
                 service = configuration.supplierOrderDelayService,
 //                stateValidatorService = configuration.stateValidatorService,
 //                jsonMapper = configuration.jsonMapper
+            )
+        )
+        .get(
+            path = USER_PATH,
+            handler = UserHandler(
+                service = configuration.userService
             )
         )
         .post(

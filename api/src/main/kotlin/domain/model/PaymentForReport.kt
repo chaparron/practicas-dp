@@ -14,7 +14,6 @@ data class PaymentForReport(
     val createdAt: String,
     @Contextual
     val reportDay: String,
-    // PaymentData
     val paymentId: Long,
     val supplierOrderId: Long,
     @Contextual

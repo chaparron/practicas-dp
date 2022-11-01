@@ -2,6 +2,7 @@ package digitalpayments.sdk
 
 import digitalpayments.sdk.configuration.SdkConfiguration
 import digitalpayments.sdk.model.*
+import domain.model.UserResponse
 import kotlinx.serialization.decodeFromString
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpHeaders.AUTHORIZATION
@@ -21,6 +22,7 @@ interface DigitalPaymentsSdk {
     fun updatePayment(updatePaymentRequest: UpdatePaymentRequest, accessToken: String): Mono<UpdatePaymentResponse>
     fun getPaymentProviders(supplierId: String, accessToken: String): Mono<List<Provider>>
     fun isDelayedSupplierOrder(supplierOrderId: String, accessToken: String): Mono<Boolean>
+    fun getUser(userId: String, accessToken: String): Mono<UserResponse>
 }
 
 class HttpDigitalPaymentsSdk(root: URI) : DigitalPaymentsSdk {
@@ -112,4 +114,24 @@ class HttpDigitalPaymentsSdk(root: URI) : DigitalPaymentsSdk {
                 responseBody.toBoolean()
             }
             .switchIfEmpty(Mono.error(UnexpectedResponse("Unexpected error retrieving payment information with supplierOrderId $supplierOrderId")))
+
+    override fun getUser(userId: String, accessToken: String): Mono<UserResponse> =
+        webClient.get()
+        .uri { builder ->
+            builder
+                .path("/dp/user")
+                .queryParam("userId", userId)
+                .build()
+        }
+        .header(AUTHORIZATION, "Bearer $accessToken")
+        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        .retrieve()
+        .onStatus(HttpStatus::isError) {
+            detailedHttpErrorHandler.handle(it)
+        }
+        .bodyToMono(String::class.java)
+        .map { responseBody ->
+            mapper.decodeFromString<UserResponse>(responseBody)
+        }
+        .switchIfEmpty(Mono.error(UnexpectedResponse("Unexpected error retrieving payment information with supplierOrderId $userId")))
 }

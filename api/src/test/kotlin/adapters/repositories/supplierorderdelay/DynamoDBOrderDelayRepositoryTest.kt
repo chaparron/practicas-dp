@@ -16,7 +16,7 @@ import java.net.URI
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class DynamoDBOrderDelayRepositoryTest {
 
-    private val dynamoDbTestUtils = DynamoDbTestUtils( // WTF
+    private val dynamoDbTestUtils = DynamoDbTestUtils(
         DynamoDbContainer.localStack.getEndpointConfiguration(LocalStackContainer.Service.DYNAMODB).serviceEndpoint
             .let { URI.create(it) }
     )

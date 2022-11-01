@@ -8,6 +8,7 @@ import adapters.repositories.supplier.DynamoDBSupplierRepository
 import adapters.repositories.supplier.SupplierRepository
 import adapters.repositories.supplierorderdelay.DynamoDBOrderDelayRepository
 import adapters.repositories.supplierorderdelay.SupplierOrderDelayRepository
+import adapters.repositories.user.DynamoDBUserRepository
 import adapters.rest.validations.Security
 import com.wabi2b.jpmc.sdk.security.cipher.aes.encrypt.AesEncrypterService
 import com.wabi2b.jpmc.sdk.security.hash.sha256.DigestHashCalculator
@@ -21,6 +22,7 @@ import configuration.EnvironmentVariable.*
 import domain.functions.PaymentExpirationListener
 import domain.functions.SupplierListenerFunction
 import domain.functions.SupplierOrderDelayListener
+import domain.functions.UserListener
 import domain.services.*
 import domain.services.providers.PaymentProviderService
 import domain.services.providers.jpmc.DefaultProviderService
@@ -119,6 +121,30 @@ object MainConfiguration : Configuration {
         PaymentExpirationListener(
             mapper = jsonMapper,
             paymentExpirationService = paymentExpirationService
+        )
+    }
+    override val userListener: UserListener by lazy {
+        UserListener(
+            jsonMapper = jsonMapper,
+            service = defaultUserService
+        )
+    }
+    override val userService: DefaultUserService by lazy {
+        DefaultUserService(
+            repository = userRepository
+        )
+    }
+
+    private val defaultUserService: DefaultUserService by lazy {
+        DefaultUserService(
+            repository = userRepository
+        )
+    }
+
+    private val userRepository: DynamoDBUserRepository by lazy {
+        DynamoDBUserRepository(
+            dynamoDbClient = dynamoDbClient,
+            tableName = USER_TABLE.get()
         )
     }
 

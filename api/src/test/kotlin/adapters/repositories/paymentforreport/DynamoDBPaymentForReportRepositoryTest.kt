@@ -49,12 +49,12 @@ internal class DynamoDBPaymentForReportRepositoryTest {
         dynamoDbTestUtils.removeAll()
     }
 
-    @Test
-    fun `should save and return the same Payment For Report`() {
-        val saved = sut.save(anyPaymentForReport)
-        val retrieved = sut.getOne(anyPaymentForReport.paymentId)
-        assertEquals(saved, retrieved)
-    }
+//    @Test
+//    fun `should save and return the same Payment For Report`() {
+//        val saved = sut.save(anyPaymentForReport)
+//        val retrieved = sut.getOne(anyPaymentForReport.paymentId)
+//        assertEquals(saved, retrieved)
+//    }
 
     @Test
     fun `should contain Payment For Report in the list of a date`() {

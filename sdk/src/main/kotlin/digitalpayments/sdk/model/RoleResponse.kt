@@ -1,4 +1,11 @@
-package digitalpayments.sdk.model
+package domain.model
 
-class RoleResponse {
+import kotlinx.serialization.Serializable
+
+@Serializable
+enum class RoleResponse {
+    ADMIN,
+    USER,
+    SUPPLIER,
+    TEST
 }

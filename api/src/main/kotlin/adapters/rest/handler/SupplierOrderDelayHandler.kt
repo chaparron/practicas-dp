@@ -27,7 +27,7 @@ class SupplierOrderDelayHandler(
 //        val state = stateValidatorService.getState(input)
         return ok(service.isDelayed(supplierOrderId).toString())
             .also {
-                logger.trace("Payment Providers retrieved: $it")
+                logger.trace("Supplier Order delay retrieved: $it")
             }
     }
 }
