@@ -9,12 +9,12 @@ import org.slf4j.LoggerFactory
 import wabi.rest2lambda.RestHandler
 import wabi.rest2lambda.ok
 
-class UserHandler (
+class GetUserHandler (
     private val service: UserService
 ) : RestHandler {
 
     companion object{
-        private val logger = LoggerFactory.getLogger(UserHandler::class.java)
+        private val logger = LoggerFactory.getLogger(GetUserHandler::class.java)
         const val USER_ID_PARAM = "userId"
         const val USER_PATH = "/dp/user"
     }

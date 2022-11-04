@@ -14,7 +14,7 @@ interface UserService {
 
 class DefaultUserService(
     private val repository: UserRepository
-): UserService{
+) : UserService {
 
     companion object {
         private val logger = LoggerFactory.getLogger(DefaultUserService::class.java)
@@ -25,10 +25,10 @@ class DefaultUserService(
         return repository.save(user)
     }
 
-    override fun get(id: Long): User {
-        logger.info("about to get the user with id: $id")
-        return repository.get(id)
+    override fun get(id: Long) = logger.info("about to get the user with id: $id").let {
+        repository.get(id)
     }
+
 
     override fun delete(id: Long): User {
         logger.info("about to delete the user with id: $id")
@@ -36,7 +36,8 @@ class DefaultUserService(
     }
 
     override fun update(id: Long): User {
-        logger.info("about to update the user with id: $id")
-        return repository.update(id)
+        TODO()
+//        logger.info("about to update the user with id: $id")
+//        return repository.update(id)
     }
 }

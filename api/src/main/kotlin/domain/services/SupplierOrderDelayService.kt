@@ -28,10 +28,7 @@ class DefaultSupplierOrderDelayService(
         return supplierOrderDelayRepository.get(supplierId)
     }
 
-    override fun isDelayed(supplierId: Long): Boolean {
-        val supplierOrderDelayEvent = get(supplierId)
-        return supplierOrderDelayEvent.delay
-    }
+    override fun isDelayed(supplierId: Long) = get(supplierId).delay
 
     private fun SupplierOrderDelayEvent.toSupplierOrderDelay(): SupplierOrderDelay {
         return SupplierOrderDelay(

@@ -11,43 +11,57 @@ interface UserRepository {
     fun save(user: User): User
     fun get(id: Long): User
     fun delete(id: Long): User
-    fun update(id: Long): User
+    fun update(user: User): User
 }
+
 class DynamoDBUserRepository(
     private val dynamoDbClient: DynamoDbClient,
     private val tableName: String
-): UserRepository{
+): UserRepository {
 
-    companion object{
+    companion object {
         private val logger = LoggerFactory.getLogger(DynamoDBUserRepository::class.java)
         private const val pkValuePrefix = "user#"
     }
+
+    // https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithItems.html
 
     override fun save(user: User): User {
         return dynamoDbClient.putItem {
             logger.trace("Saving user $user")
             it.tableName(tableName).item(user.asDynamoItem())
-        }.let{
+        }.let {
             logger.trace("Saved user $user")
             user
         }
     }
 
     override fun get(id: Long): User {
-        return dynamoDbClient.getItem{
+        return dynamoDbClient.getItem {
             logger.trace("getting user with id $id")
             it.tableName(tableName).key(id.asGetItemKey())
-        }.let{ response ->
-            response.takeIf {it.hasItem()}?.item()?.asUser() ?: throw UserNotFound(id)
+        }.let { response ->
+            response.takeIf { it.hasItem() }?.item()?.asUser() ?: throw UserNotFound(id)
         }
     }
 
     override fun delete(id: Long): User {
-        TODO("Not yet implemented")
+        return dynamoDbClient.deleteItem {
+            logger.trace("deleting user with id $id")
+            it.tableName(tableName).key(id.asGetItemKey())
+        }.let { response ->
+            response.takeIf { it.hasAttributes() }?.attributes()?.asUser() ?: throw UserNotFound(id)
+        }
     }
 
-    override fun update(id: Long): User {
-        TODO("Not yet implemented")
+    override fun update(user: User): User {
+        return dynamoDbClient.updateItem {
+            logger.trace("Updating user $user")
+            it.tableName(tableName)// .item(user.asDynamoItem())
+        }.let {
+            logger.trace("Updated user $user")
+            user
+        }
     }
 
     private fun Long.asGetItemKey() = mapOf(
@@ -66,7 +80,7 @@ class DynamoDBUserRepository(
         DynamoDBUserAttribute.R.param to role.toString().toAttributeValue(),
         DynamoDBUserAttribute.CA.param to createdAt.toAttributeValue(),
         DynamoDBUserAttribute.LL.param to lastLogin.toAttributeValue(),
-        DynamoDBUserAttribute.O.param to orders.toString().toAttributeValue(),
+        DynamoDBUserAttribute.O.param to orders.joinToString().toAttributeValue(),
     )
 
     private fun Map<String, AttributeValue>.asUser() =
@@ -80,13 +94,9 @@ class DynamoDBUserRepository(
             role = Role.valueOf(this.getValue(DynamoDBUserAttribute.R.param).s()),
             createdAt = this.getValue(DynamoDBUserAttribute.CA.param).s(),
             lastLogin = this.getValue(DynamoDBUserAttribute.LL.param).s(),
-            orders = this.getValue(DynamoDBUserAttribute.O.param).s()
-                .replace(" ", "")
-                .replace("[","")
-                .replace("]","")
-                .split(","),
+            orders = this.getValue(DynamoDBUserAttribute.O.param).s().split(", ")
         )
 
-data class UserNotFound(val userId: Long):
-    RuntimeException("Cannot find user with id $userId")
+    data class UserNotFound(val userId: Long) :
+        RuntimeException("Cannot find user with id $userId")
 }

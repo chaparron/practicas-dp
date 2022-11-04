@@ -72,7 +72,7 @@ Globals:
         NEW_RELIC_LAMBDA_EXTENSION_ENABLED: !FindInMap [ Config, !Ref EnvironmentStackName, NewRelicLambdaExtensionEnabled ]
         FORCE_UPDATE: 7
         SUPPLIER_TABLE: !Ref SupplierTable
-
+        USER_TABLE: !Ref UserTable
     DeploymentPreference:
       Type: AllAtOnce
     VpcConfig:
@@ -234,6 +234,23 @@ Resources:
   SupplierListenerFunctionDLQ:
     Type: AWS::SQS::Queue
 
+  UserTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      KeySchema:
+        - AttributeName: "PK"
+          KeyType: "HASH"
+        - AttributeName: "SK"
+          KeyType: "RANGE"
+      AttributeDefinitions:
+        - AttributeName: "PK"
+          AttributeType: "S"
+        - AttributeName: "SK"
+          AttributeType: "S"
+      BillingMode: "PAY_PER_REQUEST"
+
   SupplierTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -269,9 +286,6 @@ Resources:
           Properties:
             Topic:
               Fn::ImportValue: !Sub "${EnvironmentStackName}-SupplierOrderDelayTopic"
-            FilterPolicy:
-              Action:
-                - supplierOrderDelayCreated
 
   SupplierOrderDelayListenerDLQ:
     Type: AWS::SQS::Queue

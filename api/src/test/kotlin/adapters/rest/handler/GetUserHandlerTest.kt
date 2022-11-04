@@ -5,7 +5,6 @@ import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import domain.model.Role
 import domain.model.User
-import domain.services.DefaultSupplierOrderDelayService
 import domain.services.UserService
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -18,12 +17,12 @@ import org.mockito.kotlin.whenever
 import org.springframework.http.HttpMethod
 
 @ExtendWith(MockitoExtension::class)
-internal class UserHandlerTest{
+internal class GetUserHandlerTest{
 
     private var service: UserService = mock()
     private var context: Context = mock()
 
-    private lateinit var sut: UserHandler
+    private lateinit var sut: GetUserHandler
 
     companion object {
         private const val PATH = "/dp/user"
@@ -47,7 +46,7 @@ internal class UserHandlerTest{
 
     @BeforeEach
     fun setUp() {
-        sut = UserHandler(service)
+        sut = GetUserHandler(service)
     }
 
     @Test

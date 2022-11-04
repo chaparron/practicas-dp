@@ -30,10 +30,13 @@ class SupplierOrderDelayListener(
                 deserialize(it.sns.message)
             }.let {
                 it.doHandle(validator) { event ->
-                    supplierOrderDelayService.get(event.supplierOrderId).also { response ->
+                    supplierOrderDelayService.save(event).also { response ->
                         logger.info("Supplier order delay event saved {}", response)
                     }
                 }
+//                supplierOrderDelayService.save(it).also { response ->
+//                    logger.info("Supplier order delay event saved {}", response)
+//                }
             }
         }
     }

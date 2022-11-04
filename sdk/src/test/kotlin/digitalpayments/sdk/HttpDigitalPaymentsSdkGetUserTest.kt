@@ -5,12 +5,10 @@ import CLIENT_TOKEN_PREFIX
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.matching.EqualToPattern
 import digitalpayments.sdk.configuration.SdkConfiguration
-import digitalpayments.sdk.model.Provider
-import domain.model.RoleResponse
-import domain.model.UserResponse
+import domain.model.Role
+import domain.model.User
 import kotlinx.serialization.encodeToString
 import org.junit.Test
-import org.junit.jupiter.api.Assertions.*
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import reactor.test.StepVerifier
@@ -28,14 +26,14 @@ internal class HttpDigitalPaymentsSdkGetUserTest : AbstractSdkTest() {
     private val digitalPaymentsSdk: DigitalPaymentsSdk = HttpDigitalPaymentsSdk(root)
     private val mapper = SdkConfiguration.jsonMapper
 
-    private val anyUser = UserResponse(
+    private val anyUser = User(
         name = "Tete",
         userId = USER_ID.toLong(),
         mail = "tete@wabi.com",
         country = "Spain",
         active = true,
         phone = "+3465432112",
-        role = RoleResponse.USER,
+        role = Role.USER,
         createdAt = "2018-10-10",
         lastLogin = "30-10-2022",
         orders = listOf("123", "456", "789")
