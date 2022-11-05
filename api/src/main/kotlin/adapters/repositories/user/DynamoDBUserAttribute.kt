@@ -21,7 +21,7 @@ enum class DynamoDBUserAttribute {
     CA,
     // Last Login
     LL,
-    // Order
+    // Orders
     O;
     val param: String by lazy { this.name }
 }

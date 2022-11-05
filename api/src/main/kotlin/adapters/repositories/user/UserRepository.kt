@@ -10,7 +10,7 @@ import toAttributeValue
 interface UserRepository {
     fun save(user: User): User
     fun get(id: Long): User
-    fun delete(id: Long): User
+    fun delete(id: Long)
     fun update(user: User): User
 }
 
@@ -45,24 +45,76 @@ class DynamoDBUserRepository(
         }
     }
 
-    override fun delete(id: Long): User {
-        return dynamoDbClient.deleteItem {
+    override fun delete(id: Long) {
+        dynamoDbClient.deleteItem {
             logger.trace("deleting user with id $id")
             it.tableName(tableName).key(id.asGetItemKey())
-        }.let { response ->
-            response.takeIf { it.hasAttributes() }?.attributes()?.asUser() ?: throw UserNotFound(id)
         }
     }
 
     override fun update(user: User): User {
         return dynamoDbClient.updateItem {
             logger.trace("Updating user $user")
-            it.tableName(tableName)// .item(user.asDynamoItem())
+            it
+                .tableName(tableName)
+                .key(user.userId.asGetItemKey())
+                .updateExpression(
+                    "SET " +
+//                            "${DynamoDBUserAttribute.PK.param} = :userId," +
+                            "${DynamoDBUserAttribute.SK.param} = :userId," +
+                            "${DynamoDBUserAttribute.N.param} = :name," +
+                            "${DynamoDBUserAttribute.M.param} = :mail," +
+                            "${DynamoDBUserAttribute.C.param} = :country," +
+                            "${DynamoDBUserAttribute.A.param} = :active," +
+                            "${DynamoDBUserAttribute.P.param} = :phone," +
+                            "${DynamoDBUserAttribute.R.param} = :role," +
+                            "${DynamoDBUserAttribute.CA.param} = :createdAt," +
+                            "${DynamoDBUserAttribute.LL.param} = :lastLogin," +
+                            "${DynamoDBUserAttribute.O.param} = :orders,"
+                )
+                .expressionAttributeValues(mapOf(
+//                    ":userId" to user."$pkValuePrefix${user.userId}".toAttributeValue(),
+                    ":userId" to user.userId.toAttributeValue(),
+                    ":name" to user.name.toAttributeValue(),
+                    ":mail" to user.mail.toAttributeValue(),
+                    ":country" to user.country.toAttributeValue(),
+                    ":active" to user.active.toString().toAttributeValue(),
+                    ":phone" to user.phone.toAttributeValue(),
+                    ":role" to user.role.toString().toAttributeValue(),
+                    ":createdAt" to user.createdAt.toAttributeValue(),
+                    ":lastLogin" to user.lastLogin.toAttributeValue(),
+                    ":orders" to user.orders.joinToString().toAttributeValue(),
+                ))
         }.let {
             logger.trace("Updated user $user")
             user
         }
     }
+
+//    override fun save(supplier: Supplier): Supplier {
+//        return dynamoDbClient.updateItem {
+//            logger.trace("Saving Supplier $supplier")
+//            it
+//                .tableName(tableName)
+//                .key(supplier.supplierId.asDynamoKey())
+//                .updateExpression(
+//                    "SET " +
+//                            "${DynamoDBSupplierAttribute.SI.param} = :supplierId," +
+//                            "${DynamoDBSupplierAttribute.C.param} = :code," +
+//                            "${DynamoDBSupplierAttribute.N.param} = :bankAccountNumber," +
+//                            "${DynamoDBSupplierAttribute.LN.param} = :legalName"
+//                )
+//                .expressionAttributeValues(mapOf(
+//                    ":supplierId" to supplier.supplierId.toAttributeValue(),
+//                    ":code" to supplier.indianFinancialSystemCode.toAttributeValue(),
+//                    ":bankAccountNumber" to supplier.bankAccountNumber.toAttributeValue(),
+//                    ":legalName" to supplier.legalName.toAttributeValue()
+//                ))
+//        }.let {
+//            logger.trace("Saved Supplier $supplier")
+//            supplier
+//        }
+//    }
 
     private fun Long.asGetItemKey() = mapOf(
         DynamoDBUserAttribute.PK.param to "$pkValuePrefix$this".toAttributeValue(),

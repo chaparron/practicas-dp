@@ -73,13 +73,34 @@ internal class DynamoDBUserRepositoryTest {
     @Test
     fun `should delete existing user using his id`() {
         // Given
-        val saved = sut.save(anyUser)
-        val retrieved = sut.get(anyUser.userId)
-        val deleted = sut.delete(anyUser.userId)
+        sut.save(anyUser)
+        sut.delete(anyUser.userId)
         // Then
-        println("\u001b[7m $saved \u001b[0m")
-        println("\u001b[7m $retrieved \u001b[0m")
-        println("\u001b[7m $deleted \u001b[0m")
+        assertThrows<DynamoDBUserRepository.UserNotFound> {
+            sut.get(anyUser.userId)
+        }
+    }
+    @Test
+    fun `should update existing user giving an user with the same id`(){
+        // Given
+        val updatedUser = User(
+            name = "Tete",
+            userId = 77L,
+            mail = "tacktickTete@wabi.com",
+            country = "Spain",
+            active = true,
+            phone = "+3467896789",
+            role = Role.ADMIN,
+            createdAt = "2018-10-10",
+            lastLogin = "05-11-2022",
+            orders = listOf("123", "456", "789", "987")
+        )
+        // When
+        sut.save(anyUser)
+        sut.update(anyUser)
+        // Then
+        println("\u001b[7m ${sut.get(updatedUser.userId)} \u001b[1m")
+        // Verify
     }
 
 }

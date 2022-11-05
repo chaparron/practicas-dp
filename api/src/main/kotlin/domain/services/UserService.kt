@@ -8,7 +8,7 @@ import domain.model.User
 interface UserService {
     fun save(user: User): User
     fun get(id: Long): User
-    fun delete(id: Long): User
+    fun delete(id: Long)
     fun update(id: Long): User
 }
 
@@ -30,9 +30,9 @@ class DefaultUserService(
     }
 
 
-    override fun delete(id: Long): User {
+    override fun delete(id: Long) {
         logger.info("about to delete the user with id: $id")
-        return repository.delete(id)
+        repository.delete(id)
     }
 
     override fun update(id: Long): User {
