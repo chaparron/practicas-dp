@@ -3,12 +3,8 @@ package adapters.repositories.user
 import adapters.infrastructure.DynamoDbContainer
 import domain.model.Role
 import domain.model.User
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import org.testcontainers.containers.localstack.LocalStackContainer
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import wabipay.commons.dynamodb.testing.DynamoDbTestUtils
@@ -61,6 +57,7 @@ internal class DynamoDBUserRepositoryTest {
         println("\u001b[7m $retrieved \u001b[0m")
         assertEquals(saved, retrieved)
     }
+
     @Test
     fun `should retrieve user not found using non existing id`() {
         // Given
@@ -70,6 +67,7 @@ internal class DynamoDBUserRepositoryTest {
             sut.get(userId)
         }
     }
+
     @Test
     fun `should delete existing user using his id`() {
         // Given
@@ -80,8 +78,9 @@ internal class DynamoDBUserRepositoryTest {
             sut.get(anyUser.userId)
         }
     }
+
     @Test
-    fun `should update existing user giving an user with the same id`(){
+    fun `should update existing user giving an user with the same id`() {
         // Given
         val updatedUser = User(
             name = "Tete",
@@ -97,9 +96,9 @@ internal class DynamoDBUserRepositoryTest {
         )
         // When
         sut.save(anyUser)
-        sut.update(anyUser)
+        sut.update(updatedUser)
         // Then
-        println("\u001b[7m ${sut.get(updatedUser.userId)} \u001b[1m")
+        assertEquals(updatedUser, sut.get(anyUser.userId))
         // Verify
     }
 

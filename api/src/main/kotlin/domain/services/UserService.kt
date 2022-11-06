@@ -1,15 +1,15 @@
 package domain.services
 
 import adapters.repositories.user.UserRepository
-import org.slf4j.LoggerFactory
 import domain.model.User
+import org.slf4j.LoggerFactory
 
 
 interface UserService {
     fun save(user: User): User
     fun get(id: Long): User
     fun delete(id: Long)
-    fun update(id: Long): User
+    fun update(user: User): User
 }
 
 class DefaultUserService(
@@ -35,9 +35,8 @@ class DefaultUserService(
         repository.delete(id)
     }
 
-    override fun update(id: Long): User {
-        TODO()
-//        logger.info("about to update the user with id: $id")
-//        return repository.update(id)
+    override fun update(user: User): User {
+        logger.info("about to update the user with id: $user")
+        return repository.update(user)
     }
 }

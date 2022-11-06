@@ -1,3 +1,6 @@
+package adapters.rest.handler
+
+
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
@@ -12,22 +15,21 @@ import org.slf4j.LoggerFactory
 import wabi.rest2lambda.RestHandler
 import wabi.rest2lambda.ok
 
-class SaveUserHandler(
+class UpdateUserHandler(
     private val service: UserService,
-    private val jsonMapper: Json,
+    private val jsonMapper: Json
 ) : RestHandler {
 
     companion object {
-        private val logger = LoggerFactory.getLogger(SaveUserHandler::class.java)
-        const val SAVE_USER_PATH = "/dp/user"
+        private val logger = LoggerFactory.getLogger(UpdateUserHandler::class.java)
+        const val USER_PATH = "/dp/user"
     }
 
     override fun handleRequest(input: APIGatewayProxyRequestEvent, context: Context): APIGatewayProxyResponseEvent {
-        logger.info("About to save the next user: ${input.body}")
-        val request = jsonMapper.decodeFromString<CreateUserHandlerRequest>(input.body)
-        return ok(service.save(request.toUserRequest())
+        val request = jsonMapper.decodeFromString<UpdateUserHandlerRequest>(input.body)
+        return ok(service.update(request.toUserRequest())
             .also {
-                logger.trace("User created: $it")
+                logger.trace("User updated: $it")
             }
             .let {
                 jsonMapper.encodeToString(it)
@@ -35,7 +37,7 @@ class SaveUserHandler(
         )
     }
 
-    private fun CreateUserHandlerRequest.toUserRequest() = User(
+    private fun UpdateUserHandlerRequest.toUserRequest() = User(
         name,
         userId,
         mail,
@@ -51,7 +53,7 @@ class SaveUserHandler(
 }
 
 @Serializable
-data class CreateUserHandlerRequest(
+data class UpdateUserHandlerRequest(
     val name: String,
     val userId: Long,
     val mail: String,

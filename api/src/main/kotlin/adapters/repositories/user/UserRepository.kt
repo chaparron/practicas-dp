@@ -17,7 +17,7 @@ interface UserRepository {
 class DynamoDBUserRepository(
     private val dynamoDbClient: DynamoDbClient,
     private val tableName: String
-): UserRepository {
+) : UserRepository {
 
     companion object {
         private val logger = LoggerFactory.getLogger(DynamoDBUserRepository::class.java)
@@ -61,7 +61,7 @@ class DynamoDBUserRepository(
                 .updateExpression(
                     "SET " +
 //                            "${DynamoDBUserAttribute.PK.param} = :userId," +
-                            "${DynamoDBUserAttribute.SK.param} = :userId," +
+//                            "${DynamoDBUserAttribute.SK.param} = :userId," +
                             "${DynamoDBUserAttribute.N.param} = :name," +
                             "${DynamoDBUserAttribute.M.param} = :mail," +
                             "${DynamoDBUserAttribute.C.param} = :country," +
@@ -70,21 +70,23 @@ class DynamoDBUserRepository(
                             "${DynamoDBUserAttribute.R.param} = :role," +
                             "${DynamoDBUserAttribute.CA.param} = :createdAt," +
                             "${DynamoDBUserAttribute.LL.param} = :lastLogin," +
-                            "${DynamoDBUserAttribute.O.param} = :orders,"
+                            "${DynamoDBUserAttribute.O.param} = :orders"
                 )
-                .expressionAttributeValues(mapOf(
+                .expressionAttributeValues(
+                    mapOf(
 //                    ":userId" to user."$pkValuePrefix${user.userId}".toAttributeValue(),
-                    ":userId" to user.userId.toAttributeValue(),
-                    ":name" to user.name.toAttributeValue(),
-                    ":mail" to user.mail.toAttributeValue(),
-                    ":country" to user.country.toAttributeValue(),
-                    ":active" to user.active.toString().toAttributeValue(),
-                    ":phone" to user.phone.toAttributeValue(),
-                    ":role" to user.role.toString().toAttributeValue(),
-                    ":createdAt" to user.createdAt.toAttributeValue(),
-                    ":lastLogin" to user.lastLogin.toAttributeValue(),
-                    ":orders" to user.orders.joinToString().toAttributeValue(),
-                ))
+//                    ":userId" to user.userId.toAttributeValue(),
+                        ":name" to user.name.toAttributeValue(),
+                        ":mail" to user.mail.toAttributeValue(),
+                        ":country" to user.country.toAttributeValue(),
+                        ":active" to user.active.toString().toAttributeValue(),
+                        ":phone" to user.phone.toAttributeValue(),
+                        ":role" to user.role.toString().toAttributeValue(),
+                        ":createdAt" to user.createdAt.toAttributeValue(),
+                        ":lastLogin" to user.lastLogin.toAttributeValue(),
+                        ":orders" to user.orders.joinToString().toAttributeValue(),
+                    )
+                )
         }.let {
             logger.trace("Updated user $user")
             user

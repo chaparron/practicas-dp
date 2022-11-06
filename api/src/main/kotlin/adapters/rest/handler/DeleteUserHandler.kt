@@ -9,21 +9,22 @@ import org.slf4j.LoggerFactory
 import wabi.rest2lambda.RestHandler
 import wabi.rest2lambda.ok
 
-class GetUserHandler(
-    private val service: UserService
+class DeleteUserHandler(
+    private val service: UserService,
 ) : RestHandler {
 
     companion object {
-        private val logger = LoggerFactory.getLogger(GetUserHandler::class.java)
+        private val logger = LoggerFactory.getLogger(DeleteUserHandler::class.java)
         const val USER_ID_PARAM = "userId"
-        const val GET_USER_PATH = "/dp/user"
+        const val DELETE_USER_PATH = "/dp/user"
     }
 
     override fun handleRequest(input: APIGatewayProxyRequestEvent, context: Context): APIGatewayProxyResponseEvent {
+        logger.info("About to delete user with id: ${input.body}")
         val userId = input.queryStringParameters[USER_ID_PARAM].required(USER_ID_PARAM).toLong()
-        return ok(service.get(userId).toString())
+        return ok(service.delete(userId).toString())
             .also {
-                logger.trace("User retrived: $it")
+                logger.trace("User deleted: $it")
             }
     }
 

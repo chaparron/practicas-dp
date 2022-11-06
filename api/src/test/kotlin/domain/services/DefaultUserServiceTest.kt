@@ -3,8 +3,8 @@ package domain.services
 import adapters.repositories.user.UserRepository
 import domain.model.Role
 import domain.model.User
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
@@ -59,6 +59,19 @@ internal class DefaultUserServiceTest {
         assertEquals(expected, actual)
         // Verify
         verify(repository).save(anyUser)
+    }
+
+    @Test
+    fun `Should return saved user`() {
+        // Given
+        val savedUser = anyUser
+        // When
+        whenever(repository.get(savedUser.userId)).thenReturn(savedUser)
+        val actual = sut.get(savedUser.userId)
+        // Then
+        assertEquals(savedUser, actual)
+        // Verify
+        verify(repository).get(savedUser.userId)
     }
 
 

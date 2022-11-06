@@ -1,12 +1,14 @@
 package adapters.rest
 
 import SaveUserHandler
+import SaveUserHandler.Companion.SAVE_USER_PATH
 import adapters.rest.handler.*
-import adapters.rest.handler.JpmcUpdatePaymentHandler.Companion.UPDATE_PAYMENT_PATH
 import adapters.rest.handler.CreatePaymentHandler.Companion.CREATE_PAYMENT_PATH
+import adapters.rest.handler.DeleteUserHandler.Companion.DELETE_USER_PATH
+import adapters.rest.handler.GetUserHandler.Companion.GET_USER_PATH
+import adapters.rest.handler.JpmcUpdatePaymentHandler.Companion.UPDATE_PAYMENT_PATH
 import adapters.rest.handler.PaymentProvidersHandler.Companion.PAYMENT_PROVIDERS_PATH
 import adapters.rest.handler.SupplierOrderDelayHandler.Companion.SUPPLIER_ORDER_DELAY_PATH
-import adapters.rest.handler.GetUserHandler.Companion.USER_PATH
 import configuration.Configuration
 import configuration.EnvironmentVariable
 import configuration.MainConfiguration
@@ -48,16 +50,22 @@ class DigitalPaymentsApiGateway(
             )
         )
         .get(
-            path = USER_PATH,
+            path = GET_USER_PATH,
             handler = GetUserHandler(
                 service = configuration.userService
             )
         )
         .post(
-            path = USER_PATH,
+            path = SAVE_USER_PATH,
             handler = SaveUserHandler(
                 service = configuration.userService,
                 jsonMapper = configuration.jsonMapper
+            )
+        )
+        .delete(
+            path = DELETE_USER_PATH,
+            handler = DeleteUserHandler(
+                service = configuration.userService
             )
         )
         .post(
