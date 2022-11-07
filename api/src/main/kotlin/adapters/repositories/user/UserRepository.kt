@@ -12,6 +12,7 @@ interface UserRepository {
     fun get(id: Long): User
     fun delete(id: Long)
     fun update(user: User): User
+    fun deactivate(id: Long)
 }
 
 class DynamoDBUserRepository(
@@ -93,30 +94,27 @@ class DynamoDBUserRepository(
         }
     }
 
-//    override fun save(supplier: Supplier): Supplier {
-//        return dynamoDbClient.updateItem {
-//            logger.trace("Saving Supplier $supplier")
-//            it
-//                .tableName(tableName)
-//                .key(supplier.supplierId.asDynamoKey())
-//                .updateExpression(
-//                    "SET " +
-//                            "${DynamoDBSupplierAttribute.SI.param} = :supplierId," +
-//                            "${DynamoDBSupplierAttribute.C.param} = :code," +
-//                            "${DynamoDBSupplierAttribute.N.param} = :bankAccountNumber," +
-//                            "${DynamoDBSupplierAttribute.LN.param} = :legalName"
-//                )
-//                .expressionAttributeValues(mapOf(
-//                    ":supplierId" to supplier.supplierId.toAttributeValue(),
-//                    ":code" to supplier.indianFinancialSystemCode.toAttributeValue(),
-//                    ":bankAccountNumber" to supplier.bankAccountNumber.toAttributeValue(),
-//                    ":legalName" to supplier.legalName.toAttributeValue()
-//                ))
-//        }.let {
-//            logger.trace("Saved Supplier $supplier")
-//            supplier
-//        }
-//    }
+    override fun deactivate(id: Long) {
+        val user = get(id)
+        dynamoDbClient.updateItem {
+            logger.trace("Deactivating user $user")
+            it
+                .tableName(tableName)
+                .key(id.asGetItemKey())
+                .updateExpression(
+                    "SET " + "${DynamoDBUserAttribute.A.param} = :active"
+                )
+                .expressionAttributeValues(
+                    mapOf(
+                        ":active" to false.toString().toAttributeValue()
+                    )
+                )
+        }.let {
+            logger.trace("Deactivated user $user.name")
+        }
+    }
+
+
 
     private fun Long.asGetItemKey() = mapOf(
         DynamoDBUserAttribute.PK.param to "$pkValuePrefix$this".toAttributeValue(),

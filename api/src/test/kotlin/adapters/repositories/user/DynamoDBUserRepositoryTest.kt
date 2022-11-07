@@ -102,4 +102,16 @@ internal class DynamoDBUserRepositoryTest {
         // Verify
     }
 
+    @Test
+    fun `Should return deactivated user when deactivate function is called`() {
+        // Given
+        val user = sut.save(anyUser)
+        // When
+        sut.deactivate(user.userId)
+        val actual = sut.get(user.userId)
+        // Then
+        assertEquals(false, actual.active)
+        // Verify
+    }
+
 }

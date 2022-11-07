@@ -10,6 +10,7 @@ interface UserService {
     fun get(id: Long): User
     fun delete(id: Long)
     fun update(user: User): User
+    fun deactivate(id: Long)
 }
 
 class DefaultUserService(
@@ -29,7 +30,6 @@ class DefaultUserService(
         repository.get(id)
     }
 
-
     override fun delete(id: Long) {
         logger.info("about to delete the user with id: $id")
         repository.delete(id)
@@ -38,5 +38,10 @@ class DefaultUserService(
     override fun update(user: User): User {
         logger.info("about to update the user with id: $user")
         return repository.update(user)
+    }
+
+    override fun deactivate(id: Long) {
+        logger.info("about to deactivate user with id: $id")
+        repository.deactivate(id)
     }
 }
