@@ -7,6 +7,7 @@ import configuration.MainConfiguration
 import domain.model.Role
 import domain.model.User
 import domain.services.UserService
+import kotlinx.serialization.decodeFromString
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -96,8 +97,11 @@ internal class UpdateUserHandlerTest(
     fun `Should retrieve updated user on update user`() {
         // Given
         val event = anyAPIGatewayProxyRequestEvent()
+
+        val request = jsonMapper.decodeFromString<UpdateUserHandlerRequest>(event.body)
+        val user = request.toUserRequest()
         // When
-        whenever(service.update(any())).thenReturn(updatedUser)
+        whenever(service.update(user)).thenReturn(updatedUser)
         val response = sut.handleRequest(event, context).body
         // Then
         val expected = """
@@ -105,7 +109,20 @@ internal class UpdateUserHandlerTest(
         """.trimIndent()
         assertEquals(expected, response)
         // Verify
-        verify(service).update(any())
+        verify(service).update(user)
     }
+
+    private fun UpdateUserHandlerRequest.toUserRequest() = User(
+        name,
+        userId,
+        mail,
+        country,
+        active,
+        phone,
+        role,
+        createdAt,
+        lastLogin,
+        orders
+    )
 
 }

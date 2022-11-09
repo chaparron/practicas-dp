@@ -74,5 +74,11 @@ internal class DefaultUserServiceTest {
         verify(repository).get(savedUser.userId)
     }
 
+    @Test
+    fun `Should delete user`() {
+        val savedUser = anyUser
+        sut.delete(savedUser.userId)
+        verify(repository).delete(savedUser.userId)
+    }
 
 }

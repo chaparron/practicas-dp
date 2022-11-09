@@ -32,7 +32,7 @@ class UpdateUserHandler(
                 logger.trace("User updated: $it")
             }
             .let {
-                jsonMapper.encodeToString(it)
+                jsonMapper.encodeToString(it.toUpdateUserHandlerResponse())
             }
         )
     }
@@ -50,10 +50,37 @@ class UpdateUserHandler(
         orders
     )
 
+    private fun User.toUpdateUserHandlerResponse() = UpdateUserHandlerResponse(
+        name,
+        userId,
+        mail,
+        country,
+        active,
+        phone,
+        role,
+        createdAt,
+        lastLogin,
+        orders
+    )
+
 }
 
 @Serializable
 data class UpdateUserHandlerRequest(
+    val name: String,
+    val userId: Long,
+    val mail: String,
+    val country: String,
+    val active: Boolean,
+    val phone: String,
+    val role: Role,
+    val createdAt: String,
+    val lastLogin: String,
+    val orders: List<String>
+)
+
+@Serializable
+data class UpdateUserHandlerResponse(
     val name: String,
     val userId: Long,
     val mail: String,
